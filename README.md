@@ -1,2 +1,4 @@
 # mssivimss-plan-prev-fune
-plan prevención funerario
+- CU027_ConsultarConveniosPF_SIVIMSS
+- CU029_RenovarPlanPF_SIVIMSS
+- CU071_GenerarRenovacionEx_SIVIMSS
