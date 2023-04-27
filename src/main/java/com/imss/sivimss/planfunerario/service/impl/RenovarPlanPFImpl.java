@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.imss.sivimss.planfunerario.beans.RenovarPlanPFBean;
+import com.imss.sivimss.planfunerario.model.request.FiltrosBeneficiariosRequest;
 import com.imss.sivimss.planfunerario.service.RenovarPlanPFService;
+import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.LogUtil;
 import com.imss.sivimss.planfunerario.util.ProviderServiceRestTemplate;
@@ -52,6 +54,15 @@ public class RenovarPlanPFImpl implements RenovarPlanPFService{
 	@Override
 	public Response<?> buscarBeneficiarios(DatosRequest request, Authentication authentication) throws IOException {
 		return providerRestTemplate.consumirServicio(renovarBean.beneficiarios(request).getDatos(), urlConsulta,
+				authentication);
+	}
+
+	@Override
+	public Response<?> detalleBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
+		String datosJson = String.valueOf(request.getDatos().get("datos"));
+	FiltrosBeneficiariosRequest filtros = gson.fromJson(datosJson, FiltrosBeneficiariosRequest.class);
+	log.info("convenio: " +filtros.getIdConvenioPF());
+		return providerRestTemplate.consumirServicio(renovarBean.detalleBeneficiarios(request, filtros.getIdBeneficiario(), filtros.getIdConvenioPF()).getDatos(), urlConsulta,
 				authentication);
 	}
 
