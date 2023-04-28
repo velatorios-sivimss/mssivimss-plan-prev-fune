@@ -66,6 +66,16 @@ public class RenovarPlanPFController {
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 	
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@TimeLimiter(name = "msflujo")
+	@PostMapping("modificar-beneficiario")
+	public CompletableFuture<?> modificarBeneficiario(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		Response<?> response = renovarPlan.editarBeneficiario(request,authentication); 
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
 	/**
 	 * fallbacks generico
 	 * 

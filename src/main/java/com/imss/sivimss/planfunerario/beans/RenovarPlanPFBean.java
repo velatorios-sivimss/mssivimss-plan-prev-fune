@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class RenovarPlanPFBean {
 
+	private Integer idPersona;
 	private Integer idConvenioPf;
 	private String nombre;
 	private String apellidoP;
@@ -46,6 +47,7 @@ public class RenovarPlanPFBean {
 	private Integer usuarioAlta;
 
 	public RenovarPlanPFBean(AltaBeneficiarioRequest beneficiarioRequest) {
+		this.idPersona = beneficiarioRequest.getIdPersona();
 		this.idConvenioPf = beneficiarioRequest.getIdConvenioPF();
 		this.nombre = beneficiarioRequest.getNombre();
 		this.apellidoP = beneficiarioRequest.getApellidoP();
@@ -67,7 +69,8 @@ public class RenovarPlanPFBean {
 		queryUtil.select("SB.ID_CONVENIO_PF AS idCovenio, SB.ID_BENEFICIARIO AS idBenef, "
 				+ "CONCAT(SP.NOM_PERSONA,' ', "
 				+ "SP.NOM_PRIMER_APELLIDO, ' ', "
-				+ "SP.NOM_SEGUNDO_APELLIDO) AS nombre")
+				+ "SP.NOM_SEGUNDO_APELLIDO) AS nombre, "
+				+ "SP.ID_PERSONA AS idPersona ")
 		.from("SVC_BENEFICIARIO SB")
 		.join("SVC_PERSONA SP", " SB.ID_PERSONA = SP.ID_PERSONA");
 		queryUtil.where("SB.ID_CONVENIO_PF = :idConvenio")
@@ -173,5 +176,47 @@ public class RenovarPlanPFBean {
 	        parametro.put(AppConstantes.QUERY, encoded);
 	        request.setDatos(parametro);
 	        return query;
+	}
+
+
+
+	public DatosRequest editarPersona() {
+		DatosRequest request= new DatosRequest();
+		Map<String, Object> parametro = new HashMap<>();
+		final QueryHelper q = new QueryHelper("UPDATE SVC_PERSONA ");
+		q.agregarParametroValues(" NOM_PERSONA", "'" + this.nombre + "'");
+		q.agregarParametroValues("NOM_PRIMER_APELLIDO", "'" + this.apellidoP + "'");
+		q.agregarParametroValues("NOM_SEGUNDO_APELLIDO", "'" + this.apellidoM + "'");
+		q.agregarParametroValues("FEC_NAC", "'" + this.fechaNac + "'");
+		q.agregarParametroValues("CVE_CURP", "'"+ this.curp + "'");
+		q.agregarParametroValues("CVE_RFC", "'" +this.rfc +"'");
+		q.agregarParametroValues("DES_CORREO", "'"+ this.correoE +"'");
+		q.agregarParametroValues("DES_TELEFONO", "'" + this.tel + "'");
+		q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+usuarioAlta+"");
+		q.agregarParametroValues("FEC_ACTUALIZACION", " CURRENT_TIMESTAMP() ");
+		q.addWhere("ID_PERSONA = " + this.idPersona);
+		String query = q.obtenerQueryActualizar();
+		parametro.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes()));
+		request.setDatos(parametro);
+		return request;
+	}
+
+
+
+	public DatosRequest editarBeneficiario(Integer idPersona, Integer idUsuario, Integer parentesco, String acta) {
+		 DatosRequest request = new DatosRequest();
+	        Map<String, Object> parametro = new HashMap<>();
+	        final QueryHelper q = new QueryHelper("UPDATE SVC_BENEFICIARIO");
+	        q.agregarParametroValues("ID_PARENTESCO", ""+parentesco+"");
+	        q.agregarParametroValues("CVE_ACTA", "'"+acta+"'");
+	        q.agregarParametroValues("CVE_Estatus", "1");
+	        q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+idUsuario+"" );
+			q.agregarParametroValues("FEC_ACTUALIZACION", " CURRENT_TIMESTAMP() ");
+			q.addWhere("ID_PERSONA = " + idPersona);
+	        String query = q.obtenerQueryActualizar();
+	        String encoded = DatatypeConverter.printBase64Binary(query.getBytes());
+	        parametro.put(AppConstantes.QUERY, encoded);
+	        request.setDatos(parametro);
+	        return request;
 	}
 }

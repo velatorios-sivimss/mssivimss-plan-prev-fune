@@ -47,6 +47,9 @@ public class RenovarPlanPFImpl implements RenovarPlanPFService{
 	@Value("${endpoints.dominio-crear-multiple}")
 	private String urlCrearMultiple;
 	
+	@Value("${endpoints.dominio-actualizar}")
+	private String urlActualizar;
+	
 	@Value("${endpoints.ms-reportes}")
 	private String urlReportes;
 	
@@ -82,12 +85,12 @@ public class RenovarPlanPFImpl implements RenovarPlanPFService{
 			renovarBean = new RenovarPlanPFBean(benefRequest);
 			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 			
-			if(benefRequest.getIdConvenioPF()==null) {
+			if(benefRequest.getIdConvenioPF()==null || benefRequest.getIdParentesco()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
 			}
 				response = providerRestTemplate.consumirServicio(renovarBean.insertarPersona().getDatos(), urlCrearMultiple,
 						authentication);
-				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", CONSULTA, authentication);
+				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", ALTA, authentication);
 				return response;		
 		}catch (Exception e) {
 			String consulta = renovarBean.insertarPersona().getDatos().get("query").toString();
@@ -99,6 +102,41 @@ public class RenovarPlanPFImpl implements RenovarPlanPFService{
 		
 			
 		}
+
+	@Override
+	public Response<?> editarBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
+		Response<?> response;
+		try {
+		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
+	    AltaBeneficiarioRequest benefRequest = gson.fromJson(datosJson, AltaBeneficiarioRequest.class);	
+		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+		renovarBean = new RenovarPlanPFBean(benefRequest);
+		renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
+		
+		if(benefRequest.getIdPersona()==null) {
+		throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
+		}
+			response = providerRestTemplate.consumirServicio(renovarBean.editarPersona().getDatos(), urlActualizar,
+					authentication);
+			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", MODIFICACION, authentication);
+			if(response.getCodigo()==200) {
+				providerRestTemplate.consumirServicio(renovarBean.editarBeneficiario(benefRequest.getIdPersona(), usuarioDto.getIdUsuario(),
+						benefRequest.getIdParentesco(), benefRequest.getActaNac()).getDatos(), urlActualizar,
+						authentication);
+			}else {
+				logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"FALLO AL ACTUALIZAR EL BENEFICIARIO", MODIFICACION, authentication);
+				throw new BadRequestException(HttpStatus.BAD_REQUEST, "FALLO AL ACTUALIZAR EL BENEFICIARIO ");		
+			}
+			
+			return response;		
+	}catch (Exception e) {
+		String consulta = renovarBean.editarPersona().getDatos().get("query").toString();
+		String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
+		log.error("Error al ejecutar la query" +encoded);
+		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Fallo al ejecutar la query", MODIFICACION, authentication);
+		throw new IOException("5", e.getCause()) ;
+	}
+	}
 		
 
 }
