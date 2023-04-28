@@ -2,12 +2,16 @@ package com.imss.sivimss.planfunerario.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.imss.sivimss.planfunerario.beans.RenovarPlanPFBean;
+import com.imss.sivimss.planfunerario.exception.BadRequestException;
+import com.imss.sivimss.planfunerario.model.request.AltaBeneficiarioRequest;
 import com.imss.sivimss.planfunerario.model.request.FiltrosBeneficiariosRequest;
+import com.imss.sivimss.planfunerario.model.request.UsuarioDto;
 import com.imss.sivimss.planfunerario.service.RenovarPlanPFService;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
@@ -39,7 +43,7 @@ public class RenovarPlanPFImpl implements RenovarPlanPFService{
 	private String urlPaginado;
 	
 	@Value("${endpoints.dominio-crear-multiple}")
-	private String urlInsertarMultiple;
+	private String urlCrearMultiple;
 	
 	@Value("${endpoints.ms-reportes}")
 	private String urlReportes;
@@ -64,6 +68,21 @@ public class RenovarPlanPFImpl implements RenovarPlanPFService{
 	log.info("convenio: " +filtros.getIdConvenioPF());
 		return providerRestTemplate.consumirServicio(renovarBean.detalleBeneficiarios(request, filtros.getIdBeneficiario(), filtros.getIdConvenioPF()).getDatos(), urlConsulta,
 				authentication);
+	}
+
+	@Override
+	public Response<?> crearBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
+		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
+	    AltaBeneficiarioRequest benefRequest = gson.fromJson(datosJson, AltaBeneficiarioRequest.class);	
+		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+		renovarBean = new RenovarPlanPFBean(benefRequest);
+		renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
+		
+		if(benefRequest.getIdConvenioPF()==null) {
+		throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
+		}
+			return providerRestTemplate.consumirServicio(renovarBean.insertarPersona().getDatos(), urlCrearMultiple,
+					authentication);
 	}
 
 }

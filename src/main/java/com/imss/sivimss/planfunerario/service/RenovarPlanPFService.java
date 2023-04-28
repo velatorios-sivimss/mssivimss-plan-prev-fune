@@ -13,4 +13,6 @@ public interface RenovarPlanPFService {
 
 	Response<?> detalleBeneficiario(DatosRequest request, Authentication authentication) throws IOException;
 
+	Response<?> crearBeneficiario(DatosRequest request, Authentication authentication) throws IOException;
+
 }
