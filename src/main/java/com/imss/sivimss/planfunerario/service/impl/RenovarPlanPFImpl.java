@@ -24,6 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.util.logging.Level;
 
+import javax.xml.bind.DatatypeConverter;
+
 @Slf4j
 @Service
 public class RenovarPlanPFImpl implements RenovarPlanPFService{
@@ -72,17 +74,31 @@ public class RenovarPlanPFImpl implements RenovarPlanPFService{
 
 	@Override
 	public Response<?> crearBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
-		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
-	    AltaBeneficiarioRequest benefRequest = gson.fromJson(datosJson, AltaBeneficiarioRequest.class);	
-		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-		renovarBean = new RenovarPlanPFBean(benefRequest);
-		renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
-		
-		if(benefRequest.getIdConvenioPF()==null) {
-		throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
+		Response<?> response;
+		try {
+			String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
+		    AltaBeneficiarioRequest benefRequest = gson.fromJson(datosJson, AltaBeneficiarioRequest.class);	
+			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+			renovarBean = new RenovarPlanPFBean(benefRequest);
+			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
+			
+			if(benefRequest.getIdConvenioPF()==null) {
+			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
+			}
+				response = providerRestTemplate.consumirServicio(renovarBean.insertarPersona().getDatos(), urlCrearMultiple,
+						authentication);
+				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", CONSULTA, authentication);
+				return response;		
+		}catch (Exception e) {
+			String consulta = renovarBean.insertarPersona().getDatos().get("query").toString();
+			String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
+			log.error("Error al ejecutar la query" +encoded);
+			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Fallo al ejecutar la query", CONSULTA, authentication);
+			throw new IOException("5", e.getCause()) ;
 		}
-			return providerRestTemplate.consumirServicio(renovarBean.insertarPersona().getDatos(), urlCrearMultiple,
-					authentication);
-	}
+		
+			
+		}
+		
 
 }

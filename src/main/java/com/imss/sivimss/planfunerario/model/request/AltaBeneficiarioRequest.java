@@ -21,7 +21,7 @@ public class AltaBeneficiarioRequest {
 	private String apellidoP;
 	private String apellidoM;
 	private String fechaNac;
-	private Integer IdParentesco;
+	private Integer idParentesco;
 	private String curp;
 	private String rfc;
 	private String actaNac;
