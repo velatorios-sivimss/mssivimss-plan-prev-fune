@@ -7,7 +7,7 @@ import org.springframework.security.core.Authentication;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.Response;
 
-public interface RenovarPlanPFService {
+public interface BeneficiariosService {
 
 	Response<?> buscarBeneficiarios(DatosRequest request, Authentication authentication) throws IOException;
 
@@ -15,6 +15,8 @@ public interface RenovarPlanPFService {
 
 	Response<?> crearBeneficiario(DatosRequest request, Authentication authentication) throws IOException;
 
-	Response<?> editarBeneficiario(DatosRequest request, Authentication authentication) throws IOException;;
+	Response<?> editarBeneficiario(DatosRequest request, Authentication authentication) throws IOException;
+
+	Response<?> estatusBeneficiario(DatosRequest request, Authentication authentication) throws IOException;
 
 }

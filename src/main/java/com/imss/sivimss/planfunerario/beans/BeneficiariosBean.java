@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.xml.bind.DatatypeConverter;
 
 import com.imss.sivimss.planfunerario.exception.BadRequestException;
-import com.imss.sivimss.planfunerario.model.request.AltaBeneficiarioRequest;
+import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
 import com.imss.sivimss.planfunerario.model.request.FiltrosBeneficiariosRequest;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
@@ -30,8 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 @Builder
 @Setter
 @Getter
-public class RenovarPlanPFBean {
+public class BeneficiariosBean {
 
+	private Integer idBeneficiario;
 	private Integer idPersona;
 	private Integer idConvenioPf;
 	private String nombre;
@@ -45,18 +46,20 @@ public class RenovarPlanPFBean {
 	private String correoE;
 	private String tel;
 	private Integer usuarioAlta;
+	private Integer usuarioBaja;
 
-	public RenovarPlanPFBean(AltaBeneficiarioRequest beneficiarioRequest) {
+	public BeneficiariosBean(PersonaRequest beneficiarioRequest) {
+		this.idBeneficiario = beneficiarioRequest.getIdBeneficiario();
 		this.idPersona = beneficiarioRequest.getIdPersona();
-		this.idConvenioPf = beneficiarioRequest.getIdConvenioPF();
+		this.idConvenioPf = beneficiarioRequest.getBeneficiario().getIdConvenioPF();
 		this.nombre = beneficiarioRequest.getNombre();
 		this.apellidoP = beneficiarioRequest.getApellidoP();
 		this.apellidoM = beneficiarioRequest.getApellidoM();
 		this.fechaNac = beneficiarioRequest.getFechaNac();
-		this.idParentesco = beneficiarioRequest.getIdParentesco();
+		this.idParentesco = beneficiarioRequest.getBeneficiario().getIdParentesco();
 		this.curp = beneficiarioRequest.getCurp();
 		this.rfc = beneficiarioRequest.getRfc();
-		this.actaNac = beneficiarioRequest.getActaNac();
+		this.actaNac = beneficiarioRequest.getBeneficiario().getActaNac();
 		this.correoE = beneficiarioRequest.getCorreoE();
 		this.tel = beneficiarioRequest.getTel();
 	}
@@ -113,7 +116,8 @@ public class RenovarPlanPFBean {
 				+ " SP.DES_CORREO AS correo, "
 				+ " SP.DES_TELEFONO AS tel, "
 				+ " SB.CVE_ACTA AS acta,"
-				+ " SP.ID_PERSONA AS idPersona ")
+				+ " SP.ID_PERSONA AS idPersona, "
+				+ " SB.CVE_ESTATUS AS estatus")
 		.from("SVC_BENEFICIARIO SB")
 		.join("SVC_PERSONA SP", " SB.ID_PERSONA = SP.ID_PERSONA")
 		.join("SVC_PARENTESCO PAR", "PAR.ID_PARENTESCO = SB.ID_PARENTESCO ");
@@ -213,6 +217,23 @@ public class RenovarPlanPFBean {
 	        q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+idUsuario+"" );
 			q.agregarParametroValues("FEC_ACTUALIZACION", " CURRENT_TIMESTAMP() ");
 			q.addWhere("ID_PERSONA = " + idPersona);
+	        String query = q.obtenerQueryActualizar();
+	        String encoded = DatatypeConverter.printBase64Binary(query.getBytes());
+	        parametro.put(AppConstantes.QUERY, encoded);
+	        request.setDatos(parametro);
+	        return request;
+	}
+
+
+
+	public  DatosRequest cambiarEstatus(int idBeneficiario) {
+		 DatosRequest request = new DatosRequest();
+	        Map<String, Object> parametro = new HashMap<>();
+	        final QueryHelper q = new QueryHelper("UPDATE SVC_BENEFICIARIO");
+	        q.agregarParametroValues("CVE_ESTATUS", "!CVE_ESTATUS");
+	        q.agregarParametroValues("ID_USUARIO_BAJA", ""+usuarioBaja+"" );
+			q.agregarParametroValues("FEC_BAJA", " CURRENT_TIMESTAMP() ");
+			q.addWhere("ID_BENEFICIARIO = " + idBeneficiario);
 	        String query = q.obtenerQueryActualizar();
 	        String encoded = DatatypeConverter.printBase64Binary(query.getBytes());
 	        parametro.put(AppConstantes.QUERY, encoded);

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.imss.sivimss.planfunerario.service.RenovarPlanPFService;
+import com.imss.sivimss.planfunerario.service.BeneficiariosService;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.ProviderServiceRestTemplate;
 import com.imss.sivimss.planfunerario.util.Response;
@@ -27,13 +27,13 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/")
-public class RenovarPlanPFController {
+public class BeneficiariosController {
 	
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
 	
 	@Autowired
-	private RenovarPlanPFService renovarPlan;
+	private BeneficiariosService renovarPlan;
 	
 	
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
@@ -72,6 +72,16 @@ public class RenovarPlanPFController {
 	@PostMapping("modificar-beneficiario")
 	public CompletableFuture<?> modificarBeneficiario(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
 		Response<?> response = renovarPlan.editarBeneficiario(request,authentication); 
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@TimeLimiter(name = "msflujo")
+	@PostMapping("estatus-beneficiario")
+	public CompletableFuture<?> cambiarEstatusBeneficiario(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		Response<?> response = renovarPlan.estatusBeneficiario(request,authentication); 
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}

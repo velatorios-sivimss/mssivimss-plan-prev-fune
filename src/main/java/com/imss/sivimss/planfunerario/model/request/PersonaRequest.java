@@ -1,6 +1,7 @@
 package com.imss.sivimss.planfunerario.model.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
+import com.imss.sivimss.planfunerario.model.BeneficiarioModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,19 +15,20 @@ import lombok.Setter;
 @Setter
 @Getter
 @JsonIgnoreType(value = true)
-public class AltaBeneficiarioRequest {
+public class PersonaRequest {
 
+	private Integer idBeneficiario;
 	private Integer idPersona;
-	private Integer idConvenioPF;
+	
 	private String nombre;
 	private String apellidoP;
 	private String apellidoM;
 	private String fechaNac;
-	private Integer idParentesco;
 	private String curp;
 	private String rfc;
-	private String actaNac;
 	private String correoE;
 	private String tel;
+	private BeneficiarioModel beneficiario;
+		
 	
 }
