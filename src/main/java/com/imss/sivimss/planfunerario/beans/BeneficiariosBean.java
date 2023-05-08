@@ -117,7 +117,7 @@ public class BeneficiariosBean {
 				+ " SP.DES_TELEFONO AS tel, "
 				+ " SB.CVE_ACTA AS acta,"
 				+ " SP.ID_PERSONA AS idPersona, "
-				+ " SB.CVE_ESTATUS AS estatus")
+				+ " SB.IND_ACTIVO AS estatus")
 		.from("SVC_BENEFICIARIO SB")
 		.join("SVC_PERSONA SP", " SB.ID_PERSONA = SP.ID_PERSONA")
 		.join("SVC_PARENTESCO PAR", "PAR.ID_PARENTESCO = SB.ID_PARENTESCO ");
@@ -131,12 +131,6 @@ public class BeneficiariosBean {
 	    request.setDatos(parametros);
 	    return request;
 	}
-	
-	private static String obtieneQuery(SelectQueryUtil queryUtil) {
-        return queryUtil.build();
-    }
-
-
 
 	public DatosRequest insertarPersona() {
 		DatosRequest request = new DatosRequest();
@@ -172,7 +166,7 @@ public class BeneficiariosBean {
 	        q.agregarParametroValues("ID_PERSONA", "idTabla");
 	        q.agregarParametroValues("ID_PARENTESCO", ""+parentesco+"");
 	        q.agregarParametroValues("CVE_ACTA", "'"+actaNac+"'");
-	        q.agregarParametroValues("CVE_Estatus", "1");
+	        q.agregarParametroValues("IND_ACTIVO", "1");
 	        q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"" );
 			q.agregarParametroValues("FEC_ALTA", " CURRENT_TIMESTAMP() ");
 	        String query = q.obtenerQueryInsertar();
@@ -213,7 +207,7 @@ public class BeneficiariosBean {
 	        final QueryHelper q = new QueryHelper("UPDATE SVC_BENEFICIARIO");
 	        q.agregarParametroValues("ID_PARENTESCO", ""+parentesco+"");
 	        q.agregarParametroValues("CVE_ACTA", "'"+acta+"'");
-	        q.agregarParametroValues("CVE_Estatus", "1");
+	        q.agregarParametroValues("IND_ACTIVO", "1");
 	        q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+idUsuario+"" );
 			q.agregarParametroValues("FEC_ACTUALIZACION", " CURRENT_TIMESTAMP() ");
 			q.addWhere("ID_PERSONA = " + idPersona);
@@ -230,7 +224,7 @@ public class BeneficiariosBean {
 		 DatosRequest request = new DatosRequest();
 	        Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("UPDATE SVC_BENEFICIARIO");
-	        q.agregarParametroValues("CVE_ESTATUS", "!CVE_ESTATUS");
+	        q.agregarParametroValues("IND_ACTIVO", "!IND_aCTIVO");
 	        q.agregarParametroValues("ID_USUARIO_BAJA", ""+usuarioBaja+"" );
 			q.agregarParametroValues("FEC_BAJA", " CURRENT_TIMESTAMP() ");
 			q.addWhere("ID_BENEFICIARIO = " + idBeneficiario);
@@ -240,4 +234,9 @@ public class BeneficiariosBean {
 	        request.setDatos(parametro);
 	        return request;
 	}
+	
+	private static String obtieneQuery(SelectQueryUtil queryUtil) {
+        return queryUtil.build();
+    }
+
 }

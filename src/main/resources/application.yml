@@ -30,11 +30,7 @@ logos:
   msit_logo_sistema: /sivimss_data/LOGOS/logoSistema.png
 
 endpoints:
-   dominio-consulta: http://localhost:8090/mssivimss-mod-catalogos/generico/consulta
-   dominio-consulta-paginado: http://localhost:8090/mssivimss-mod-catalogos/generico/paginado
-   dominio-crear: http://localhost:8090/mssivimss-mod-catalogos/generico/crear
-   dominio-crear-multiple: http://localhost:8090/mssivimss-mod-catalogos/generico/crearMultiple
-   dominio-actualizar: http://localhost:8090/mssivimss-mod-catalogos/generico/actualizar
+   dominio-consulta: http://localhost:8090/mssivimss-mod-catalogos/v1/
    ms-reportes: http://localhost:8088/mssivimss-reportes-jpr/generales/generar-reporte
 
 jwt:
@@ -75,4 +71,4 @@ resilience4j.timelimiter:
         
         
 formato_fecha: '%d/%m/%Y'
-ruta-log: 'C:/Users/ruta/Documents/logs/'
+ruta-log: 'C:/logs/'

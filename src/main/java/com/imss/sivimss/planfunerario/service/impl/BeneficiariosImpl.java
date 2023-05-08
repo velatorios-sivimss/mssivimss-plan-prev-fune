@@ -41,18 +41,12 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	@Value("${endpoints.dominio-consulta}")
 	private String urlConsulta;
 	
-	@Value("${endpoints.dominio-consulta-paginado}")
-	private String urlPaginado;
-	
-	@Value("${endpoints.dominio-crear-multiple}")
-	private String urlCrearMultiple;
-	
-	@Value("${endpoints.dominio-actualizar}")
-	private String urlActualizar;
-	
 	@Value("${endpoints.ms-reportes}")
 	private String urlReportes;
 	
+	 private static final String PATH_CONSULTA="generico/consulta";
+	 private static final String PATH_ACTUALIZAR="generico/actualizar";
+	 
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
 	
@@ -62,7 +56,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 
 	@Override
 	public Response<?> buscarBeneficiarios(DatosRequest request, Authentication authentication) throws IOException {
-		return providerRestTemplate.consumirServicio(renovarBean.beneficiarios(request).getDatos(), urlConsulta,
+		return providerRestTemplate.consumirServicio(renovarBean.beneficiarios(request).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 	}
 
@@ -71,7 +65,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 	FiltrosBeneficiariosRequest filtros = gson.fromJson(datosJson, FiltrosBeneficiariosRequest.class);
 	log.info("convenio: " +filtros.getIdConvenioPF());
-		return providerRestTemplate.consumirServicio(renovarBean.detalleBeneficiarios(request, filtros.getIdBeneficiario(), filtros.getIdConvenioPF()).getDatos(), urlConsulta,
+		return providerRestTemplate.consumirServicio(renovarBean.detalleBeneficiarios(request, filtros.getIdBeneficiario(), filtros.getIdConvenioPF()).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 	}
 
@@ -88,7 +82,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 			if(benefRequest.getBeneficiario().getIdConvenioPF()==null || benefRequest.getBeneficiario().getIdParentesco()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
 			}
-				response = providerRestTemplate.consumirServicio(renovarBean.insertarPersona().getDatos(), urlCrearMultiple,
+				response = providerRestTemplate.consumirServicio(renovarBean.insertarPersona().getDatos(), urlConsulta + "/generico/crearMultiple",
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", ALTA, authentication);
 				return response;		
@@ -116,12 +110,12 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		if(benefRequest.getIdPersona()==null) {
 		throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
 		}
-			response = providerRestTemplate.consumirServicio(renovarBean.editarPersona().getDatos(), urlActualizar,
+			response = providerRestTemplate.consumirServicio(renovarBean.editarPersona().getDatos(), urlConsulta + PATH_ACTUALIZAR,
 					authentication);
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", MODIFICACION, authentication);
 			if(response.getCodigo()==200) {
 				providerRestTemplate.consumirServicio(renovarBean.editarBeneficiario(benefRequest.getIdPersona(), usuarioDto.getIdUsuario(),
-						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getActaNac()).getDatos(), urlActualizar,
+						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getActaNac()).getDatos(), urlConsulta + PATH_ACTUALIZAR,
 						authentication);
 			}else {
 				String consulta = renovarBean.editarBeneficiario(benefRequest.getIdPersona(), usuarioDto.getIdUsuario(),
@@ -148,7 +142,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		renovarBean.setUsuarioBaja(usuarioDto.getIdUsuario());
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 	  PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
-	  Response<?> response = providerRestTemplate.consumirServicio(renovarBean.cambiarEstatus(benefRequest.getIdBeneficiario()).getDatos(), urlActualizar,
+	  Response<?> response = providerRestTemplate.consumirServicio(renovarBean.cambiarEstatus(benefRequest.getIdBeneficiario()).getDatos(), urlConsulta +PATH_ACTUALIZAR,
 				authentication);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", BAJA, authentication);
 	return response;
