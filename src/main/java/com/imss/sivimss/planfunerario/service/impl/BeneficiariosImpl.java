@@ -52,11 +52,11 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	
 	Gson gson = new Gson();
 	
-	BeneficiariosBean renovarBean = new BeneficiariosBean();
+	BeneficiariosBean benefBean = new BeneficiariosBean();
 
 	@Override
 	public Response<?> buscarBeneficiarios(DatosRequest request, Authentication authentication) throws IOException {
-		return providerRestTemplate.consumirServicio(renovarBean.beneficiarios(request).getDatos(), urlConsulta + PATH_CONSULTA,
+		return providerRestTemplate.consumirServicio(benefBean.beneficiarios(request).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 	}
 
@@ -65,7 +65,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 	FiltrosBeneficiariosRequest filtros = gson.fromJson(datosJson, FiltrosBeneficiariosRequest.class);
 	log.info("convenio: " +filtros.getIdConvenioPF());
-		return providerRestTemplate.consumirServicio(renovarBean.detalleBeneficiarios(request, filtros.getIdBeneficiario(), filtros.getIdConvenioPF()).getDatos(), urlConsulta + PATH_CONSULTA,
+		return providerRestTemplate.consumirServicio(benefBean.detalleBeneficiarios(request, filtros.getIdBeneficiario(), filtros.getIdConvenioPF()).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 	}
 
@@ -76,18 +76,18 @@ public class BeneficiariosImpl implements BeneficiariosService{
 			String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		    PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-			renovarBean = new BeneficiariosBean(benefRequest);
-			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
+			benefBean = new BeneficiariosBean(benefRequest);
+			benefBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 			
 			if(benefRequest.getBeneficiario().getIdConvenioPF()==null || benefRequest.getBeneficiario().getIdParentesco()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
 			}
-				response = providerRestTemplate.consumirServicio(renovarBean.insertarPersona().getDatos(), urlConsulta + "/generico/crearMultiple",
+				response = providerRestTemplate.consumirServicio(benefBean.insertarPersona().getDatos(), urlConsulta + "/generico/crearMultiple",
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", ALTA, authentication);
 				return response;		
 		}catch (Exception e) {
-			String consulta = renovarBean.insertarPersona().getDatos().get("query").toString();
+			String consulta = benefBean.insertarPersona().getDatos().get("query").toString();
 			String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error("Error al ejecutar la query" +encoded);
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Fallo al ejecutar la query", CONSULTA, authentication);
@@ -104,21 +104,21 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 	    PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-		renovarBean = new BeneficiariosBean(benefRequest);
-		renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
+		benefBean = new BeneficiariosBean(benefRequest);
+		benefBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 		
 		if(benefRequest.getIdPersona()==null) {
 		throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
 		}
-			response = providerRestTemplate.consumirServicio(renovarBean.editarPersona().getDatos(), urlConsulta + PATH_ACTUALIZAR,
+			response = providerRestTemplate.consumirServicio(benefBean.editarPersona().getDatos(), urlConsulta + PATH_ACTUALIZAR,
 					authentication);
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", MODIFICACION, authentication);
 			if(response.getCodigo()==200) {
-				providerRestTemplate.consumirServicio(renovarBean.editarBeneficiario(benefRequest.getIdPersona(), usuarioDto.getIdUsuario(),
+				providerRestTemplate.consumirServicio(benefBean.editarBeneficiario(benefRequest.getIdPersona(), usuarioDto.getIdUsuario(),
 						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getActaNac()).getDatos(), urlConsulta + PATH_ACTUALIZAR,
 						authentication);
 			}else {
-				String consulta = renovarBean.editarBeneficiario(benefRequest.getIdPersona(), usuarioDto.getIdUsuario(),
+				String consulta = benefBean.editarBeneficiario(benefRequest.getIdPersona(), usuarioDto.getIdUsuario(),
 						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getActaNac()).getDatos().get("query").toString();
 				String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 				log.error("Error al ejecutar la query" +encoded);
@@ -128,7 +128,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 			
 			return response;		
 	}catch (Exception e) {
-		String consulta = renovarBean.editarPersona().getDatos().get("query").toString();
+		String consulta = benefBean.editarPersona().getDatos().get("query").toString();
 		String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 		log.error("Error al ejecutar la query" +encoded);
 		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Fallo al ejecutar la query", MODIFICACION, authentication);
@@ -139,10 +139,10 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	@Override
 	public Response<?> estatusBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-		renovarBean.setUsuarioBaja(usuarioDto.getIdUsuario());
+		benefBean.setUsuarioBaja(usuarioDto.getIdUsuario());
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 	  PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
-	  Response<?> response = providerRestTemplate.consumirServicio(renovarBean.cambiarEstatus(benefRequest.getIdBeneficiario()).getDatos(), urlConsulta +PATH_ACTUALIZAR,
+	  Response<?> response = providerRestTemplate.consumirServicio(benefBean.cambiarEstatus(benefRequest.getIdBeneficiario()).getDatos(), urlConsulta +PATH_ACTUALIZAR,
 				authentication);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", BAJA, authentication);
 	return response;
