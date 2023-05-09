@@ -55,12 +55,15 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
 		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarNuevo(request, filtros).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
-	      if(response.getDatos().toString().equals("{}")){
+		Object rst = response.getDatos();
+	      if(rst.toString().equals("[]")){
 	    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda", CONSULTA, authentication);
 	    		response.setMensaje("45");
 	    		return response;
+		}else {
+			return response;
 		}
-		return response;
+		
 	}
 	
 	public Response<?> buscarConvenioAnterior(DatosRequest request, Authentication authentication) throws IOException {
@@ -68,7 +71,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
 		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarAnterior(request, filtros).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
-	      if(response.getDatos().toString().equals("{}")){
+	      if(response.getDatos().toString().equals("[]")){
 	    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda", CONSULTA, authentication);
 	    		response.setMensaje("45");
 	    		return response;
