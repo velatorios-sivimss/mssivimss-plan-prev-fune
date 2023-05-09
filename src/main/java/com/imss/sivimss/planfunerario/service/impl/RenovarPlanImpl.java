@@ -5,11 +5,13 @@ import java.util.logging.Level;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.imss.sivimss.planfunerario.beans.RenovarBean;
+import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.FiltrosBeneficiariosRequest;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
 import com.imss.sivimss.planfunerario.service.RenovarPlanService;
@@ -69,6 +71,9 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	public Response<?> buscarConvenioAnterior(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
+		if(filtros.getNumeroContratante()==null && filtros.getNumeroConvenio()==null) {
+			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
+		}
 		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarAnterior(request, filtros).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 	      if(response.getDatos().toString().equals("[]")){
