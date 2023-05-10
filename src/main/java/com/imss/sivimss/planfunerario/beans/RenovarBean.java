@@ -58,22 +58,22 @@ public class RenovarBean {
 			queryUtil.where("SP.CVE_RFC = :cveRfc")
 			.setParameter("cveRfc", filtros.getRfc());
 		}else if(filtros.getFolio()==null && filtros.getRfc()==null && filtros.getNumIne()!=null) {
-			queryUtil.where("'FALTA INE' = :numIne")
+			queryUtil.where("SP.NUM_INE = :numIne")
 			.setParameter("numIne", filtros.getNumIne());
 		}else if(filtros.getFolio()!=null && filtros.getRfc()!=null && filtros.getNumIne()==null) {
 			queryUtil.where("SCP.DES_FOLIO  = :desFolio").and("SP.CVE_RFC = :cveRfc")
 			.setParameter("desFolio", filtros.getFolio())
 			.setParameter("cveRfc", filtros.getRfc());
 		}else if(filtros.getFolio()!=null && filtros.getRfc()==null && filtros.getNumIne()!=null) {
-			queryUtil.where("SCP.DES_FOLIO  = :desFolio").and("'FALTA INE' = :numIne")
+			queryUtil.where("SCP.DES_FOLIO  = :desFolio").and("SP.NUM_INE = :numIne")
 			.setParameter("desFolio", filtros.getFolio())
 			.setParameter("numIne", filtros.getNumIne());
 		}else if(filtros.getFolio()==null && filtros.getRfc()!=null && filtros.getNumIne()!=null) {
-			queryUtil.where("SP.CVE_RFC = :cveRfc").and("'FALTA INE' = :numIne")
+			queryUtil.where("SP.CVE_RFC = :cveRfc").and("SP.NUM_INE = :numIne")
 			.setParameter("cveRfc", filtros.getRfc())
 			.setParameter("numIne", filtros.getNumIne());
 		}else if(filtros.getFolio()!=null && filtros.getRfc()!=null && filtros.getNumIne()!=null) {
-			queryUtil.where("SCP.DES_FOLIO = :desFolio").and("SP.CVE_RFC = :cveRfc").and("'FALTA INE' = :numIne")
+			queryUtil.where("SCP.DES_FOLIO = :desFolio").and("SP.CVE_RFC = :cveRfc").and("SP.NUM_INE = :numIne")
 			.setParameter("desFolio", filtros.getFolio())
 			.setParameter("cveRfc", filtros.getRfc())
 			.setParameter("numIne", filtros.getNumIne());

@@ -55,6 +55,9 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	public Response<?> buscarConvenioNuevo(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
+		if(filtros.getFolio()==null && filtros.getRfc()==null && filtros.getNumIne()==null) {
+			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
+		}
 		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarNuevo(request, filtros).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 		Object rst = response.getDatos();
