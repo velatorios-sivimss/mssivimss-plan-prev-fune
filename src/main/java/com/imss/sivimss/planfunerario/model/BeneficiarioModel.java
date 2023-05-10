@@ -17,7 +17,7 @@ import lombok.Setter;
 @JsonIgnoreType(value = true)
 public class BeneficiarioModel {
 	
-	private Integer idConvenioPF;
+	private Integer idContratanteConvenioPf;
 	private Integer idParentesco;
 	private String actaNac;
 

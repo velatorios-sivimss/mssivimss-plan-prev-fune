@@ -34,7 +34,7 @@ public class BeneficiariosBean {
 
 	private Integer idBeneficiario;
 	private Integer idPersona;
-	private Integer idConvenioPf;
+	private Integer idContratanteConvenioPf;
 	private String nombre;
 	private String apellidoP;
 	private String apellidoM;
@@ -51,7 +51,7 @@ public class BeneficiariosBean {
 	public BeneficiariosBean(PersonaRequest beneficiarioRequest) {
 		this.idBeneficiario = beneficiarioRequest.getIdBeneficiario();
 		this.idPersona = beneficiarioRequest.getIdPersona();
-		this.idConvenioPf = beneficiarioRequest.getBeneficiario().getIdConvenioPF();
+		this.idContratanteConvenioPf = beneficiarioRequest.getBeneficiario().getIdContratanteConvenioPf();
 		this.nombre = beneficiarioRequest.getNombre();
 		this.apellidoP = beneficiarioRequest.getApellidoP();
 		this.apellidoM = beneficiarioRequest.getApellidoM();
@@ -69,14 +69,15 @@ public class BeneficiariosBean {
 	public DatosRequest beneficiarios(DatosRequest request) {
 		String palabra = request.getDatos().get("palabra").toString();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("SB.ID_CONVENIO_PF AS idCovenio, SB.ID_CONTRATANTE_BENEFICIARIOS AS idBenef, "
-				+ "CONCAT(SP.NOM_PERSONA,' ', "
-				+ "SP.NOM_PRIMER_APELLIDO, ' ', "
-				+ "SP.NOM_SEGUNDO_APELLIDO) AS nombre, "
-				+ "SP.ID_PERSONA AS idPersona ")
+		queryUtil.select("SCPC.ID_CONVENIO_PF AS idCovenio, SB.ID_CONTRATANTE_BENEFICIARIOS AS idBenef",
+				"CONCAT(SP.NOM_PERSONA,' '",
+				"SP.NOM_PRIMER_APELLIDO, ' '",
+				"SP.NOM_SEGUNDO_APELLIDO) AS nombre",
+				"SP.ID_PERSONA AS idPersona ")
 		.from("SVT_CONTRATANTE_BENEFICIARIOS SB")
+		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
 		.join("SVC_PERSONA SP", " SB.ID_PERSONA = SP.ID_PERSONA");
-		queryUtil.where("SB.ID_CONVENIO_PF = :idConvenio")
+		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio")
 		.setParameter("idConvenio", Integer.parseInt(palabra));
 		String query = obtieneQuery(queryUtil);
 		log.info("estoy en: " +query);
@@ -105,23 +106,24 @@ public class BeneficiariosBean {
 
 	public DatosRequest detalleBeneficiarios(DatosRequest request, Integer idBeneficiario, Integer idConvenio) {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("SB.ID_CONVENIO_PF AS idCovenio, SB.ID_CONTRATANTE_BENEFICIARIOS AS idBenef, "
-				+ "SP.NOM_PERSONA AS nombre , "
-				+ "SP.NOM_PRIMER_APELLIDO AS primerApellido, "
-				+ "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido, "
-				+ " TIMESTAMPDIFF(YEAR, SP.FEC_nac, CURRENT_TIMESTAMP()) AS edad,"
-				+ " PAR.DES_PARENTESCO AS parentesco, "
-				+ " SP.CVE_CURP AS curp, "
-				+ " SP.CVE_RFC AS rfc, "
-				+ " SP.DES_CORREO AS correo, "
-				+ " SP.DES_TELEFONO AS tel, "
-				+ " SB.CVE_ACTA AS acta,"
-				+ " SP.ID_PERSONA AS idPersona, "
-				+ " SB.IND_ACTIVO AS estatus")
+		queryUtil.select("SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF AS idCovenio, SB.ID_CONTRATANTE_BENEFICIARIOS AS idBenef",
+				 "SP.NOM_PERSONA AS nombre",
+				 "SP.NOM_PRIMER_APELLIDO AS primerApellido",
+				 "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
+				 " TIMESTAMPDIFF(YEAR, SP.FEC_nac, CURRENT_TIMESTAMP()) AS edad",
+			    " PAR.DES_PARENTESCO AS parentesco",
+				 " SP.CVE_CURP AS curp",
+				 " SP.CVE_RFC AS rfc",
+				 " SP.DES_CORREO AS correo",
+				 " SP.DES_TELEFONO AS tel",
+				 " SB.CVE_ACTA AS acta",
+				 " SP.ID_PERSONA AS idPersona",
+				 " SB.IND_ACTIVO AS estatus")
 		.from("SVT_CONTRATANTE_BENEFICIARIOS SB")
+		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
 		.join("SVC_PERSONA SP", " SB.ID_PERSONA = SP.ID_PERSONA")
 		.join("SVC_PARENTESCO PAR", "PAR.ID_PARENTESCO = SB.ID_PARENTESCO ");
-		queryUtil.where("SB.ID_CONVENIO_PF = :idConvenio").and("SB.ID_CONTRATANTE_BENEFICIARIOS = :idBeneficiario")
+		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio").and("SB.ID_CONTRATANTE_BENEFICIARIOS = :idBeneficiario")
 		.setParameter("idConvenio", idConvenio)
 		.setParameter("idBeneficiario", idBeneficiario);
 		String query = obtieneQuery(queryUtil);
@@ -146,7 +148,7 @@ public class BeneficiariosBean {
 		q.agregarParametroValues("DES_TELEFONO", "'" + this.tel + "'");
 		q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"");
 		q.agregarParametroValues("FEC_ALTA", " CURRENT_TIMESTAMP() ");
-		String query = q.obtenerQueryInsertar() +"$$"  + insertarBeneficiario(this.idConvenioPf, this.idParentesco, this.actaNac);
+		String query = q.obtenerQueryInsertar() +"$$"  + insertarBeneficiario(this.idContratanteConvenioPf, this.idParentesco, this.actaNac);
 			  String encoded = DatatypeConverter.printBase64Binary(query.getBytes());
 		        parametro.put(AppConstantes.QUERY, encoded);
 		        parametro.put("separador","$$");
@@ -158,11 +160,11 @@ public class BeneficiariosBean {
 
 
 
-	private String insertarBeneficiario(Integer idConvenioPf, Integer parentesco, String actaNac) {
+	private String insertarBeneficiario(Integer idContratanteConvenioPf, Integer parentesco, String actaNac) {
 		 DatosRequest request = new DatosRequest();
 	        Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("INSERT INTO SVT_CONTRATANTE_BENEFICIARIOS");
-	        q.agregarParametroValues("ID_CONVENIO_PF", ""+idConvenioPf+"");
+	        q.agregarParametroValues("ID_CONTRATANTE_PAQUETE_CONVENIO_PF", ""+idContratanteConvenioPf+"");
 	        q.agregarParametroValues("ID_PERSONA", "idTabla");
 	        q.agregarParametroValues("ID_PARENTESCO", ""+parentesco+"");
 	        q.agregarParametroValues("CVE_ACTA", "'"+actaNac+"'");

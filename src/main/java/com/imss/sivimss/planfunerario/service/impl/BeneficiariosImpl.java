@@ -79,7 +79,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 			benefBean = new BeneficiariosBean(benefRequest);
 			benefBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 			
-			if(benefRequest.getBeneficiario().getIdConvenioPF()==null || benefRequest.getBeneficiario().getIdParentesco()==null) {
+			if(benefRequest.getBeneficiario().getIdContratanteConvenioPf()==null || benefRequest.getBeneficiario().getIdParentesco()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
 			}
 				response = providerRestTemplate.consumirServicio(benefBean.insertarPersona().getDatos(), urlConsulta + "/generico/crearMultiple",

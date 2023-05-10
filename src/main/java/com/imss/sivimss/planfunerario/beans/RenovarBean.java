@@ -28,12 +28,12 @@ public class RenovarBean {
 				 "CASE "
 				+ "WHEN PAQ.ID_PAQUETE = 7 THEN 'BASICO' "
 				+ "WHEN PAQ.ID_PAQUETE = 8 THEN 'ECONOMICO' "
-				+ "WHEN PAQ.ID_PAQUETE =9 THEN 'BASICO CON CREMACION'"
+				+ "WHEN PAQ.ID_PAQUETE = 9 THEN 'BASICO CON CREMACION'"
 				+ "ELSE 'DESCONOCIDO'"
 				+ "END AS tipoPaquete",
 				 "SCP.ID_ESTATUS_CONVENIO AS estatusConvenio",
-				 "SCP.FEC_INICIO AS fechaInicio",
-				 "SCP.FEC_VIGENCIA AS fechaVigencia",
+				 "DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y') AS fechaInicio",
+				 "DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y') AS fechaVigencia",
 				 "SD.DES_CALLE AS calle",
 				 "SD.NUM_EXTERIOR AS numExt",
 				 "SD.NUM_INTERIOR AS numInt",
@@ -104,8 +104,8 @@ public class RenovarBean {
 				+ "ELSE 'DESCONOCIDO'"
 				+ "END AS tipoPaquete",
 				 "SCP.ID_ESTATUS_CONVENIO AS estatusConvenio",
-				 "SCP.FEC_INICIO AS fechaInicio",
-				 "SCP.FEC_VIGENCIA AS fechaVigencia",
+				 "DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y') AS fechaInicio",
+				 "DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y') AS fechaVigencia",
 				 "SD.DES_CALLE AS calle",
 				 "SD.NUM_EXTERIOR AS numExt",
 				 "SD.NUM_INTERIOR AS numInt",
