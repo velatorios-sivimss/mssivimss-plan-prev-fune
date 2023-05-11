@@ -18,6 +18,7 @@ public class RenovarBean {
 	public DatosRequest buscarNuevo(DatosRequest request, FiltrosConvenioPFRequest filtros) {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SCP.DES_FOLIO AS folio",
+				"SCP.ID_CONVENIO_PF AS convenioPF",
 				 "SP.CVE_RFC AS rfc",
 				 "SC.CVE_MATRICULA AS matricula",
 				 "SP.NOM_PERSONA AS nombre",
@@ -41,7 +42,16 @@ public class RenovarBean {
 				 "CP.DES_ESTADO AS estado",
 				 "CP.DES_MNPIO AS municipio",
 				 "SP.DES_TELEFONO AS telefono",
-				 "SP.DES_CORREO AS correo")
+				 "SP.DES_CORREO AS correo",
+				 " PAQ.MON_COSTO_REFERENCIA AS costoRenovacion",
+				 "(SELECT "
+				 +"GROUP_CONCAT(CONCAT(PC.NOM_PERSONA, ' ', "
+				 +"PC.NOM_PRIMER_APELLIDO, ' ', "
+				 + "PC.NOM_SEGUNDO_APELLIDO)) "
+				  +"FROM svt_contratante_beneficiarios SCB "
+				 +"JOIN svt_contratante_paquete_convenio_pf BENEF ON SCB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF=BENEF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF "
+				 + "JOIN svc_persona PC ON SCB.ID_PERSONA = PC.ID_PERSONA "
+				 + "WHERE BENEF.ID_CONVENIO_PF=SCP.ID_CONVENIO_PF  ) AS beneficiario ")
 		.from("SVT_CONVENIO_PF SCP")
 		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
@@ -113,7 +123,16 @@ public class RenovarBean {
 				 "CP.DES_ESTADO AS estado",
 				 "CP.DES_MNPIO AS municipio",
 				 "SP.DES_TELEFONO AS telefono",
-				 "SP.DES_CORREO AS correo")
+				 "SP.DES_CORREO AS correo",
+		 " PAQ.MON_COSTO_REFERENCIA AS costoRenovacion",
+		 "(SELECT "
+		 +"GROUP_CONCAT(CONCAT(PC.NOM_PERSONA, ' ', "
+		 +"PC.NOM_PRIMER_APELLIDO, ' ', "
+		 + "PC.NOM_SEGUNDO_APELLIDO)) "
+		  +"FROM svt_contratante_beneficiarios SCB "
+		 +"JOIN svt_contratante_paquete_convenio_pf BENEF ON SCB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF=BENEF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF "
+		 + "JOIN svc_persona PC ON SCB.ID_PERSONA = PC.ID_PERSONA "
+		 + "WHERE BENEF.ID_CONVENIO_PF= " +filtros.getNumeroConvenio()+") AS beneficiario ")
 		.from("SVT_CONVENIO_PF SCP")
 		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
@@ -121,7 +140,7 @@ public class RenovarBean {
 		.join("SVT_DOMICILIO SD", "SC.ID_DOMICILIO = SD.ID_DOMICILIO ")
 		.join("SVC_CP CP", "SD.ID_CP = CP.ID_CODIGO_POSTAL")
 		.join("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA");
-		queryUtil.where("SCP.ID_TIPO_PREVISION = 0");
+		queryUtil.where("SCP.ID_TIPO_PREVISION = 2");
 		if(filtros.getNumeroConvenio()!=null && filtros.getNumeroContratante()==null) {
 			queryUtil.where("SCP.ID_CONVENIO_PF = :idConvenio")
 			.setParameter("idConvenio", filtros.getNumeroConvenio());
