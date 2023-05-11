@@ -181,4 +181,18 @@ public class RenovarBean {
 			return request;
 	}
 
+	public DatosRequest validarVigencia(String folio) {
+		DatosRequest request= new DatosRequest();
+		Map<String, Object> parametro = new HashMap<>();
+			String query = "SELECT "
+					+ "TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA) AS dif "
+					+ "FROM svt_convenio_pf PF "
+					+ "WHERE PF.DES_FOLIO = '"+folio +"' ";
+			String encoded=DatatypeConverter.printBase64Binary(query.getBytes());
+			log.info("validar "+query);
+			parametro.put(AppConstantes.QUERY, encoded);
+			request.setDatos(parametro);
+			return request;
+	}
+
 }
