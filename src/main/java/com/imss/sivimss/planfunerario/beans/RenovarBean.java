@@ -185,7 +185,7 @@ public class RenovarBean {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 			String query = "SELECT "
-					+ "TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA) AS dif "
+					+ "IF(TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA)>=20, PF.FEC_VIGENCIA, NULL) AS vigencia "
 					+ "FROM svt_convenio_pf PF "
 					+ "WHERE PF.DES_FOLIO = '"+folio +"' ";
 			String encoded=DatatypeConverter.printBase64Binary(query.getBytes());

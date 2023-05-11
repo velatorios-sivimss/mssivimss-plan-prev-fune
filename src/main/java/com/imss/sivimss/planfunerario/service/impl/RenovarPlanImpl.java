@@ -112,10 +112,9 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private boolean validarVigenciaCto(String folio, Authentication authentication) throws IOException {
 		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarVigencia(folio).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
-		
 	Object rst=response.getDatos();
 	log.info("-> " +rst.toString());
-	return !rst.toString().equals("[]");
+	return !rst.toString().equals("[null]");
 	}
 	
 }
