@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
+import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
@@ -164,5 +165,20 @@ public class RenovarBean {
 	private static String obtieneQuery(SelectQueryUtil queryUtil) {
         return queryUtil.build();
     }
+
+	public DatosRequest validarFallecido(String rfc) {
+		DatosRequest request= new DatosRequest();
+		Map<String, Object> parametro = new HashMap<>();
+			String query = "SELECT SP.CVE_RFC, "
+					+ "SP.NOM_PERSONA "
+					+ "FROM svc_finado SF "
+					+ "JOIN svc_persona SP ON SP.ID_PERSONA = SF.ID_PERSONA "
+					+ "WHERE SP.CVE_RFC =  '"+rfc +"' ";
+			String encoded=DatatypeConverter.printBase64Binary(query.getBytes());
+			log.info("validar "+query);
+			parametro.put(AppConstantes.QUERY, encoded);
+			request.setDatos(parametro);
+			return request;
+	}
 
 }
