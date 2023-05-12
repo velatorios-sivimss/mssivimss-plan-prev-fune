@@ -185,9 +185,37 @@ public class RenovarBean {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 			String query = "SELECT "
-					+ "IF(TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA)>=20, PF.FEC_VIGENCIA, NULL) AS vigencia "
-					+ "FROM svt_convenio_pf PF "
-					+ "WHERE PF.DES_FOLIO = '"+folio +"' ";
+					+ " PF.FEC_VIGENCIA "
+					+ "FROM SVT_CONVENIO_PF PF "
+					+ "WHERE IF(TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA)>=20, PF.FEC_VIGENCIA, 0) AND PF.DES_FOLIO = '"+folio +"' ";
+			String encoded=DatatypeConverter.printBase64Binary(query.getBytes());
+			log.info("validar "+query);
+			parametro.put(AppConstantes.QUERY, encoded);
+			request.setDatos(parametro);
+			return request;
+	}
+
+	public DatosRequest validaVigCtoAnterior(Integer numConvenio) {
+		DatosRequest request= new DatosRequest();
+		Map<String, Object> parametro = new HashMap<>();
+			String query = "SELECT "
+					+ " PF.FEC_VIGENCIA "
+					+ "FROM SVT_CONVENIO_PF PF "
+					+ "WHERE IF(TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA)>=20, PF.FEC_VIGENCIA, 0) AND PF.ID_CONVENIO_PF = "+numConvenio +" ";
+			String encoded=DatatypeConverter.printBase64Binary(query.getBytes());
+			log.info("validar "+query);
+			parametro.put(AppConstantes.QUERY, encoded);
+			request.setDatos(parametro);
+			return request;
+	}
+
+	public DatosRequest validarFallecido(Integer numContratante) {
+		DatosRequest request= new DatosRequest();
+		Map<String, Object> parametro = new HashMap<>();
+			String query = "SELECT SF.ID_PERSONA "
+					+ "FROM svc_finado SF "
+					+ "JOIN svc_contratante SC ON SF.ID_PERSONA = SC.ID_PERSONA "
+					+ "WHERE SC.ID_CONTRATANTE=  '"+numContratante +"' ";
 			String encoded=DatatypeConverter.printBase64Binary(query.getBytes());
 			log.info("validar "+query);
 			parametro.put(AppConstantes.QUERY, encoded);
