@@ -11,6 +11,8 @@ public interface RenovarPlanService {
 
 	Response<?> buscarConvenioNuevo(DatosRequest request, Authentication authentication) throws IOException;
 
-	Response<?> buscarConvenioAnterior(DatosRequest request, Authentication authentication)  throws IOException;
+	Response<?> buscarConvenioAnterior(DatosRequest request, Authentication authentication) throws IOException;
+
+	Response<?> renovarConvenio(DatosRequest request, Authentication authentication)throws IOException;
 
 }

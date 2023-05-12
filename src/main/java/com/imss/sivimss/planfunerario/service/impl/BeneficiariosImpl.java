@@ -84,12 +84,12 @@ public class BeneficiariosImpl implements BeneficiariosService{
 			}
 				response = providerRestTemplate.consumirServicio(benefBean.insertarPersona().getDatos(), urlConsulta + "/generico/crearMultiple",
 						authentication);
-				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", ALTA, authentication);
+				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
 				return response;		
 		}catch (Exception e) {
 			String consulta = benefBean.insertarPersona().getDatos().get("query").toString();
 			String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
-			log.error("Error al ejecutar la query" +encoded);
+			log.error("Error al ejecutar la query " +encoded);
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Fallo al ejecutar la query", CONSULTA, authentication);
 			throw new IOException("5", e.getCause()) ;
 		}

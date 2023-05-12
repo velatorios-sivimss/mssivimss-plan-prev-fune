@@ -3,6 +3,8 @@ package com.imss.sivimss.planfunerario.service.impl;
 import java.io.IOException;
 import java.util.logging.Level;
 
+import javax.xml.bind.DatatypeConverter;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,10 +13,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
+import com.imss.sivimss.planfunerario.beans.BeneficiariosBean;
 import com.imss.sivimss.planfunerario.beans.RenovarBean;
 import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
+import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
+import com.imss.sivimss.planfunerario.model.request.RenovarPlanPFRequest;
+import com.imss.sivimss.planfunerario.model.request.UsuarioDto;
 import com.imss.sivimss.planfunerario.service.RenovarPlanService;
+import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.LogUtil;
 import com.imss.sivimss.planfunerario.util.ProviderServiceRestTemplate;
@@ -65,7 +72,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 					authentication);
 			Object rst = response.getDatos();
 		      if(rst.toString().equals("[]")){
-		    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda", CONSULTA, authentication);
+		    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getFolio(), CONSULTA, authentication);
 		    		response.setMensaje("45");
 		      }else {
 		    	  if(!validarVigenciaCto(filtros.getFolio(), authentication)) {
@@ -94,7 +101,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarAnterior(request, filtros).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 	      if(response.getDatos().toString().equals("[]")){
-	    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda", CONSULTA, authentication);
+	    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getNumeroConvenio(), CONSULTA, authentication);
 	    		response.setMensaje("45");
 	      }else {
 			    	  if(!validarVigenciaCtoAnterior(filtros.getNumeroConvenio(), authentication)) {
@@ -112,6 +119,30 @@ public class RenovarPlanImpl implements RenovarPlanService {
 					}
 		}
 		return response;
+	}
+	
+	@Override
+	public Response<?> renovarConvenio(DatosRequest request, Authentication authentication) throws IOException {
+		Response<?> response;
+		try {
+			String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
+		    RenovarPlanPFRequest renovarRequest = gson.fromJson(datosJson, RenovarPlanPFRequest .class);	
+			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+			renovarBean = new RenovarBean(renovarRequest);
+			renovarBean.setUsuarioModifica(usuarioDto.getIdUsuario());
+			
+				response = providerRestTemplate.consumirServicio(renovarBean.renovarPlan().getDatos(), urlConsulta + PATH_ACTUALIZAR,
+						authentication);
+				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", MODIFICACION, authentication);
+				
+					return response;						
+		}catch (Exception e) {
+			String consulta = renovarBean.renovarPlan().getDatos().get("query").toString();
+			String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
+			log.error("Error al ejecutar la query " +encoded);
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Fallo al ejecutar la query", MODIFICACION, authentication);
+			throw new IOException("5", e.getCause()) ;
+		}
 	}
 
 	private boolean validarFallecidoCtoAnterior(Integer numContratante, Authentication authentication) throws IOException {
@@ -143,5 +174,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	log.info("-> " +rst.toString());
 	return !rst.toString().equals("[]");
 	}
+
+	
 	
 }

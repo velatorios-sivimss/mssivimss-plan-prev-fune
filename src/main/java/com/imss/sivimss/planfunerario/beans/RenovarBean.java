@@ -7,14 +7,36 @@ import javax.xml.bind.DatatypeConverter;
 
 import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
+import com.imss.sivimss.planfunerario.model.request.RenovarPlanPFRequest;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
+import com.imss.sivimss.planfunerario.util.QueryHelper;
 import com.imss.sivimss.planfunerario.util.SelectQueryUtil;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Setter
+@Getter
 public class RenovarBean {
+	
+	private String datosBancarios;
+	private Integer idConvenioPf;
+	private Integer usuarioModifica;
+	
+	public RenovarBean(RenovarPlanPFRequest renovarRequest) {
+		this.datosBancarios = renovarRequest.getDatosBancarios();
+		this.idConvenioPf = renovarRequest.getIdConvenioPf();
+	}
+
 
 	public DatosRequest buscarNuevo(DatosRequest request, FiltrosConvenioPFRequest filtros) {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
@@ -221,6 +243,23 @@ public class RenovarBean {
 			parametro.put(AppConstantes.QUERY, encoded);
 			request.setDatos(parametro);
 			return request;
+	}
+
+
+	public DatosRequest renovarPlan() {
+		DatosRequest request= new DatosRequest();
+		Map<String, Object> parametro = new HashMap<>();
+		final QueryHelper q = new QueryHelper("UPDATE SVT_CONVENIO_PF");
+		q.agregarParametroValues("DATOS_BANCARIOS", "'" + this.datosBancarios + "'");
+		q.agregarParametroValues("FEC_VIGENCIA", "DATE_ADD(FEC_VIGENCIA, INTERVAL 365 DAY)");
+		q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+usuarioModifica+"");
+		q.agregarParametroValues("FEC_ACTUALIZACION", " CURRENT_TIMESTAMP() ");
+		q.addWhere("ID_CONVENIO_PF = " + this.idConvenioPf);
+		String query = q.obtenerQueryActualizar();
+		log.info("renovar -> "+query);
+		parametro.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes()));
+		request.setDatos(parametro);
+		return request;
 	}
 
 }
