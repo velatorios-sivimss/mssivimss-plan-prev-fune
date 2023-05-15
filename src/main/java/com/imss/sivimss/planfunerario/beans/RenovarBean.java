@@ -203,15 +203,21 @@ public class RenovarBean {
 			return request;
 	}
 
-	public DatosRequest validarVigencia(String folio) {
+	public DatosRequest validarPeriodo(String folio, Integer idConvenio) {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
-			String query = "SELECT "
-					+ " PF.FEC_VIGENCIA "
-					+ "FROM SVT_CONVENIO_PF PF "
-					+ "WHERE IF(TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA)>=20, PF.FEC_VIGENCIA, 0) AND PF.DES_FOLIO = '"+folio +"' ";
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("PF.FEC_VIGENCIA")
+		.from("SVT_CONVENIO_PF PF");
+		queryUtil.where("IF(TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA)>=20, PF.FEC_VIGENCIA, 0)");
+		if(folio!=null) {
+			queryUtil.where("PF.DES_FOLIO = '"+folio +"' ");
+		}else {
+			queryUtil.where("PF.ID_CONVENIO_PF = "+idConvenio +" ");
+		}
+		String query = obtieneQuery(queryUtil);
 			String encoded=DatatypeConverter.printBase64Binary(query.getBytes());
-			log.info("validar "+query);
+			log.info("validar -> "+query);
 			parametro.put(AppConstantes.QUERY, encoded);
 			request.setDatos(parametro);
 			return request;
@@ -255,6 +261,37 @@ public class RenovarBean {
 		q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+usuarioModifica+"");
 		q.agregarParametroValues("FEC_ACTUALIZACION", " CURRENT_TIMESTAMP() ");
 		q.addWhere("ID_CONVENIO_PF = " + this.idConvenioPf);
+		String query = q.obtenerQueryActualizar();
+		log.info("renovar -> "+query);
+		parametro.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes()));
+		request.setDatos(parametro);
+		return request;
+	}
+
+
+	public DatosRequest validarVigencia(String folio) {
+		DatosRequest request= new DatosRequest();
+		Map<String, Object> parametro = new HashMap<>();
+			String query = "SELECT "
+					+ " PF.FEC_VIGENCIA "
+					+ "FROM SVT_CONVENIO_PF PF "
+					+ "WHERE IF(TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA)>=0, PF.FEC_VIGENCIA, 0) AND PF.DES_FOLIO = '"+folio +"' ";
+			String encoded=DatatypeConverter.printBase64Binary(query.getBytes());
+			log.info("validar "+query);
+			parametro.put(AppConstantes.QUERY, encoded);
+			request.setDatos(parametro);
+			return request;
+	}
+
+
+	public DatosRequest cambiarEstatusPlan(String folio, Integer id) {
+		DatosRequest request= new DatosRequest();
+		Map<String, Object> parametro = new HashMap<>();
+		final QueryHelper q = new QueryHelper("UPDATE SVT_CONVENIO_PF");
+		q.agregarParametroValues("ID_ESTATUS_CONVENIO", "3");
+		q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+id+"");
+		q.agregarParametroValues("FEC_ACTUALIZACION", " CURRENT_TIMESTAMP() ");
+		q.addWhere("DES_FOLIO = '"+folio+"'");
 		String query = q.obtenerQueryActualizar();
 		log.info("renovar -> "+query);
 		parametro.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes()));
