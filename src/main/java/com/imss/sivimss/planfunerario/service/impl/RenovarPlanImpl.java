@@ -120,15 +120,18 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			    		  if(!validarFallecidoCtoAnterior(filtros.getNumeroContratante(),filtros.getNumeroConvenio(), authentication)) {
 			    		return response;
 			    		}else {
+			    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A CERRADO", MODIFICACION, authentication);
+			    			 providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusACerrado(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlConsulta + PATH_ACTUALIZAR,
+					 					authentication);
 			    			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
-			    			response.setMensaje("39");
 			    			throw new BadRequestException(HttpStatus.BAD_REQUEST, "TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO");
 			    		}
 			    		}else {
-			    			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 EL CONVENIO SE ENCUENTRA INACTIVO", CONSULTA, authentication);
-			    			 providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlanAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlConsulta + PATH_CONSULTA,
+			    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
+			    			 providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlanAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlConsulta + PATH_ACTUALIZAR,
 					 					authentication);
-			    			throw new BadRequestException(HttpStatus.BAD_REQUEST, "EL CONVENIO SE ENCUENTRA INACTIVO"); 
+			    			 logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 EL CONVENIO SE ENCUENTRA INACTIVO", CONSULTA, authentication);
+			    			 throw new BadRequestException(HttpStatus.BAD_REQUEST, "EL CONVENIO SE ENCUENTRA INACTIVO"); 
 			    		}
 			    	  }else {
 			  			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);

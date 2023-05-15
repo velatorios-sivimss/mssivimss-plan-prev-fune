@@ -76,9 +76,9 @@ public class RenovarBean {
 				 + "JOIN svc_persona PC ON SCB.ID_PERSONA = PC.ID_PERSONA "
 				 + "WHERE BENEF.ID_CONVENIO_PF=SCP.ID_CONVENIO_PF  ) AS beneficiario ")
 		.from("SVT_CONVENIO_PF SCP")
-		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
+		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC ", "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
-		.join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
+		.join("SVC_CONTRATANTE SC ", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE ")
 		.join("SVT_DOMICILIO SD", "SC.ID_DOMICILIO = SD.ID_DOMICILIO ")
 		.join("SVC_CP CP", "SD.ID_CP = CP.ID_CODIGO_POSTAL")
 		.join("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA");
@@ -344,6 +344,33 @@ public class RenovarBean {
 			query = "UPDATE SVT_CONVENIO_PF SC "
 					+ "JOIN SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC ON SC.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF "
 					+ "SET SC.ID_ESTATUS_CONVENIO = 3,"
+					+ "SC.ID_USUARIO_MODIFICA= " +idUsuario+ " ,"
+							+ "SC.FEC_ACTUALIZACION= CURRENT_TIMESTAMP() "
+					+ " WHERE SCPC.ID_CONTRATANTE ="  +idContratante+ "";
+		}
+		log.info("renovar -> "+query);
+		parametro.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes()));
+		request.setDatos(parametro);
+		return request;
+	}
+
+
+	public DatosRequest cambiarEstatusACerrado(Integer idContratante, Integer idConvenio,
+			Integer idUsuario) {
+		DatosRequest request= new DatosRequest();
+		Map<String, Object> parametro = new HashMap<>();
+		String query;
+		if(idConvenio!=null) {
+			final QueryHelper q = new QueryHelper("UPDATE SVT_CONVENIO_PF");
+			q.agregarParametroValues("ID_ESTATUS_CONVENIO", "4");
+			q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+idUsuario+"");
+			q.agregarParametroValues("FEC_ACTUALIZACION", " CURRENT_TIMESTAMP() ");
+			q.addWhere("ID_CONVENIO_PF = "+idConvenio+"");
+			query = q.obtenerQueryActualizar();
+		}else {
+			query = "UPDATE SVT_CONVENIO_PF SC "
+					+ "JOIN SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC ON SC.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF "
+					+ "SET SC.ID_ESTATUS_CONVENIO = 4,"
 					+ "SC.ID_USUARIO_MODIFICA= " +idUsuario+ " ,"
 							+ "SC.FEC_ACTUALIZACION= CURRENT_TIMESTAMP() "
 					+ " WHERE SCPC.ID_CONTRATANTE ="  +idContratante+ "";
