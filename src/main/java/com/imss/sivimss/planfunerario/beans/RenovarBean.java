@@ -245,13 +245,20 @@ public class RenovarBean {
 			return request;
 	}
 
-	public DatosRequest validarFallecido(Integer numContratante) {
+	public DatosRequest validarFallecido(Integer idContratante, Integer idConvenio) {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
-			String query = "SELECT SF.ID_PERSONA "
-					+ "FROM svc_finado SF "
-					+ "JOIN svc_contratante SC ON SF.ID_PERSONA = SC.ID_PERSONA "
-					+ "WHERE SC.ID_CONTRATANTE=  '"+numContratante +"' ";
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("SF.ID_PERSONA")
+		.from("SVC_FINADO SF")
+		.join("SVC_CONTRATANTE SC", "SF.ID_PERSONA = SC.ID_PERSONA")
+		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SC.ID_CONTRATANTE = SCPC.ID_CONTRATANTE");
+		if(idContratante!=null) {
+			queryUtil.where("SC.ID_CONTRATANTE= " +idContratante +"");
+		}else {
+			queryUtil.where("SCPC.ID_CONVENIO_PF =" +idConvenio +"");
+		}
+		String query = obtieneQuery(queryUtil);
 			String encoded=DatatypeConverter.printBase64Binary(query.getBytes());
 			log.info("validar "+query);
 			parametro.put(AppConstantes.QUERY, encoded);

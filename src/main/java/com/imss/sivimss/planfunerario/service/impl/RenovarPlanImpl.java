@@ -115,7 +115,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	    		response.setMensaje("45");
 	      }else {
 			    	  if(!validarPeriodoCtoAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), authentication)) {
-			    		if(!validarFallecidoCtoAnterior(filtros.getNumeroContratante(), authentication)) {
+			    		if(!validarFallecidoCtoAnterior(filtros.getNumeroContratante(),filtros.getNumeroConvenio(), authentication)) {
 			    		return response;
 			    		}else {
 			    			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
@@ -155,8 +155,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		}
 	}
 
-	private boolean validarFallecidoCtoAnterior(Integer numContratante, Authentication authentication) throws IOException {
-		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarFallecido(numContratante).getDatos(), urlConsulta + PATH_CONSULTA,
+	private boolean validarFallecidoCtoAnterior(Integer numContratante, Integer numConvenio, Authentication authentication) throws IOException {
+		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarFallecido(numContratante, numConvenio).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 	Object rst=response.getDatos();
 	return !rst.toString().equals("[]");
