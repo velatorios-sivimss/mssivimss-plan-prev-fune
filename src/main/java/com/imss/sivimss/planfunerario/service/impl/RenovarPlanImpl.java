@@ -73,8 +73,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getFolio(), CONSULTA, authentication);
 		    		response.setMensaje("45");
 		      }else {
-		    	  if(!validarPeriodoRenovacion(filtros.getFolio(),filtros.getNumeroConvenio(), authentication)) {
-		    		  if(validarVigencia(filtros.getFolio(), authentication)) {
+		    	  if(!validarPeriodoRenovacion(filtros, authentication)) {
+		    		  if(validarVigencia(filtros, authentication)) {
 		    		if(!validarFallecido(filtros.getRfc(), authentication)) {
 		    		
 		    		return response;
@@ -105,16 +105,16 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	public Response<?> buscarConvenioAnterior(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
-		if(filtros.getNumeroContratante()==null && filtros.getNumeroConvenio()==null) {
-			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
-		}
+	//	if(filtros.getNumeroContratante()==null && filtros.getNumeroConvenio()==null) {
+		//	throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
+	//	}
 		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarAnterior(request, filtros).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 	      if(response.getDatos().toString().equals("[]")){
 	    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getNumeroConvenio(), CONSULTA, authentication);
 	    		response.setMensaje("45");
 	      }else {
-			    	  if(!validarPeriodoRenovacion(filtros.getFolio(), filtros.getNumeroConvenio(), authentication)) {
+			    	  if(!validarPeriodoCtoAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), authentication)) {
 			    		if(!validarFallecidoCtoAnterior(filtros.getNumeroContratante(), authentication)) {
 			    		return response;
 			    		}else {
@@ -162,8 +162,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	return !rst.toString().equals("[]");
 	}
 
-	private boolean validarVigenciaCtoAnterior(Integer numConvenio, Authentication authentication) throws IOException {
-		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validaVigCtoAnterior(numConvenio).getDatos(), urlConsulta + PATH_CONSULTA,
+	private boolean validarPeriodoCtoAnterior(Integer numContratante, Integer numConvenio, Authentication authentication) throws IOException {
+		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validaPeriodoCtoAnterior(numContratante, numConvenio).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 	Object rst=response.getDatos();
 	log.info("-> " +rst.toString());
@@ -177,16 +177,16 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	return !rst.toString().equals("[]");
 	}
 	
-	private boolean validarPeriodoRenovacion(String folio, Integer id, Authentication authentication) throws IOException {
-		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarPeriodo(folio, id).getDatos(), urlConsulta + PATH_CONSULTA,
+	private boolean validarPeriodoRenovacion(FiltrosConvenioPFRequest filtros, Authentication authentication) throws IOException {
+		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarPeriodo(filtros).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 	Object rst=response.getDatos();
 	log.info("-> " +rst.toString());
 	return !rst.toString().equals("[]");
 	}
 
-	private boolean validarVigencia(String folio, Authentication authentication) throws IOException {
-		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarVigencia(folio).getDatos(), urlConsulta + PATH_CONSULTA,
+	private boolean validarVigencia(FiltrosConvenioPFRequest filtros, Authentication authentication) throws IOException {
+		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarVigencia(filtros).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 	Object rst=response.getDatos();
 	log.info("-> " +rst.toString());

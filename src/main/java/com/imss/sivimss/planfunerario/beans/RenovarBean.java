@@ -203,17 +203,17 @@ public class RenovarBean {
 			return request;
 	}
 
-	public DatosRequest validarPeriodo(String folio, Integer idConvenio) {
+	public DatosRequest validarPeriodo(FiltrosConvenioPFRequest filtros) {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("PF.FEC_VIGENCIA")
 		.from("SVT_CONVENIO_PF PF");
 		queryUtil.where("IF(TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA)>=20, PF.FEC_VIGENCIA, 0)");
-		if(folio!=null) {
-			queryUtil.where("PF.DES_FOLIO = '"+folio +"' ");
+		if(filtros.getFolio()!=null) {
+			queryUtil.where("PF.DES_FOLIO = '"+filtros.getFolio() +"' ");
 		}else {
-			queryUtil.where("PF.ID_CONVENIO_PF = "+idConvenio +" ");
+			queryUtil.where("PF.ID_CONVENIO_PF = "+filtros.getNumIne() +" ");
 		}
 		String query = obtieneQuery(queryUtil);
 			String encoded=DatatypeConverter.printBase64Binary(query.getBytes());
@@ -223,15 +223,23 @@ public class RenovarBean {
 			return request;
 	}
 
-	public DatosRequest validaVigCtoAnterior(Integer numConvenio) {
+	public DatosRequest validaPeriodoCtoAnterior(Integer idContratante, Integer idConvenio) {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
-			String query = "SELECT "
-					+ " PF.FEC_VIGENCIA "
-					+ "FROM SVT_CONVENIO_PF PF "
-					+ "WHERE IF(TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA)>=20, PF.FEC_VIGENCIA, 0) AND PF.ID_CONVENIO_PF = "+numConvenio +" ";
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("PF.FEC_VIGENCIA")
+		.from("SVT_CONVENIO_PF PF")
+		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "PF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
+		.join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE");
+		queryUtil.where("IF(TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA)>=20, PF.FEC_VIGENCIA, 0)");
+		if(idConvenio!=null) {
+			queryUtil.where("PF.ID_CONVENIO_PF = "+idConvenio +"");
+		}else {
+			queryUtil.where("SC.ID_CONTRATANTE = "+idContratante +"");
+		}
+		String query = obtieneQuery(queryUtil);
 			String encoded=DatatypeConverter.printBase64Binary(query.getBytes());
-			log.info("validar "+query);
+			log.info("validar -> "+query);
 			parametro.put(AppConstantes.QUERY, encoded);
 			request.setDatos(parametro);
 			return request;
@@ -269,13 +277,19 @@ public class RenovarBean {
 	}
 
 
-	public DatosRequest validarVigencia(String folio) {
+	public DatosRequest validarVigencia(FiltrosConvenioPFRequest filtros) {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
-			String query = "SELECT "
-					+ " PF.FEC_VIGENCIA "
-					+ "FROM SVT_CONVENIO_PF PF "
-					+ "WHERE IF(TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA)>=0, PF.FEC_VIGENCIA, 0) AND PF.DES_FOLIO = '"+folio +"' ";
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("PF.FEC_VIGENCIA")
+		.from("SVT_CONVENIO_PF PF");
+		queryUtil.where("IF(TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA)>=0, PF.FEC_VIGENCIA, 0)");
+		if(filtros.getFolio()!=null) {
+			queryUtil.where("PF.DES_FOLIO = '"+filtros.getFolio() +"'");
+		}else {
+			queryUtil.where("PF.ID_CONVENIO_PF = "+filtros.getNumIne()+"");
+		}
+		String query = obtieneQuery(queryUtil);
 			String encoded=DatatypeConverter.printBase64Binary(query.getBytes());
 			log.info("validar "+query);
 			parametro.put(AppConstantes.QUERY, encoded);
