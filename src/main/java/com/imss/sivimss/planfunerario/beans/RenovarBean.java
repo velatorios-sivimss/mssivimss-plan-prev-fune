@@ -207,13 +207,18 @@ public class RenovarBean {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("PF.FEC_VIGENCIA")
-		.from("SVT_CONVENIO_PF PF");
-		queryUtil.where("IF(TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA)>=20, PF.FEC_VIGENCIA, 0)");
+		queryUtil.select("SPF.FEC_VIGENCIA ")
+		.from("SVT_CONVENIO_PF SPF")
+		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SPF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
+		.join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
+		.join("SVC_PERSONA SP", "SC.ID_PERSONA=SP.ID_PERSONA");
+		queryUtil.where("IF(TIMESTAMPDIFF(DAY, CURDATE(), SPF.FEC_VIGENCIA)>=20, SPF.FEC_VIGENCIA, 0)");
 		if(filtros.getFolio()!=null) {
-			queryUtil.where("PF.DES_FOLIO = '"+filtros.getFolio() +"' ");
-		}else {
-			queryUtil.where("PF.ID_CONVENIO_PF = "+filtros.getNumIne() +" ");
+			queryUtil.where("SPF.DES_FOLIO = '"+filtros.getFolio() +"'");
+		}else if(filtros.getNumIne()!=null && filtros.getFolio()==null){
+			queryUtil.where("SP.NUM_INE = '"+filtros.getNumIne() +"' ");
+		}else if(filtros.getRfc()!=null && filtros.getFolio()==null) {
+			queryUtil.where("SP.CVE_RFC = '"+filtros.getRfc() +"' ");
 		}
 		String query = obtieneQuery(queryUtil);
 			String encoded=DatatypeConverter.printBase64Binary(query.getBytes());
