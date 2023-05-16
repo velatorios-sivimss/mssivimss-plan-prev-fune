@@ -84,7 +84,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		  				  			throw new BadRequestException(HttpStatus.BAD_REQUEST, "EL CONVENIO SE ENCUENTRA INACTIVO");
 		    		    }
 		    		    	
-		    		if(validarFallecido(filtros.getRfc(), authentication)) {
+		    		if(validarFallecido(filtros, authentication)) {
 		    			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
 		    			throw new BadRequestException(HttpStatus.BAD_REQUEST, "TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO");
 		    		  }
@@ -173,8 +173,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	return !rst.toString().equals("[]");
 	}
 
-	private boolean validarFallecido(String rfc, Authentication authentication) throws IOException {	
-		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarFallecido(rfc).getDatos(), urlConsulta + PATH_CONSULTA,
+	private boolean validarFallecido(FiltrosConvenioPFRequest filtros, Authentication authentication) throws IOException {	
+		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarFallecido(filtros).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 	Object rst=response.getDatos();
 	return !rst.toString().equals("[]");

@@ -188,16 +188,27 @@ public class RenovarBean {
         return queryUtil.build();
     }
 
-	public DatosRequest validarFallecido(String rfc) {
+	public DatosRequest validarFallecido(FiltrosConvenioPFRequest filtros) {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
-			String query = "SELECT SP.CVE_RFC, "
-					+ "SP.NOM_PERSONA "
-					+ "FROM svc_finado SF "
-					+ "JOIN svc_persona SP ON SP.ID_PERSONA = SF.ID_PERSONA "
-					+ "WHERE SP.CVE_RFC =  '"+rfc +"' ";
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("SP.CVE_RFC",
+				"SP.NOM_PERSONA")
+		.from("SVC_FINADO SF")
+		.join("SVC_PERSONA SP", "SF.ID_PERSONA = SP.ID_PERSONA")
+		.join("SVC_CONTRATANTE SC", "SP.ID_PERSONA = SC.ID_PERSONA")
+		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SC.ID_CONTRATANTE = SCPC.ID_CONTRATANTE")
+		.join("SVT_CONVENIO_PF PF", "SCPC.ID_CONVENIO_PF = PF.ID_CONVENIO_PF");
+		if(filtros.getNumIne()!= null) {
+			queryUtil.where("SP.NUM_INE= '"+filtros.getNumIne()+"'");
+		}else if(filtros.getRfc()!=null) {
+			queryUtil.where("SP.CVE_RFC = '"+filtros.getRfc()+"'");
+		}else if(filtros.getFolio()!=null && filtros.getRfc()==null || filtros.getNumIne()==null) {
+			queryUtil.where("PF.DES_FOLIO= '"+filtros.getFolio()+"'");
+		}
+			String query = obtieneQuery(queryUtil);
 			String encoded=DatatypeConverter.printBase64Binary(query.getBytes());
-			log.info("validar "+query);
+			log.info("validar ->"+query);
 			parametro.put(AppConstantes.QUERY, encoded);
 			request.setDatos(parametro);
 			return request;
