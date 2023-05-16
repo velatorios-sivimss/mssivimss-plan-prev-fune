@@ -19,4 +19,6 @@ public interface BeneficiariosService {
 
 	Response<?> estatusBeneficiario(DatosRequest request, Authentication authentication) throws IOException;
 
+	Response<?> buscarBeneficiariosPlanAnterior(DatosRequest request, Authentication authentication)throws IOException;
+
 }

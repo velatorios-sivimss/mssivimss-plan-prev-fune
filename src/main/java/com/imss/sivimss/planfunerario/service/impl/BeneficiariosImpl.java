@@ -147,6 +147,13 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", BAJA, authentication);
 	return response;
 	}
+
+	@Override
+	public Response<?> buscarBeneficiariosPlanAnterior(DatosRequest request, Authentication authentication)
+			throws IOException {
+		return providerRestTemplate.consumirServicio(benefBean.beneficiariosPlanAnterior(request).getDatos(), urlConsulta + PATH_CONSULTA,
+				authentication);
+	}
 		
 
 }

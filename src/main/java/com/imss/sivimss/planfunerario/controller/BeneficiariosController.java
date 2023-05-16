@@ -60,6 +60,19 @@ public class BeneficiariosController {
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
+	@PostMapping("buscar-beneficiarios-plan-anterior")
+	public CompletableFuture<?> buscarBeneficiariosPlanAnterior(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Buscar Beneficiarios", CONSULTA, authentication);
+		Response<?> response = benefService.buscarBeneficiariosPlanAnterior(request,authentication); 
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	
+	
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@TimeLimiter(name = "msflujo")
 	@PostMapping("detalle-beneficiario")
 	public CompletableFuture<?> buscarDetalleBeneficiario(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DetalleBeneficiarios", CONSULTA, authentication);

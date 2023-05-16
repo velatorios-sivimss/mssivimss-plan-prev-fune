@@ -237,6 +237,40 @@ public class BeneficiariosBean {
 	        return request;
 	}
 	
+	public DatosRequest beneficiariosPlanAnterior(DatosRequest request) {
+		String palabra = request.getDatos().get("palabra").toString();
+		String query = "SELECT SCPC.ID_CONVENIO_PF AS idCovenio, SB.ID_CONTRATANTE_BENEFICIARIOS AS idBenef, "
+				+ "CONCAT(SP.NOM_PERSONA,' ', "
+				+ "SP.NOM_PRIMER_APELLIDO, ' ', "
+				+ "SP.NOM_SEGUNDO_APELLIDO) AS nombre, "
+				+ "SP.ID_PERSONA AS idPersona "
+				+ "FROM SVT_CONTRATANTE_BENEFICIARIOS SB "
+				+ "JOIN SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC ON SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF "
+				+ "JOIN SVT_CONVENIO_PF PF ON SCPC.ID_CONVENIO_PF = PF.ID_CONVENIO_PF "
+				+ "JOIN SVC_PERSONA SP ON SB.ID_PERSONA = SP.ID_PERSONA "
+				+ "WHERE PF.ID_TIPO_PREVISION=2 AND SB.ID_PARENTESCO !=4 "
+				+ "AND PF.ID_CONVENIO_PF= '"+palabra+"' "
+						+ "UNION "
+						+ "SELECT SCPC.ID_CONVENIO_PF AS idCovenio, SB.ID_CONTRATANTE_BENEFICIARIOS AS idBenef, "
+						+ "CONCAT(SP.NOM_PERSONA,' ', "
+						+ "SP.NOM_PRIMER_APELLIDO, ' ', "
+						+ "SP.NOM_SEGUNDO_APELLIDO) AS nombre, "
+						+ "SP.ID_PERSONA AS idPersona "
+						+ "FROM SVT_CONTRATANTE_BENEFICIARIOS SB "
+						+ "JOIN SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC ON SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF "
+						+ "JOIN SVT_CONVENIO_PF PF ON SCPC.ID_CONVENIO_PF = PF.ID_CONVENIO_PF "
+						+ "JOIN SVC_PERSONA SP ON SB.ID_PERSONA = SP.ID_PERSONA "
+						+ "WHERE PF.ID_CONVENIO_PF= '"+palabra+"' AND PF.ID_TIPO_PREVISION=2 "
+								+ "AND (IF(SB.ID_PARENTESCO=4 AND TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURDATE())<18, SB.ID_PARENTESCO, NULL)) "
+								+ "OR (SB.ID_PARENTESCO=4 AND SB.CVE_ACTA IS NOT NULL "
+								+ "AND TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURDATE()) BETWEEN 18 AND 25) ";
+		log.info("estoy en: " +query);
+		Map<String, Object> parametros = new HashMap<>();
+	    parametros.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes()));
+	    request.setDatos(parametros);
+	    return request;
+	}
+	
 	private static String obtieneQuery(SelectQueryUtil queryUtil) {
         return queryUtil.build();
     }
