@@ -73,10 +73,12 @@ public class BeneficiariosBean {
 				"CONCAT(SP.NOM_PERSONA,' '",
 				"SP.NOM_PRIMER_APELLIDO, ' '",
 				"SP.NOM_SEGUNDO_APELLIDO) AS nombre",
-				"SP.ID_PERSONA AS idPersona ")
+				"SP.ID_PERSONA AS idPersona")
 		.from("SVT_CONTRATANTE_BENEFICIARIOS SB")
 		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
-		.join("SVC_PERSONA SP", " SB.ID_PERSONA = SP.ID_PERSONA");
+		.join("SVC_PERSONA SP", " SB.ID_PERSONA = SP.ID_PERSONA")
+		.join("SVT_CONVENIO_PF PF", "SCPC.ID_CONVENIO_PF = PF.ID_CONVENIO_PF");
+		queryUtil.where("PF.ID_TIPO_PREVISION= 1");
 		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio")
 		.setParameter("idConvenio", Integer.parseInt(palabra));
 		String query = obtieneQuery(queryUtil);
