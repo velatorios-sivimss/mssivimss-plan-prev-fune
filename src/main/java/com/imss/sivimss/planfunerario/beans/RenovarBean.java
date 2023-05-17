@@ -32,6 +32,7 @@ public class RenovarBean {
 	private Integer idConvenioPf;
 	private Integer usuarioAlta;
 	private String vigencia;
+	private String folioAdenda;
 	
 	public RenovarBean(RenovarPlanPFRequest renovarRequest) {
 		this.datosBancarios = renovarRequest.getDatosBancarios();
@@ -291,6 +292,7 @@ public class RenovarBean {
 		final QueryHelper q = new QueryHelper("INSERT INTO SVT_RENOVACION_CONVENIO_PF");
 		q.agregarParametroValues("ID_CONVENIO_PF", "" + this.idConvenioPf+ "");
 		q.agregarParametroValues("FEC_INICIO", "'" + this.vigencia + "'");
+		q.agregarParametroValues("DES_FOLIO_ADENDA", "'" + folioAdenda + "'");
 		q.agregarParametroValues("DES_DATOS_BANCARIOS", "'" + this.datosBancarios + "'");
 		q.agregarParametroValues("FEC_VIGENCIA", "DATE_ADD('"+ this.vigencia +"', INTERVAL 365 DAY)");
 		q.agregarParametroValues("IND_ESTATUS", "1");

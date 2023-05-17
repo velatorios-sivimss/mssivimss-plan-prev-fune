@@ -134,16 +134,16 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	@Override
 	public Response<?> renovarConvenio(DatosRequest request, Authentication authentication) throws IOException {
 		Response<?> response;
-		Integer folio=000001;
 		try {
 			String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		    RenovarPlanPFRequest renovarRequest = gson.fromJson(datosJson, RenovarPlanPFRequest .class);	
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 			renovarBean = new RenovarBean(renovarRequest);
 			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
-			String velatorio= renovarRequest.getVelatorio().substring(0,3).toUpperCase()+"-";
-		    Integer renovacion=00+1;
-		    String folioAdenda = velatorio + folio.toString()+"-"+renovacion;
+			String velatorio= renovarRequest.getVelatorio().substring(0,3).toUpperCase();
+		    Integer renovacion=1;
+		 String folioAdenda=buildFolio(velatorio, renovacion);
+		 renovarBean.setFolioAdenda(folioAdenda);
 		    log.info("->" +folioAdenda);
 			
 				response = providerRestTemplate.consumirServicio(renovarBean.renovarPlan().getDatos(), urlConsulta + PATH_CREAR,
@@ -162,6 +162,14 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			throw new IOException("5", e.getCause()) ;
 		}
 	}
+
+	private String buildFolio(String velatorio, Integer renovacion) {
+		String formatearConvenioCeros = String.format("%06d", renovacion);
+		String formatearnumConvenio = String.format("%02d", renovacion);
+		return velatorio +"-"+formatearConvenioCeros+"-"+formatearnumConvenio;
+	}
+
+
 
 	private boolean validarFallecidoCtoAnterior(Integer numContratante, Integer numConvenio, Authentication authentication) throws IOException {
 		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarFallecido(numContratante, numConvenio).getDatos(), urlConsulta + PATH_CONSULTA,
