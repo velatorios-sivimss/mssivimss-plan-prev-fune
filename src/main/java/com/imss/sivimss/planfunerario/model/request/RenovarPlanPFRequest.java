@@ -19,5 +19,7 @@ public class RenovarPlanPFRequest {
 	
 	private String datosBancarios;
 	private Integer idConvenioPf;
+	private String velatorio;
+	private String vigencia;
 
 }

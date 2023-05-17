@@ -51,6 +51,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private String urlReportes;
 	
 	 private static final String PATH_CONSULTA="generico/consulta";
+	 private static final String PATH_CREAR="generico/crear";
 	 private static final String PATH_ACTUALIZAR="generico/actualizar";
 	 
 	@Autowired
@@ -133,23 +134,31 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	@Override
 	public Response<?> renovarConvenio(DatosRequest request, Authentication authentication) throws IOException {
 		Response<?> response;
+		Integer folio=000001;
 		try {
 			String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		    RenovarPlanPFRequest renovarRequest = gson.fromJson(datosJson, RenovarPlanPFRequest .class);	
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 			renovarBean = new RenovarBean(renovarRequest);
-			renovarBean.setUsuarioModifica(usuarioDto.getIdUsuario());
+			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
+			String velatorio= renovarRequest.getVelatorio().substring(0,3).toUpperCase()+"-";
+		    Integer renovacion=00+1;
+		    String folioAdenda = velatorio + folio.toString()+"-"+renovacion;
+		    log.info("->" +folioAdenda);
 			
-				response = providerRestTemplate.consumirServicio(renovarBean.renovarPlan().getDatos(), urlConsulta + PATH_ACTUALIZAR,
+				response = providerRestTemplate.consumirServicio(renovarBean.renovarPlan().getDatos(), urlConsulta + PATH_CREAR,
 						authentication);
-				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", MODIFICACION, authentication);
-				
+				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
+				if(response.getCodigo()==200) {
+					providerRestTemplate.consumirServicio(renovarBean.actualizarEstatusConvenio(renovarRequest.getIdConvenioPf()).getDatos(), urlConsulta + PATH_ACTUALIZAR,
+							authentication);
+				}
 					return response;						
 		}catch (Exception e) {
 			String consulta = renovarBean.renovarPlan().getDatos().get("query").toString();
 			String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error("Error al ejecutar la query " +encoded);
-			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Fallo al ejecutar la query", MODIFICACION, authentication);
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"ERRO AL RENOVAR EL CONVENIO: Fallo al ejecutar la query", ALTA, authentication);
 			throw new IOException("5", e.getCause()) ;
 		}
 	}
