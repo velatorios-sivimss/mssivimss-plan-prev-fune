@@ -99,15 +99,6 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	}
 
 
-
-	private int fechaHoy() {
-		SimpleDateFormat sdf = new SimpleDateFormat("dd");
-		String date = sdf.format(new Date());
-		return Integer.parseInt(date);
-	}
-
-
-
 	public Response<?> buscarConvenioAnterior(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
@@ -255,4 +246,9 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	return !rst.toString().equals("[]");
 	}
 	
+	private int fechaHoy() {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd");
+		String date = sdf.format(new Date());
+		return Integer.parseInt(date);
+	}
 }
