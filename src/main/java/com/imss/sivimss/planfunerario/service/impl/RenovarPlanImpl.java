@@ -1,6 +1,8 @@
 package com.imss.sivimss.planfunerario.service.impl;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -76,16 +78,17 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getFolio(), CONSULTA, authentication);
 		    		response.setMensaje("45");
 		      }else {
-		    	  if(validarPeriodoRenovacion(filtros, authentication)) {
+		    	  if(!validarPeriodoRenovacion(filtros, authentication)) {
 		    		  logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);
 			  			response.setMensaje("36");
 			  			throw new BadRequestException(HttpStatus.BAD_REQUEST, "EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION");
 		    	  }
-		    		    if(!validarVigencia(filtros, authentication)) {
+		    		// if(!validarVigencia(filtros, authentication)) {
+		    	  if(fechaHoy()>20) {
 		    		    	logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 CONVENIO INACTIVO", CONSULTA, authentication);
 		  				  //	 providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), usuarioDto.getIdUsuario()).getDatos(), urlConsulta + PATH_ACTUALIZAR,authentication);
 		  				  			throw new BadRequestException(HttpStatus.BAD_REQUEST, "EL CONVENIO SE ENCUENTRA INACTIVO");
-		    		    }
+		    		    } 
 		    		    	
 		    		if(validarFallecido(filtros, authentication)) {
 		    			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
@@ -93,6 +96,14 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    		  }
 				}
 			return response;    		
+	}
+
+
+
+	private int fechaHoy() {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd");
+		String date = sdf.format(new Date());
+		return Integer.parseInt(date);
 	}
 
 
@@ -145,10 +156,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			String velatorio= renovarRequest.getVelatorio().substring(0,3).toUpperCase();
 		Integer contador = contadorRenovaciones(renovarRequest.getIdConvenioPf(), authentication);
 	//Integer contador=0;
-	Integer folio=100+contador;	
-	if(contador==0) {
-		folio=101;
-	}					
+	Integer folio=101+contador;	
 				 String folioAdenda=buildFolio(velatorio,folio);
 				 renovarBean.setFolioAdenda(folioAdenda);
 				    log.info("->" +folioAdenda);
@@ -230,13 +238,13 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	return !rst.toString().equals("[]");
 	}
 
-	private boolean validarVigencia(FiltrosConvenioPFRequest filtros, Authentication authentication) throws IOException {
+/*	private boolean validarVigencia(FiltrosConvenioPFRequest filtros, Authentication authentication) throws IOException {
 		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validaVigencia(filtros).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 	Object rst=response.getDatos();
 	log.info("-> " +rst.toString());
 	return !rst.toString().equals("[]");
-	}
+	} */
 	
 	private boolean validarVigenciaCtoAnterior(Integer numContratante, Integer numConvenio,
 			Authentication authentication) throws IOException {

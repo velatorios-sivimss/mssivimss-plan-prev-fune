@@ -226,7 +226,7 @@ public class RenovarBean {
 		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SPF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
 		.join("SVC_PERSONA SP", "SC.ID_PERSONA=SP.ID_PERSONA");
-		queryUtil.where("IF(TIMESTAMPDIFF(DAY, DATE_FORMAT(SPF.FEC_VIGENCIA, \"%Y/%m/%1\"), CURDATE()) NOT BETWEEN 0 AND 19, SPF.FEC_VIGENCIA, 0)");
+		queryUtil.where("IF(TIMESTAMPDIFF(DAY, DATE_FORMAT(SPF.FEC_VIGENCIA, \"%Y/%m/%1\"), CURDATE())>=0, SPF.FEC_VIGENCIA, 0)");
 		if(filtros.getFolio()!=null) {
 			queryUtil.where("SPF.DES_FOLIO = '"+filtros.getFolio() +"'");
 		}else if(filtros.getNumIne()!=null && filtros.getFolio()==null){
