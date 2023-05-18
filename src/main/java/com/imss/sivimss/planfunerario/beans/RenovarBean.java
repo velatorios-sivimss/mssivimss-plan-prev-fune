@@ -439,4 +439,21 @@ public class RenovarBean {
 	}
 
 
+	public DatosRequest contador (Integer idConvenioPf) {
+		DatosRequest request= new DatosRequest();
+		Map<String, Object> parametros = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("COUNT(*)")
+		.from("SVT_RENOVACION_CONVENIO_PF RPF");
+		queryUtil.where("RPF.ID_CONVENIO_PF= :id")
+		.setParameter("id", +idConvenioPf);
+		String query = obtieneQuery(queryUtil);
+		log.info("QueryHelper -> " +query);
+		String encoded = DatatypeConverter.printBase64Binary(query.getBytes());
+	    parametros.put(AppConstantes.QUERY, encoded );
+	    request.setDatos(parametros);
+	    return request;
+	}
+
+
 }

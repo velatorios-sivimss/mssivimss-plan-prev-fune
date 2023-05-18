@@ -2,6 +2,8 @@ package com.imss.sivimss.planfunerario.service.impl;
 
 import java.io.IOException;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -141,10 +143,17 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			renovarBean = new RenovarBean(renovarRequest);
 			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 			String velatorio= renovarRequest.getVelatorio().substring(0,3).toUpperCase();
-		    Integer renovacion=1;
-		 String folioAdenda=buildFolio(velatorio, renovacion);
-		 renovarBean.setFolioAdenda(folioAdenda);
-		    log.info("->" +folioAdenda);
+		Integer contador = contadorRenovaciones(renovarRequest.getIdConvenioPf(), authentication);
+	//Integer contador=0;
+	Integer folio=100+contador;	
+	if(contador==0) {
+		folio=101;
+	}					
+				 String folioAdenda=buildFolio(velatorio,folio);
+				 renovarBean.setFolioAdenda(folioAdenda);
+				    log.info("->" +folioAdenda);
+			
+				  
 			
 				response = providerRestTemplate.consumirServicio(renovarBean.renovarPlan().getDatos(), urlConsulta + PATH_CREAR,
 						authentication);
@@ -163,10 +172,30 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		}
 	}
 
-	private String buildFolio(String velatorio, Integer renovacion) {
-		String formatearConvenioCeros = String.format("%06d", renovacion);
-		String formatearnumConvenio = String.format("%02d", renovacion);
-		return velatorio +"-"+formatearConvenioCeros+"-"+formatearnumConvenio;
+	private int contadorRenovaciones(Integer idConvenioPf, Authentication authentication) throws IOException {
+		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.contador(idConvenioPf).getDatos(), urlConsulta + PATH_CONSULTA,
+				authentication);
+		
+		String resultado=response.getDatos().toString();
+		Integer contador = 0;
+	
+		Pattern pattern = Pattern.compile("COUNT\\(\\*\\)=(\\d+)");
+		Matcher matcher = pattern.matcher(resultado);
+		if (matcher.find()) {
+		    contador = Integer.parseInt(matcher.group(1));
+		}
+		log.info("contador{} ", contador);
+		return contador;
+	}
+
+
+
+	private String buildFolio(String velatorio, Integer folio) {
+	    String formatearConvenioCeros = String.format("%08d", folio);
+	    String folioConvenio= formatearConvenioCeros.substring(0,6);
+	    log.info("-> "+folioConvenio);
+	    String formatearnumConvenio = formatearConvenioCeros.substring(6,8);
+		return velatorio +"-"+folioConvenio+"-"+formatearnumConvenio;
 	}
 
 
