@@ -158,8 +158,11 @@ public class RenovarPlanImpl implements RenovarPlanService {
 				response = providerRestTemplate.consumirServicio(renovarBean.renovarPlan().getDatos(), urlConsulta + PATH_CREAR,
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
-				if(response.getCodigo()==200) {
+				if(response.getCodigo()==200 && renovarRequest.getIndRenovacion()==0) {
 					providerRestTemplate.consumirServicio(renovarBean.actualizarEstatusConvenio(renovarRequest.getIdConvenioPf()).getDatos(), urlConsulta + PATH_ACTUALIZAR,
+							authentication);
+				}else if(response.getCodigo()==200 && renovarRequest.getIndRenovacion()==1) {
+					providerRestTemplate.consumirServicio(renovarBean.actualizarEstatusRenovacionConvenio(renovarRequest.getIdConvenioPf(), renovarRequest.getVigencia()).getDatos(), urlConsulta + PATH_ACTUALIZAR,
 							authentication);
 				}
 					return response;						

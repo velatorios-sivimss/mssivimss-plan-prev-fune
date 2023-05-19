@@ -21,5 +21,6 @@ public class RenovarPlanPFRequest {
 	private Integer idConvenioPf;
 	private String velatorio;
 	private String vigencia;
+	private Integer indRenovacion;
 
 }

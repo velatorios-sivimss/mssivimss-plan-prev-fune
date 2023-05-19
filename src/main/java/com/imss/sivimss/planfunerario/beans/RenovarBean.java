@@ -72,6 +72,7 @@ public class RenovarBean {
 				 "SP.DES_TELEFONO AS telefono",
 				 "SP.DES_CORREO AS correo",
 				 " PAQ.MON_COSTO_REFERENCIA AS costoRenovacion",
+				 "SCP.IND_RENOVACION AS indRenovacion",
 				 "(SELECT "
 				 +"GROUP_CONCAT(CONCAT(PC.NOM_PERSONA, ' ', "
 				 +"PC.NOM_PRIMER_APELLIDO, ' ', "
@@ -324,6 +325,21 @@ public class RenovarBean {
 		request.setDatos(parametro);
 		return request;
 	}
+	
+	public DatosRequest actualizarEstatusRenovacionConvenio(Integer idConvenioPf, String vigencia) {
+		DatosRequest request= new DatosRequest();
+		Map<String, Object> parametro = new HashMap<>();
+		final QueryHelper q = new QueryHelper("UPDATE SVT_RENOVACION_CONVENIO_PF ");
+		q.agregarParametroValues("IND_ESTATUS", "0");
+		q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+usuarioAlta+"");
+		q.agregarParametroValues("FEC_ACTUALIZACION", " CURRENT_TIMESTAMP()");
+		q.addWhere("ID_CONVENIO_PF = " + idConvenioPf +" AND FEC_VIGENCIA = '"+ vigencia +"'");
+		String query = q.obtenerQueryActualizar();
+		log.info("renovar -> "+query);
+		parametro.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes()));
+		request.setDatos(parametro);
+		return request;
+	}
 
 
 	public DatosRequest validarVigenciaCtoAnterior(Integer idContratante, Integer idConvenio) {
@@ -459,6 +475,9 @@ public class RenovarBean {
 	    request.setDatos(parametros);
 	    return request;
 	}
+
+
+	
 
 
 }
