@@ -112,7 +112,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getNumeroConvenio(), CONSULTA, authentication);
 	    		response.setMensaje("45");
 	      }else {
-			    	  if(validarPeriodoCtoAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), authentication)) {
+			    	  if(!validarPeriodoCtoAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), authentication)) {
 			    		  logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);
 				  			response.setMensaje("36");
 				  			throw new BadRequestException(HttpStatus.BAD_REQUEST, "EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION");
@@ -239,7 +239,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	Object rst=response.getDatos();
 	log.info("-> " +rst.toString());
 	return !rst.toString().equals("[]");
-	} */
+	} 
 	
 	private boolean validarVigenciaCtoAnterior(Integer numContratante, Integer numConvenio,
 			Authentication authentication) throws IOException {
@@ -248,7 +248,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	Object rst=response.getDatos();
 	log.info("-> " +rst.toString());
 	return !rst.toString().equals("[]");
-	}
+	} */
 	
 	private int fechaHoy() {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd");

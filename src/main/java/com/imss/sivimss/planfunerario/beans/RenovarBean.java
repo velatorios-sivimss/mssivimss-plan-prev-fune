@@ -168,7 +168,7 @@ public class RenovarBean {
 		.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
 		.join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
 		.join("SVT_DOMICILIO SD", "SC.ID_DOMICILIO = SD.ID_DOMICILIO ")
-		.join("SVC_CP CP", "SD.ID_CP = CP.ID_CODIGO_POSTAL")
+		.join("SVC_CP CP", "SD.DES_CP = CP.CVE_CODIGO_POSTAL")
 		.join("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA");
 		queryUtil.where("SCP.ID_TIPO_PREVISION = 2");
 		if(filtros.getNumeroConvenio()!=null && filtros.getNumeroContratante()==null) {
@@ -183,6 +183,7 @@ public class RenovarBean {
 			.setParameter("idConvenio", filtros.getNumeroConvenio())
 			.setParameter("idNumeroContratante", filtros.getNumeroContratante());
 		}
+		queryUtil.groupBy("CP.CVE_CODIGO_POSTAL");
 		String query = obtieneQuery(queryUtil);
 		log.info("QueryHelper -> " +query);
 		Map<String, Object> parametros = new HashMap<>();
@@ -252,13 +253,14 @@ public class RenovarBean {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("PF.FEC_VIGENCIA")
-		.from("SVT_CONVENIO_PF PF")
-		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "PF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
+		queryUtil.select("SPF.FEC_VIGENCIA")
+		.from("SVT_CONVENIO_PF SPF")
+		.join("SVT_RENOVACION_CONVENIO_PF RPF", "SPF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS=1")
+		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SPF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE");
-		queryUtil.where("IF(TIMESTAMPDIFF(DAY, CURDATE(), PF.FEC_VIGENCIA)>=20, PF.FEC_VIGENCIA, 0)");
+		queryUtil.where("IF(TIMESTAMPDIFF(DAY, IF(SPF.IND_RENOVACION=0, DATE_FORMAT(SPF.FEC_VIGENCIA, \"%Y/%m/%1\"), DATE_FORMAT(RPF.FEC_VIGENCIA, \"%Y/%m/%1\")), CURDATE())>0, SPF.FEC_VIGENCIA, 0)");
 		if(idConvenio!=null) {
-			queryUtil.where("PF.ID_CONVENIO_PF = "+idConvenio +"");
+			queryUtil.where("SPF.ID_CONVENIO_PF = "+idConvenio +"");
 		}else {
 			queryUtil.where("SC.ID_CONTRATANTE = "+idContratante +"");
 		}
