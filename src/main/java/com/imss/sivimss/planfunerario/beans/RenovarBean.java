@@ -335,8 +335,8 @@ public class RenovarBean {
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("UPDATE SVT_RENOVACION_CONVENIO_PF ");
 		q.agregarParametroValues("IND_ESTATUS", "0");
-		q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+usuarioAlta+"");
-		q.agregarParametroValues("FEC_ACTUALIZACION", " CURRENT_TIMESTAMP()");
+		q.agregarParametroValues("ID_USUARIO_BAJA", ""+usuarioAlta+"");
+		q.agregarParametroValues("FEC_BAJA", " CURRENT_TIMESTAMP()");
 		q.addWhere("ID_CONVENIO_PF = " + idConvenioPf +" AND FEC_VIGENCIA = '"+ vigencia +"'");
 		String query = q.obtenerQueryActualizar();
 		log.info("renovar -> "+query);
