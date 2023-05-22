@@ -8,6 +8,7 @@ import javax.xml.bind.DatatypeConverter;
 import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
 import com.imss.sivimss.planfunerario.model.request.RenovarPlanPFRequest;
+import com.imss.sivimss.planfunerario.model.request.ReporteAdendaAnualDto;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.QueryHelper;
@@ -478,6 +479,16 @@ public class RenovarBean {
 	    parametros.put(AppConstantes.QUERY, encoded );
 	    request.setDatos(parametros);
 	    return request;
+	}
+
+
+	public Map<String, Object> generarAdendaAnual(ReporteAdendaAnualDto reporte) {
+	Map<String, Object> envioDatos = new HashMap<>();
+	envioDatos.put("rutaNombreReporte", reporte.getRutaNombreReporte());
+	envioDatos.put("tipoReporte", reporte.getTipoReporte());
+	envioDatos.put("folio", reporte.getFolio());
+	envioDatos.put("planPF", "CONVENIO PF NUEVO");
+	return envioDatos;
 	}
 
 

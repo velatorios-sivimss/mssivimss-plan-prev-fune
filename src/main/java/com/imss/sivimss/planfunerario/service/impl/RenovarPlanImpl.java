@@ -3,6 +3,7 @@ package com.imss.sivimss.planfunerario.service.impl;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,6 +24,7 @@ import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
 import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
 import com.imss.sivimss.planfunerario.model.request.RenovarPlanPFRequest;
+import com.imss.sivimss.planfunerario.model.request.ReporteAdendaAnualDto;
 import com.imss.sivimss.planfunerario.model.request.UsuarioDto;
 import com.imss.sivimss.planfunerario.service.RenovarPlanService;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
@@ -254,5 +256,15 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd");
 		String date = sdf.format(new Date());
 		return Integer.parseInt(date);
+	}
+
+
+	@Override
+	public Response<?> descargarAdendaRenovacionAnual(DatosRequest request, Authentication authentication) throws IOException {
+		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
+		ReporteAdendaAnualDto reporteDto= gson.fromJson(datosJson, ReporteAdendaAnualDto.class);
+		Map<String, Object> envioDatos = new RenovarBean().generarAdendaAnual(reporteDto);
+		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
+				authentication);
 	}
 }

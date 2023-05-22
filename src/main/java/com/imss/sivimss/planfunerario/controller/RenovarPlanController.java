@@ -22,6 +22,7 @@ import io.github.resilience4j.retry.annotation.Retry;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
@@ -75,6 +76,17 @@ public class RenovarPlanController {
 	public CompletableFuture<?> renovarConvenioPF(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Buscar Convenio PF", CONSULTA, authentication);
 		Response<?> response = renovarPlan.renovarConvenio(request,authentication); 
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@TimeLimiter(name = "msflujo")
+	@PostMapping("/descargar-reporte/adenda-renovacion")
+	public CompletableFuture<?> descargarReporte(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException {
+	
+		Response<?> response = renovarPlan.descargarAdendaRenovacionAnual(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
