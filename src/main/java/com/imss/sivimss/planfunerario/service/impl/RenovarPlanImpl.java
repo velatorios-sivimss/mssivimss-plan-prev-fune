@@ -267,4 +267,14 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
 				authentication);
 	}
+
+
+	@Override
+	public Response<?> descargarConvenioPlanAnterior(DatosRequest request, Authentication authentication) throws IOException {
+		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
+		ReporteAdendaAnualDto reporteDto= gson.fromJson(datosJson, ReporteAdendaAnualDto.class);
+		Map<String, Object> envioDatos = new RenovarBean().generarConvenioAnterior(reporteDto);
+		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
+				authentication);
+	}
 }

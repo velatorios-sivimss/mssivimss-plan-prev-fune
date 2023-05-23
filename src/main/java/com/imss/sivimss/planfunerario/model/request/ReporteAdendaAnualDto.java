@@ -14,4 +14,6 @@ public class ReporteAdendaAnualDto {
 	private String rutaNombreReporte;
 	private String folio;
 	private String convenioPF;
+	private Integer costoRenovacion;
+	private Integer idConvenio;
 }

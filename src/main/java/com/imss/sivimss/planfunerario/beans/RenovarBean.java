@@ -1,10 +1,12 @@
 package com.imss.sivimss.planfunerario.beans;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
+import com.ibm.icu.text.RuleBasedNumberFormat;
 import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
 import com.imss.sivimss.planfunerario.model.request.RenovarPlanPFRequest;
@@ -489,6 +491,20 @@ public class RenovarBean {
 	envioDatos.put("folio", reporte.getFolio());
 	envioDatos.put("planPF", "CONVENIO PF NUEVO");
 	return envioDatos;
+	}
+
+
+	public Map<String, Object> generarConvenioAnterior(ReporteAdendaAnualDto reporteDto) {
+		Map<String, Object> envioDatos = new HashMap<>();
+		RuleBasedNumberFormat rule = new RuleBasedNumberFormat(new Locale("es-ES"), RuleBasedNumberFormat.SPELLOUT);
+		String costoLetra = rule.format(reporteDto.getCostoRenovacion());
+		envioDatos.put("rutaNombreReporte", reporteDto.getRutaNombreReporte());
+		envioDatos.put("tipoReporte", reporteDto.getTipoReporte());
+		envioDatos.put("idConvenio", reporteDto.getIdConvenio());
+		envioDatos.put("costoConvenio", reporteDto.getCostoRenovacion());
+		envioDatos.put("letraCosto", costoLetra+" pesos MN");
+		envioDatos.put("nombreFibeso", "Dra. Cristinne Leo Martel");
+		return envioDatos;
 	}
 
 
