@@ -502,7 +502,7 @@ public class RenovarBean {
 		envioDatos.put("tipoReporte", reporteDto.getTipoReporte());
 		envioDatos.put("idConvenio", reporteDto.getIdConvenio());
 		envioDatos.put("costoConvenio", reporteDto.getCostoRenovacion());
-		envioDatos.put("letraCosto", costoLetra+" pesos MN");
+		envioDatos.put("letraCosto", costoLetra+" Pesos 00/100 M/N");
 		envioDatos.put("nombreFibeso", "Dra. Cristinne Leo Martel");
 		return envioDatos;
 	}
