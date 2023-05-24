@@ -146,8 +146,8 @@ public class RenovarBean {
 				+ "ELSE 'DESCONOCIDO'"
 				+ "END AS tipoPaquete",
 				 "SCP.ID_ESTATUS_CONVENIO AS estatusConvenio",
-				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y')), MAX(DATE_FORMAT(RPF.FEC_INICIO, '%d/%m/%Y'))) AS fechaInicio",
-				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y')), MAX(DATE_FORMAT(RPF.FEC_VIGENCIA, '%d/%m/%Y'))) AS fechaVigencia",
+				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y')), DATE_FORMAT(RPF.FEC_INICIO, '%d/%m/%Y')) AS fechaInicio",
+				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%d/%m/%Y')) AS fechaVigencia",
 				 "SD.DES_CALLE AS calle",
 				 "SD.NUM_EXTERIOR AS numExt",
 				 "SD.NUM_INTERIOR AS numInt",
@@ -167,7 +167,7 @@ public class RenovarBean {
 		 + "JOIN SVC_PERSONA PC ON SCB.ID_PERSONA = PC.ID_PERSONA "
 		 + "WHERE BENEF.ID_CONVENIO_PF= " +filtros.getNumeroConvenio()+") AS beneficiario ")
 		.from("SVT_CONVENIO_PF SCP")
-		.join("SVT_RENOVACION_CONVENIO_PF RPF", "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF")
+		.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS=1")
 		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
 		.join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
@@ -259,7 +259,7 @@ public class RenovarBean {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SPF.FEC_VIGENCIA")
 		.from("SVT_CONVENIO_PF SPF")
-		.join("SVT_RENOVACION_CONVENIO_PF RPF", "SPF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS=1")
+		.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "SPF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS=1")
 		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SPF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE");
 		queryUtil.where("IF(TIMESTAMPDIFF(DAY, IF(SPF.IND_RENOVACION=0, DATE_FORMAT(SPF.FEC_VIGENCIA, \"%Y/%m/%1\"), DATE_FORMAT(RPF.FEC_VIGENCIA, \"%Y/%m/%1\")), CURDATE())>0, SPF.FEC_VIGENCIA, 0)");
@@ -502,7 +502,7 @@ public class RenovarBean {
 		envioDatos.put("idConvenio", reporteDto.getIdConvenio());
 		envioDatos.put("costoConvenio", reporteDto.getCostoRenovacion());
 		envioDatos.put("letraCosto", costoLetra+" Pesos 00/100 M/N");
-		envioDatos.put("nombreFibeso", "Dra. Cristinne Leo Martel");
+		envioDatos.put("nomFibeso", " ");
 		return envioDatos;
 	}
 
@@ -513,7 +513,7 @@ public class RenovarBean {
 		envioDatos.put("tipoReporte", reporteDto.getTipoReporte());
 		envioDatos.put("idConvenio", reporteDto.getIdConvenio());
 		envioDatos.put("tipoConvenio", "CONVENIO PLAN ANTERIOR");
-		envioDatos.put("nombreFibeso", "Dra. Cristinne Leo Martel");
+		envioDatos.put("nombreFibeso", " ");
 		envioDatos.put("observaciones", reporteDto.getObservaciones());
 		return envioDatos;
 	}
