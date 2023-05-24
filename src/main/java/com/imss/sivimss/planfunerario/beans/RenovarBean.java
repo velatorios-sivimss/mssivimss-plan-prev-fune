@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import com.ibm.icu.text.RuleBasedNumberFormat;
 import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
@@ -43,27 +45,21 @@ public class RenovarBean {
 		this.vigencia = renovarRequest.getVigencia();
 	}
 
-
 	public DatosRequest buscarNuevo(DatosRequest request, FiltrosConvenioPFRequest filtros) {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SCP.DES_FOLIO AS folio",
-				"SCP.ID_CONVENIO_PF AS convenioPF",
+				"SCP.ID_CONVENIO_PF AS idConvenio",
 				 "SP.CVE_RFC AS rfc",
 				 "SC.CVE_MATRICULA AS matricula",
 				 "SP.NOM_PERSONA AS nombre",
 				 "SP.NOM_PRIMER_APELLIDO AS primerApellido",
 				 "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
 				 "SCP.ID_TIPO_PREVISION AS tipoPrevision",
-				 "SCPC.ID_PAQUETE",
-				 "CASE "
-				+ "WHEN PAQ.ID_PAQUETE = 7 THEN 'BASICO' "
-				+ "WHEN PAQ.ID_PAQUETE = 8 THEN 'ECONOMICO' "
-				+ "WHEN PAQ.ID_PAQUETE = 9 THEN 'BASICO CON CREMACION'"
-				+ "ELSE 'DESCONOCIDO'"
-				+ "END AS tipoPaquete",
+				 "SCPC.ID_PAQUETE AS idPaquete",
+				  "PAQ.DES_PAQUETE AS tipoPaquete",
 				 "SCP.ID_ESTATUS_CONVENIO AS estatusConvenio",
-				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y')), MAX(DATE_FORMAT(RPF.FEC_INICIO, '%d/%m/%Y'))) AS fechaInicio",
-				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y')), MAX(DATE_FORMAT(RPF.FEC_VIGENCIA, '%d/%m/%Y'))) AS fechaVigencia",
+				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y')), DATE_FORMAT(RPF.FEC_INICIO, '%d/%m/%Y')) AS fechaInicio",
+				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%d/%m/%Y')) AS fechaVigencia",
 				// "DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y') AS fechaInicio",
 				// "DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y') AS fechaVigencia",
 				 "SD.DES_CALLE AS calle",
@@ -80,9 +76,9 @@ public class RenovarBean {
 				 +"GROUP_CONCAT(CONCAT(PC.NOM_PERSONA, ' ', "
 				 +"PC.NOM_PRIMER_APELLIDO, ' ', "
 				 + "PC.NOM_SEGUNDO_APELLIDO)) "
-				  +"FROM svt_contratante_beneficiarios SCB "
-				 +"JOIN svt_contratante_paquete_convenio_pf BENEF ON SCB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF=BENEF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF "
-				 + "JOIN svc_persona PC ON SCB.ID_PERSONA = PC.ID_PERSONA "
+				  +"FROM SVT_CONTRATANTE_BENEFICIARIOS SCB "
+				 +"JOIN SVT_CONTRATANTE_PAQUETE_CONVENIO_PF BENEF ON SCB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF=BENEF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF "
+				 + "JOIN SVC_PERSONA PC ON SCB.ID_PERSONA = PC.ID_PERSONA "
 				 + "WHERE BENEF.ID_CONVENIO_PF=SCP.ID_CONVENIO_PF  ) AS beneficiario ")
 		.from("SVT_CONVENIO_PF SCP")
 		.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS=1")
@@ -120,7 +116,8 @@ public class RenovarBean {
 			.setParameter("desFolio", filtros.getFolio())
 			.setParameter("cveRfc", filtros.getRfc())
 			.setParameter("numIne", filtros.getNumIne());
-		}queryUtil.groupBy("CP.CVE_CODIGO_POSTAL");
+		} 
+		queryUtil.groupBy("CP.CVE_CODIGO_POSTAL");
 		String query = obtieneQuery(queryUtil);
 		log.info("QueryHelper -> " +query);
 		Map<String, Object> parametros = new HashMap<>();
@@ -132,21 +129,17 @@ public class RenovarBean {
 	public DatosRequest buscarAnterior(DatosRequest request, FiltrosConvenioPFRequest filtros ) {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SCP.DES_FOLIO AS folio",
+				"SCP.ID_CONVENIO_PF AS idConvenio",
 				 "SP.CVE_RFC AS rfc",
 				 "SC.CVE_MATRICULA AS matricula",
 				 "SP.NOM_PERSONA AS nombre",
 				 "SP.NOM_PRIMER_APELLIDO AS primerApellido",
 				 "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
 				 "SCP.ID_TIPO_PREVISION AS tipoPrevision",
-				 "SCPC.ID_PAQUETE",
-				 "CASE "
-				+ "WHEN PAQ.ID_PAQUETE = 7 THEN 'BASICO' "
-				+ "WHEN PAQ.ID_PAQUETE = 8 THEN 'ECONOMICO' "
-				+ "WHEN PAQ.ID_PAQUETE =9 THEN 'BASICO CON CREMACION'"
-				+ "ELSE 'DESCONOCIDO'"
-				+ "END AS tipoPaquete",
+				 "SCPC.ID_PAQUETE AS idPaquete",
+				  "PAQ.DES_PAQUETE AS tipoPaquete",
 				 "SCP.ID_ESTATUS_CONVENIO AS estatusConvenio",
-				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y')), DATE_FORMAT(RPF.FEC_INICIO, '%d/%m/%Y')) AS fechaInicio",
+				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO,'%d/%m/%Y')), DATE_FORMAT(RPF.FEC_INICIO, '%d/%m/%Y')) AS fechaInicio",
 				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%d/%m/%Y')) AS fechaVigencia",
 				 "SD.DES_CALLE AS calle",
 				 "SD.NUM_EXTERIOR AS numExt",
@@ -195,10 +188,6 @@ public class RenovarBean {
 	    request.setDatos(parametros);
 	    return request;
 	}
-
-	private static String obtieneQuery(SelectQueryUtil queryUtil) {
-        return queryUtil.build();
-    }
 
 	public DatosRequest validarFallecido(FiltrosConvenioPFRequest filtros) {
 		DatosRequest request= new DatosRequest();
@@ -517,4 +506,9 @@ public class RenovarBean {
 		envioDatos.put("observaciones", reporteDto.getObservaciones());
 		return envioDatos;
 	}
+	
+	private static String obtieneQuery(SelectQueryUtil queryUtil) {
+        return queryUtil.build();
+    }
+
 }

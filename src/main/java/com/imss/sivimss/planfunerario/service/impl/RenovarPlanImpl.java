@@ -1,8 +1,10 @@
 package com.imss.sivimss.planfunerario.service.impl;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -86,7 +88,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			  			throw new BadRequestException(HttpStatus.BAD_REQUEST, "EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION");
 		    	  }
 		    		// if(!validarVigencia(filtros, authentication)) {
-		    	  if(fechaHoy()>20) {
+		    	  if(fechaHoy()>31) {
 		    		    	logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 CONVENIO INACTIVO", CONSULTA, authentication);
 		  				  //	 providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), usuarioDto.getIdUsuario()).getDatos(), urlConsulta + PATH_ACTUALIZAR,authentication);
 		  				  			throw new BadRequestException(HttpStatus.BAD_REQUEST, "EL CONVENIO SE ENCUENTRA INACTIVO");
@@ -120,7 +122,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 				  			throw new BadRequestException(HttpStatus.BAD_REQUEST, "EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION");
 			    	  }
 			    		//if(!validarVigenciaCtoAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), authentication)) {
-			    		 if(fechaHoy()>20) {
+			    		 if(fechaHoy()>31) {
 			    	         logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 			    			 providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlanAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlConsulta + PATH_ACTUALIZAR,
 					 					authentication);
@@ -147,6 +149,11 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 			renovarBean = new RenovarBean(renovarRequest);
 			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
+			Date dateF = new SimpleDateFormat("dd-MM-yyyy").parse(renovarRequest.getVigencia());
+	        DateFormat anioMes = new SimpleDateFormat("yyyy-MM-dd", new Locale("es", "MX"));
+	        String fecha=anioMes.format(dateF);
+	        log.info("-> "+fecha);
+	        renovarBean.setVigencia(fecha);
 			String velatorio= renovarRequest.getVelatorio().substring(0,3).toUpperCase();
 		Integer contador = contadorRenovaciones(renovarRequest.getIdConvenioPf(), authentication);
 	//Integer contador=0;
@@ -164,7 +171,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 					providerRestTemplate.consumirServicio(renovarBean.actualizarEstatusConvenio(renovarRequest.getIdConvenioPf()).getDatos(), urlConsulta + PATH_ACTUALIZAR,
 							authentication);
 				}else if(response.getCodigo()==200 && renovarRequest.getIndRenovacion()==1) {
-					providerRestTemplate.consumirServicio(renovarBean.actualizarEstatusRenovacionConvenio(renovarRequest.getIdConvenioPf(), renovarRequest.getVigencia()).getDatos(), urlConsulta + PATH_ACTUALIZAR,
+					providerRestTemplate.consumirServicio(renovarBean.actualizarEstatusRenovacionConvenio(renovarRequest.getIdConvenioPf(), fecha).getDatos(), urlConsulta + PATH_ACTUALIZAR,
 							authentication);
 				}
 					return response;						
