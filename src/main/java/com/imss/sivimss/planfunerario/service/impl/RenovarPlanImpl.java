@@ -24,7 +24,7 @@ import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
 import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
 import com.imss.sivimss.planfunerario.model.request.RenovarPlanPFRequest;
-import com.imss.sivimss.planfunerario.model.request.ReporteAdendaAnualDto;
+import com.imss.sivimss.planfunerario.model.request.ReporteDto;
 import com.imss.sivimss.planfunerario.model.request.UsuarioDto;
 import com.imss.sivimss.planfunerario.service.RenovarPlanService;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
@@ -262,7 +262,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	@Override
 	public Response<?> descargarAdendaRenovacionAnual(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
-		ReporteAdendaAnualDto reporteDto= gson.fromJson(datosJson, ReporteAdendaAnualDto.class);
+		ReporteDto reporteDto= gson.fromJson(datosJson, ReporteDto.class);
 		Map<String, Object> envioDatos = new RenovarBean().generarAdendaAnual(reporteDto);
 		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
 				authentication);
@@ -272,8 +272,18 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	@Override
 	public Response<?> descargarConvenioPlanAnterior(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
-		ReporteAdendaAnualDto reporteDto= gson.fromJson(datosJson, ReporteAdendaAnualDto.class);
+		ReporteDto reporteDto= gson.fromJson(datosJson, ReporteDto.class);
 		Map<String, Object> envioDatos = new RenovarBean().generarConvenioAnterior(reporteDto);
+		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
+				authentication);
+	}
+
+
+	@Override
+	public Response<?> descargarHojaAfiliacion(DatosRequest request, Authentication authentication) throws IOException {
+		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
+		ReporteDto reporteDto= gson.fromJson(datosJson, ReporteDto.class);
+		Map<String, Object> envioDatos = new RenovarBean().generarHojaAfiliacion(reporteDto);
 		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
 				authentication);
 	}

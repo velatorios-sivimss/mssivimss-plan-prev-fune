@@ -19,4 +19,6 @@ public interface RenovarPlanService {
 
 	Response<?> descargarConvenioPlanAnterior(DatosRequest request, Authentication authentication) throws IOException;
 
+	Response<?> descargarHojaAfiliacion(DatosRequest request, Authentication authentication) throws IOException;
+
 }

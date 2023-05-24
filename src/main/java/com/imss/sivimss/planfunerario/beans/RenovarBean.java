@@ -10,7 +10,7 @@ import com.ibm.icu.text.RuleBasedNumberFormat;
 import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
 import com.imss.sivimss.planfunerario.model.request.RenovarPlanPFRequest;
-import com.imss.sivimss.planfunerario.model.request.ReporteAdendaAnualDto;
+import com.imss.sivimss.planfunerario.model.request.ReporteDto;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.QueryHelper;
@@ -64,8 +64,8 @@ public class RenovarBean {
 				 "SCP.ID_ESTATUS_CONVENIO AS estatusConvenio",
 				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y')), MAX(DATE_FORMAT(RPF.FEC_INICIO, '%d/%m/%Y'))) AS fechaInicio",
 				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y')), MAX(DATE_FORMAT(RPF.FEC_VIGENCIA, '%d/%m/%Y'))) AS fechaVigencia",
-				 "DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y') AS fechaInicio",
-				 "DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y') AS fechaVigencia",
+				// "DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y') AS fechaInicio",
+				// "DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y') AS fechaVigencia",
 				 "SD.DES_CALLE AS calle",
 				 "SD.NUM_EXTERIOR AS numExt",
 				 "SD.NUM_INTERIOR AS numInt",
@@ -85,7 +85,7 @@ public class RenovarBean {
 				 + "JOIN svc_persona PC ON SCB.ID_PERSONA = PC.ID_PERSONA "
 				 + "WHERE BENEF.ID_CONVENIO_PF=SCP.ID_CONVENIO_PF  ) AS beneficiario ")
 		.from("SVT_CONVENIO_PF SCP")
-		.join("SVT_RENOVACION_CONVENIO_PF RPF", "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF")
+		.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS=1")
 		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC ", "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
 		.join("SVC_CONTRATANTE SC ", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE ")
@@ -120,8 +120,7 @@ public class RenovarBean {
 			.setParameter("desFolio", filtros.getFolio())
 			.setParameter("cveRfc", filtros.getRfc())
 			.setParameter("numIne", filtros.getNumIne());
-		}
-		queryUtil.groupBy("CP.CVE_CODIGO_POSTAL");
+		}queryUtil.groupBy("CP.CVE_CODIGO_POSTAL");
 		String query = obtieneQuery(queryUtil);
 		log.info("QueryHelper -> " +query);
 		Map<String, Object> parametros = new HashMap<>();
@@ -233,7 +232,7 @@ public class RenovarBean {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SPF.FEC_VIGENCIA ")
 		.from("SVT_CONVENIO_PF SPF")
-		.join("SVT_RENOVACION_CONVENIO_PF RPF", "SPF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS=1")
+		.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "SPF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS=1")
 		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SPF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
 		.join("SVC_PERSONA SP", "SC.ID_PERSONA=SP.ID_PERSONA");
@@ -484,7 +483,7 @@ public class RenovarBean {
 	}
 
 
-	public Map<String, Object> generarAdendaAnual(ReporteAdendaAnualDto reporte) {
+	public Map<String, Object> generarAdendaAnual(ReporteDto reporte) {
 	Map<String, Object> envioDatos = new HashMap<>();
 	envioDatos.put("rutaNombreReporte", reporte.getRutaNombreReporte());
 	envioDatos.put("tipoReporte", reporte.getTipoReporte());
@@ -494,7 +493,7 @@ public class RenovarBean {
 	}
 
 
-	public Map<String, Object> generarConvenioAnterior(ReporteAdendaAnualDto reporteDto) {
+	public Map<String, Object> generarConvenioAnterior(ReporteDto reporteDto) {
 		Map<String, Object> envioDatos = new HashMap<>();
 		RuleBasedNumberFormat rule = new RuleBasedNumberFormat(new Locale("es-ES"), RuleBasedNumberFormat.SPELLOUT);
 		String costoLetra = rule.format(reporteDto.getCostoRenovacion());
@@ -508,7 +507,14 @@ public class RenovarBean {
 	}
 
 
-	
-
-
+	public Map<String, Object> generarHojaAfiliacion(ReporteDto reporteDto) {
+		Map<String, Object> envioDatos = new HashMap<>();
+		envioDatos.put("rutaNombreReporte", reporteDto.getRutaNombreReporte());
+		envioDatos.put("tipoReporte", reporteDto.getTipoReporte());
+		envioDatos.put("idConvenio", reporteDto.getIdConvenio());
+		envioDatos.put("tipoConvenio", "CONVENIO PLAN ANTERIOR");
+		envioDatos.put("nombreFibeso", "Dra. Cristinne Leo Martel");
+		envioDatos.put("observaciones", reporteDto.getObservaciones());
+		return envioDatos;
+	}
 }
