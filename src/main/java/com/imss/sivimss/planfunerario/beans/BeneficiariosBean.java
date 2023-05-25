@@ -1,17 +1,12 @@
 package com.imss.sivimss.planfunerario.beans;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
-import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
-import com.imss.sivimss.planfunerario.model.request.FiltrosBeneficiariosRequest;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.QueryHelper;
@@ -67,6 +62,7 @@ public class BeneficiariosBean {
 	
 	
 	public DatosRequest beneficiarios(DatosRequest request) {
+		Map<String, Object> parametros = new HashMap<>();
 		String palabra = request.getDatos().get("palabra").toString();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SCPC.ID_CONVENIO_PF AS idCovenio, SB.ID_CONTRATANTE_BENEFICIARIOS AS idBenef",
@@ -83,30 +79,13 @@ public class BeneficiariosBean {
 		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio").and("SB.IND_SINIESTROS=0")
 		.setParameter("idConvenio", Integer.parseInt(palabra));
 		String query = obtieneQuery(queryUtil);
-		log.info("estoy en: " +query);
-		Map<String, Object> parametros = new HashMap<>();
-	    parametros.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes()));
+		log.info("-> " +query);
+		String encoded = encodedQuery(query);
+	    parametros.put(AppConstantes.QUERY, encoded);
 	    request.setDatos(parametros);
 	    return request;
 	}
-	
-/*	public DatosRequest beneficiarios(DatosRequest request) {
-		String palabra = request.getDatos().get("palabra").toString();
-	String query = " SELECT SB.ID_CONVENIO_PF AS idCovenio, SB.ID_BENEFICIARIO AS idBenef, "
-				+ "CONCAT(SP.NOM_PERSONA,' ', "
-				+ "SP.NOM_PRIMER_APELLIDO, ' ', "
-				+ "SP.NOM_SEGUNDO_APELLIDO) AS nombre "
-				+ " FROM SVC_BENEFICIARIO SB "
-				+ "JOIN SVC_PERSONA SP ON SB.ID_PERSONA = SP.ID_PERSONA "
-				+ " WHERE SB.ID_CONVENIO_PF = "+ Integer.parseInt(palabra) +"";
-	log.info(query);
-	request.getDatos().remove("palabra");
-	request.getDatos().put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes()));
-	return request;
-	} */
-
-	
-
+		
 	public DatosRequest detalleBeneficiarios(DatosRequest request, Integer idBeneficiario, Integer idConvenio) {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF AS idCovenio, SB.ID_CONTRATANTE_BENEFICIARIOS AS idBenef",
@@ -132,7 +111,8 @@ public class BeneficiariosBean {
 		String query = obtieneQuery(queryUtil);
 		log.info("estoy en: " +query);
 		Map<String, Object> parametros = new HashMap<>();
-	    parametros.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes()));
+		 String encoded = encodedQuery(query);
+	    parametros.put(AppConstantes.QUERY, encoded);
 	    request.setDatos(parametros);
 	    return request;
 	}
@@ -150,9 +130,9 @@ public class BeneficiariosBean {
 		q.agregarParametroValues("DES_CORREO", "'"+ this.correoE +"'");
 		q.agregarParametroValues("DES_TELEFONO", "'" + this.tel + "'");
 		q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"");
-		q.agregarParametroValues("FEC_ALTA", " CURRENT_TIMESTAMP() ");
+		q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		String query = q.obtenerQueryInsertar() +"$$"  + insertarBeneficiario(this.idContratanteConvenioPf, this.idParentesco, this.actaNac);
-			  String encoded = DatatypeConverter.printBase64Binary(query.getBytes());
+		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 		        parametro.put(AppConstantes.QUERY, encoded);
 		        parametro.put("separador","$$");
 		        parametro.put("replace","idTabla");
@@ -171,12 +151,12 @@ public class BeneficiariosBean {
 	        q.agregarParametroValues("ID_PERSONA", "idTabla");
 	        q.agregarParametroValues("ID_PARENTESCO", ""+parentesco+"");
 	        q.agregarParametroValues("CVE_ACTA", "'"+actaNac+"'");
-	        q.agregarParametroValues("IND_ACTIVO", "1");
+	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 	        q.agregarParametroValues("IND_SINIESTROS", "0");
 	        q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"" );
-			q.agregarParametroValues("FEC_ALTA", " CURRENT_TIMESTAMP() ");
+			q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 	        String query = q.obtenerQueryInsertar();
-	        String encoded = DatatypeConverter.printBase64Binary(query.getBytes());
+	        String encoded = encodedQuery(query);
 	        parametro.put(AppConstantes.QUERY, encoded);
 	        request.setDatos(parametro);
 	        return query;
@@ -197,10 +177,11 @@ public class BeneficiariosBean {
 		q.agregarParametroValues("DES_CORREO", "'"+ this.correoE +"'");
 		q.agregarParametroValues("DES_TELEFONO", "'" + this.tel + "'");
 		q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+usuarioAlta+"");
-		q.agregarParametroValues("FEC_ACTUALIZACION", " CURRENT_TIMESTAMP() ");
+		q.agregarParametroValues("FEC_ACTUALIZACION", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		q.addWhere("ID_PERSONA = " + this.idPersona);
 		String query = q.obtenerQueryActualizar();
-		parametro.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes()));
+		String encoded = encodedQuery(query);
+		parametro.put(AppConstantes.QUERY, encoded);
 		request.setDatos(parametro);
 		return request;
 	}
@@ -213,12 +194,12 @@ public class BeneficiariosBean {
 	        final QueryHelper q = new QueryHelper("UPDATE SVT_CONTRATANTE_BENEFICIARIOS");
 	        q.agregarParametroValues("ID_PARENTESCO", ""+parentesco+"");
 	        q.agregarParametroValues("CVE_ACTA", "'"+acta+"'");
-	        q.agregarParametroValues("IND_ACTIVO", "1");
+	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 	        q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+idUsuario+"" );
-			q.agregarParametroValues("FEC_ACTUALIZACION", " CURRENT_TIMESTAMP() ");
+			q.agregarParametroValues("FEC_ACTUALIZACION", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 			q.addWhere("ID_PERSONA = " + idPersona);
 	        String query = q.obtenerQueryActualizar();
-	        String encoded = DatatypeConverter.printBase64Binary(query.getBytes());
+	        String encoded = encodedQuery(query);
 	        parametro.put(AppConstantes.QUERY, encoded);
 	        request.setDatos(parametro);
 	        return request;
@@ -230,12 +211,12 @@ public class BeneficiariosBean {
 		 DatosRequest request = new DatosRequest();
 	        Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("UPDATE SVT_CONTRATANTE_BENEFICIARIOS");
-	        q.agregarParametroValues("IND_ACTIVO", "!IND_aCTIVO");
+	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "!IND_aCTIVO");
 	        q.agregarParametroValues("ID_USUARIO_BAJA", ""+usuarioBaja+"" );
-			q.agregarParametroValues("FEC_BAJA", " CURRENT_TIMESTAMP() ");
+			q.agregarParametroValues("FEC_BAJA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 			q.addWhere("ID_CONTRATANTE_BENEFICIARIOS = " + idBeneficiario);
 	        String query = q.obtenerQueryActualizar();
-	        String encoded = DatatypeConverter.printBase64Binary(query.getBytes());
+	        String encoded = encodedQuery(query);
 	        parametro.put(AppConstantes.QUERY, encoded);
 	        request.setDatos(parametro);
 	        return request;
@@ -270,13 +251,18 @@ public class BeneficiariosBean {
 								+ "AND TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURDATE()) BETWEEN 18 AND 25) ";
 		log.info("estoy en: " +query);
 		Map<String, Object> parametros = new HashMap<>();
-	    parametros.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes()));
+	   String encoded = encodedQuery(query);
+	   parametros.put(AppConstantes.QUERY, encoded);
 	    request.setDatos(parametros);
 	    return request;
 	}
 	
 	private static String obtieneQuery(SelectQueryUtil queryUtil) {
         return queryUtil.build();
+    }
+	
+	private static String encodedQuery(String query) {
+        return DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
     }
 
 }
