@@ -27,7 +27,7 @@ public class LogUtil {
         UsuarioDto usuarioDto = json.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
         DateFormat formatoFechaLog = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         DateFormat formatoFecha = new SimpleDateFormat("ddMMyyyy");
-        File archivo = new File(rutaLog + formatoFecha.format(new Date()) + ".log" );
+        File archivo = new File(rutaLog + "mssivimss-plan-prev-fune-" +formatoFecha.format(new Date()) + ".log" );
         FileWriter escribirArchivo = new FileWriter(archivo,true);
         if(archivo.exists()){
             escribirArchivo.write("" + formatoFechaLog.format(new Date()) + " --- [" + tipoLog +"] " +  origen + " " +clasePath + " : " + mensaje + " , Usuario: " + usuarioDto.getCveUsuario() + " - " + tiempoEjecucion );

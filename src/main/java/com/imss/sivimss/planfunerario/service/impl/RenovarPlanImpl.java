@@ -41,6 +41,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private static final String BAJA = "baja";
 	private static final String MODIFICACION = "modificacion";
 	private static final String CONSULTA = "consulta";
+	private static final String IMPRIMIR = "imprimir";
 	
 	@Autowired
 	private LogUtil logUtil;
@@ -281,8 +282,10 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		ReporteDto reporteDto= gson.fromJson(datosJson, ReporteDto.class);
 		Map<String, Object> envioDatos = new RenovarBean().generarAdendaAnual(reporteDto);
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DESCARGA CORRECTA ANEXO B ADENDA DE RENOVACION ANUAL", IMPRIMIR, authentication);
 		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
 				authentication);
+		
 	}
 
 
@@ -291,6 +294,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		ReporteDto reporteDto= gson.fromJson(datosJson, ReporteDto.class);
 		Map<String, Object> envioDatos = new RenovarBean().generarConvenioAnterior(reporteDto);
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DESCARGA CORRECTA PLANTILLA CONVENIO RENOVACION PLAN ANTERIOR", IMPRIMIR, authentication);
 		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
 				authentication);
 	}
@@ -301,6 +305,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		ReporteDto reporteDto= gson.fromJson(datosJson, ReporteDto.class);
 		Map<String, Object> envioDatos = new RenovarBean().generarHojaAfiliacion(reporteDto);
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DESCARGA CORRECTA PLANTILLA HOJA DE AFILIACION", IMPRIMIR, authentication);
 		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
 				authentication);
 	}

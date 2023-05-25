@@ -34,7 +34,7 @@ import lombok.AllArgsConstructor;
 public class RenovarPlanController {
 	
 	private static final String ALTA = "alta";
-	private static final String BAJA = "baja";
+	private static final String IMPRIMIR = "imprimir";
 	private static final String MODIFICACION = "modificacion";
 	private static final String CONSULTA = "consulta";
 
@@ -74,7 +74,7 @@ public class RenovarPlanController {
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("renovar-convenio-pf")
 	public CompletableFuture<?> renovarConvenioPF(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
-		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Buscar Convenio PF", CONSULTA, authentication);
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Renovar Convenio PF", ALTA, authentication);
 		Response<?> response = renovarPlan.renovarConvenio(request,authentication); 
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
@@ -84,8 +84,8 @@ public class RenovarPlanController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/descargar-reporte/adenda-renovacion")
-	public CompletableFuture<?> descargarReporte(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException {
-	
+	public CompletableFuture<?> descargarReporte(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Imprimir Plantilla de renovacion contrato nuevo", IMPRIMIR, authentication);
 		Response<?> response = renovarPlan.descargarAdendaRenovacionAnual(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
@@ -95,8 +95,8 @@ public class RenovarPlanController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/descargar-reporte/convenio-anterior")
-	public CompletableFuture<?> descargarReporteConvenioAnterior(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException {
-	
+	public CompletableFuture<?> descargarReporteConvenioAnterior(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Imprimir plantilla de renovacion contrato anterior", IMPRIMIR, authentication);
 		Response<?> response = renovarPlan.descargarConvenioPlanAnterior(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
@@ -107,7 +107,7 @@ public class RenovarPlanController {
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/descargar-reporte/hoja-afiliacion")
 	public CompletableFuture<?> descargarHojaAfilicion(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException {
-	
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Imprimir Plantilla Hoja de afiliacion", IMPRIMIR, authentication);
 		Response<?> response = renovarPlan.descargarHojaAfiliacion(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
