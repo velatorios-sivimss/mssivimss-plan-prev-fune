@@ -28,17 +28,17 @@ public class LogUtil {
         DateFormat formatoFechaLog = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         DateFormat formatoFecha = new SimpleDateFormat("ddMMyyyy");
         File archivo = new File(rutaLog + "mssivimss-plan-prev-fune-" +formatoFecha.format(new Date()) + ".log" );
-        FileWriter escribirArchivo = new FileWriter(archivo,true);
-        if(archivo.exists()){
+    	FileWriter escribirArchivo = new FileWriter(archivo,true);
+        try {
             escribirArchivo.write("" + formatoFechaLog.format(new Date()) + " --- [" + tipoLog +"] " +  origen + " " +clasePath + " : " + mensaje + " , Usuario: " + usuarioDto.getCveUsuario() + " - " + tiempoEjecucion );
             escribirArchivo.write("\r\n");
             escribirArchivo.close();
-        }else{
-            archivo.createNewFile();
-            escribirArchivo.write("" + formatoFechaLog.format(new Date()) + " --- [" + tipoLog +"] " +  origen + " " +clasePath + " : " + mensaje + " , Usuario: " + usuarioDto.getCveUsuario() + " - " + tiempoEjecucion );
-            escribirArchivo.write("\r\n");
-            escribirArchivo.close();
-        }
+        }catch(Exception e) {
+        	log.error("No se puede escribir el log.");
+            log.error(e.getMessage());
+        }finally {
+       	 escribirArchivo.close();
+       }
     }
 
 }

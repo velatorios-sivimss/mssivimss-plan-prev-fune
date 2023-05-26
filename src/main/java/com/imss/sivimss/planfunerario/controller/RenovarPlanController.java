@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.imss.sivimss.planfunerario.service.BeneficiariosService;
 import com.imss.sivimss.planfunerario.service.RenovarPlanService;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.LogUtil;
@@ -22,7 +21,6 @@ import io.github.resilience4j.retry.annotation.Retry;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
@@ -106,7 +104,7 @@ public class RenovarPlanController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("/descargar-reporte/hoja-afiliacion")
-	public CompletableFuture<?> descargarHojaAfilicion(@RequestBody DatosRequest request,Authentication authentication) throws IOException, ParseException {
+	public CompletableFuture<?> descargarHojaAfilicion(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Imprimir Plantilla Hoja de afiliacion", IMPRIMIR, authentication);
 		Response<?> response = renovarPlan.descargarHojaAfiliacion(request,authentication);
 		return CompletableFuture

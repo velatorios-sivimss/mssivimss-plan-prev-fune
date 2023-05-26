@@ -86,6 +86,7 @@ public class BeneficiariosController {
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("alta-beneficiario")
 	public CompletableFuture<?> altaBeneficiario(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Alta beneficiarios", ALTA, authentication);
 		Response<?> response = benefService.crearBeneficiario(request,authentication); 
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
@@ -96,6 +97,7 @@ public class BeneficiariosController {
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("modificar-beneficiario")
 	public CompletableFuture<?> modificarBeneficiario(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"actualizar beneficiarios", MODIFICACION, authentication);
 		Response<?> response = benefService.editarBeneficiario(request,authentication); 
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
@@ -106,6 +108,7 @@ public class BeneficiariosController {
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("estatus-beneficiario")
 	public CompletableFuture<?> cambiarEstatusBeneficiario(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Cambiar estatus beneficiarios", BAJA, authentication);
 		Response<?> response = benefService.estatusBeneficiario(request,authentication); 
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));

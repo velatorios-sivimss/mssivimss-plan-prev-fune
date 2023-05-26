@@ -1,7 +1,6 @@
 package com.imss.sivimss.planfunerario.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
-import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

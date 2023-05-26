@@ -15,7 +15,7 @@ import com.imss.sivimss.planfunerario.util.NoRedirectSimpleClientHttpRequestFact
 public class PlanFunerarioApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(PlanFunerarioApplication.class, args);
+		SpringApplication.run(PlanFunerarioApplication.class);
 	}
 
 	@Bean

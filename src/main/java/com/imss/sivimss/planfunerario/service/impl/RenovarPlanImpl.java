@@ -207,7 +207,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		String resultado=response.getDatos().toString();
 		Integer contador = 0;
 	
-		Pattern pattern = Pattern.compile("COUNT\\(\\*\\)=(\\d+)");
+		Pattern pattern = Pattern.compile("c=(\\d+)");
 		Matcher matcher = pattern.matcher(resultado);
 		if (matcher.find()) {
 		    contador = Integer.parseInt(matcher.group(1));

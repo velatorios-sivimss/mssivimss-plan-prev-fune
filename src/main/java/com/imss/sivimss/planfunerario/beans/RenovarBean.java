@@ -479,7 +479,7 @@ public class RenovarBean {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("COUNT(*)")
+		queryUtil.select("COUNT(*) AS c")
 		.from(SVT_RENOVACION_CONVENIO_PF);
 		queryUtil.where("RPF.ID_CONVENIO_PF= :id")
 		.setParameter("id", +idConvenioPf);
