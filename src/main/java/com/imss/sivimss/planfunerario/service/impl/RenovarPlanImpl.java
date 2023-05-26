@@ -134,8 +134,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			    		//if(!validarVigenciaCtoAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), authentication)) {
 			    		 if(fechaHoy()>31) {
 			    	         logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
-			    			 providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlanAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlConsulta + PATH_ACTUALIZAR,
-					 					authentication);
+			    			// providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlanAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlConsulta + PATH_ACTUALIZAR, authentication);
 			    			 logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO SE ENCUENTRA INACTIVO", CONSULTA, authentication);
 			    			    response.setMensaje("36 CONVENIO INACTIVO");
 			    				response.setDatos(null);
@@ -144,8 +143,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			    		}
 			    		  if(validarFallecidoCtoAnterior(filtros.getNumeroContratante(),filtros.getNumeroConvenio(), authentication)) {
 			    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A CERRADO", MODIFICACION, authentication);
-			    			 providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusACerrado(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlConsulta + PATH_ACTUALIZAR,
-					 					authentication);
+			    			//providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusACerrado(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlConsulta + PATH_ACTUALIZAR, authentication);
 			    			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
 			    			response.setMensaje("39");
 			    			response.setDatos(null);

@@ -102,7 +102,7 @@ public class RenovarBean {
 		.join("SVT_DOMICILIO SD", "SC.ID_DOMICILIO = SD.ID_DOMICILIO ")
 		.leftJoin("SVC_CP CP", "SD.DES_CP = CP.CVE_CODIGO_POSTAL")
 		.join(SVC_PERSONA, "SC.ID_PERSONA = SP.ID_PERSONA");
-		queryUtil.where("SCP.ID_TIPO_PREVISION = 1");
+		queryUtil.where("SCP.ID_TIPO_PREVISION = 1 ").and("SCP.ID_ESTATUS_CONVENIO = 2");
 		if(filtros.getFolio()!=null && filtros.getRfc()==null && filtros.getNumIne()==null) {
 			queryUtil.where("SCP.DES_FOLIO = :desFolio")
 			.setParameter(DES_FOLIO, filtros.getFolio());
@@ -182,7 +182,7 @@ public class RenovarBean {
 		.join("SVT_DOMICILIO SD", "SC.ID_DOMICILIO = SD.ID_DOMICILIO ")
 		.join("SVC_CP CP", "SD.DES_CP = CP.CVE_CODIGO_POSTAL")
 		.join(SVC_PERSONA, "SC.ID_PERSONA = SP.ID_PERSONA");
-		queryUtil.where("SCP.ID_TIPO_PREVISION = 2");
+		queryUtil.where("SCP.ID_TIPO_PREVISION = 2").and("SCP.ID_ESTATUS_CONVENIO = 2");
 		if(filtros.getNumeroConvenio()!=null && filtros.getNumeroContratante()==null) {
 			queryUtil.where("SCP.ID_CONVENIO_PF = :idConvenio")
 			.setParameter(ID_CONVENIO, filtros.getNumeroConvenio());
