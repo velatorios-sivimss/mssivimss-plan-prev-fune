@@ -15,11 +15,13 @@ import javax.xml.bind.DatatypeConverter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.imss.sivimss.planfunerario.beans.RenovarBean;
+import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
 import com.imss.sivimss.planfunerario.model.request.RenovarPlanPFRequest;
 import com.imss.sivimss.planfunerario.model.request.ReporteDto;
@@ -73,6 +75,9 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
 	//	UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+		if(filtros.getFolio()==null && filtros.getRfc()==null && filtros.getNumIne()==null) {
+			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
+		}
 			Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarNuevo(request, filtros).getDatos(), urlConsulta + PATH_CONSULTA,
 					authentication);
 			Object rst = response.getDatos();
@@ -110,9 +115,9 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-	//	if(filtros.getNumeroContratante()==null && filtros.getNumeroConvenio()==null) {
-		//	throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
-	//	}
+		if(filtros.getNumeroContratante()==null && filtros.getNumeroConvenio()==null) {
+			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
+		}
 		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarAnterior(request, filtros).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 	      if(response.getDatos().toString().equals("[]")){
@@ -158,6 +163,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		    RenovarPlanPFRequest renovarRequest = gson.fromJson(datosJson, RenovarPlanPFRequest .class);	
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+			
 			renovarBean = new RenovarBean(renovarRequest);
 			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 			Date dateF = new SimpleDateFormat("dd-MM-yyyy").parse(renovarRequest.getVigencia());

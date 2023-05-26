@@ -29,6 +29,8 @@ public class AppConstantes {
 	public static final String OCURRIO_ERROR_GENERICO="187";// Ocurrio un error al procesar tu solicitud.
 	public static final String CURRENT_TIMESTAMP="CURRENT_TIMESTAMP()";
 	public static final String IND_ACTIVO="IND_ACTIVO";
+	public static final String RUTA="rutaNombreReporte";
+	public static final String TIPO="tipoReporte";
 	
 	private AppConstantes() {
 	    throw new IllegalStateException("AppConstantes class");
