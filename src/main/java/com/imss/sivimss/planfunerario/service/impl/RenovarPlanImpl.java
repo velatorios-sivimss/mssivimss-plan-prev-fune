@@ -167,7 +167,6 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	        renovarBean.setVigencia(fecha);
 			String velatorio= renovarRequest.getVelatorio().substring(0,3).toUpperCase();
 		Integer contador = contadorRenovaciones(renovarRequest.getIdConvenioPf(), authentication);
-	//Integer contador=0;
 	Integer folio=101+contador;	
 				 String folioAdenda=buildFolio(velatorio,folio);
 				 renovarBean.setFolioAdenda(folioAdenda);

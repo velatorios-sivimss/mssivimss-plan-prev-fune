@@ -34,6 +34,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	private static final String BAJA = "baja";
 	private static final String MODIFICACION = "modificacion";
 	private static final String CONSULTA = "consulta";
+	private static final String ERROR = "Fallo al ejecutar la query ";
 	
 	@Autowired
 	private LogUtil logUtil;
@@ -87,10 +88,10 @@ public class BeneficiariosImpl implements BeneficiariosService{
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
 				return response;		
 		}catch (Exception e) {
-			String consulta = benefBean.insertarPersona().getDatos().get("query").toString();
+			String consulta = benefBean.insertarPersona().getDatos().get(""+AppConstantes.QUERY+"").toString();
 			String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error("Error al ejecutar la query " +encoded);
-			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Fallo al ejecutar la query", CONSULTA, authentication);
+			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),ERROR, CONSULTA, authentication);
 			throw new IOException("5", e.getCause()) ;
 		}
 		
@@ -119,10 +120,10 @@ public class BeneficiariosImpl implements BeneficiariosService{
 						authentication);
 			}else {
 				String consulta = benefBean.editarBeneficiario(benefRequest.getIdPersona(), usuarioDto.getIdUsuario(),
-						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getActaNac()).getDatos().get("query").toString();
+						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getActaNac()).getDatos().get(""+AppConstantes.QUERY+"").toString();
 				String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 				log.error("Error al ejecutar la query" +encoded);
-				logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Fallo al ejecutar la query", MODIFICACION, authentication);
+				logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),ERROR, MODIFICACION, authentication);
 				throw new BadRequestException(HttpStatus.BAD_REQUEST, " 5 FALLO AL ACTUALIZAR EL BENEFICIARIO ");		
 			}
 			
@@ -131,7 +132,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		String consulta = benefBean.editarPersona().getDatos().get("query").toString();
 		String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 		log.error("Error al ejecutar la query" +encoded);
-		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Fallo al ejecutar la query", MODIFICACION, authentication);
+		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),ERROR, MODIFICACION, authentication);
 		throw new IOException("5", e.getCause()) ;
 	}
 	}
