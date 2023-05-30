@@ -7,10 +7,14 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
+import com.google.gson.Gson;
 import com.ibm.icu.text.RuleBasedNumberFormat;
+import com.imss.sivimss.planfunerario.exception.BadRequestException;
+import com.imss.sivimss.planfunerario.model.RenovarDocumentacionModel;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
 import com.imss.sivimss.planfunerario.model.request.RenovarPlanPFRequest;
 import com.imss.sivimss.planfunerario.model.request.ReporteDto;
+import com.imss.sivimss.planfunerario.model.request.VerificarDocumentacionRequest;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.QueryHelper;
@@ -420,26 +424,24 @@ public class RenovarBean {
 	}
 
 
-	public DatosRequest  cambiarEstatusPlanAnterior(Integer idContratante, Integer idConvenio,
-			Integer idUsuario) {
+	public DatosRequest  cambiarEstatusPlanAnterior(Integer idConvenio, Integer idUsuario) {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		String query;
-		if(idConvenio!=null) {
 			final QueryHelper q = new QueryHelper(UPDATE_SVT_CONVENIO_PF);
 			q.agregarParametroValues(""+AppConstantes.ID_ESTATUS_CONVENIO+"", "3");
 			q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+idUsuario+"");
 			q.agregarParametroValues("FEC_ACTUALIZACION", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 			q.addWhere("ID_CONVENIO_PF = "+idConvenio+"");
 			query = q.obtenerQueryActualizar();
-		}else {
+		/*
 			query = "UPDATE SVT_CONVENIO_PF SC "
 					+ "JOIN SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC ON SC.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF "
 					+ "SET SC.ID_ESTATUS_CONVENIO = 3,"
 					+ "SC.ID_USUARIO_MODIFICA= " +idUsuario+ " ,"
 							+ "SC.FEC_ACTUALIZACION= CURRENT_TIMESTAMP() "
 					+ " WHERE SCPC.ID_CONTRATANTE ="  +idContratante+ "";
-		}
+		} */
 		log.info("renovar -> "+query);
 		String encoded = encodedQuery(query);
 		parametro.put(AppConstantes.QUERY, encoded);
@@ -448,7 +450,7 @@ public class RenovarBean {
 	}
 
 
-	public DatosRequest cambiarEstatusACerrado(Integer idContratante, Integer idConvenio,
+	public DatosRequest cambiarEstatusACerrado(String folio, Integer idConvenio,
 			Integer idUsuario) {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
@@ -461,12 +463,12 @@ public class RenovarBean {
 			q.addWhere("ID_CONVENIO_PF = "+idConvenio+"");
 			query = q.obtenerQueryActualizar();
 		}else {
-			query = "UPDATE SVT_CONVENIO_PF SC "
-					+ "JOIN SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC ON SC.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF "
-					+ "SET SC.ID_ESTATUS_CONVENIO = 4,"
-					+ "SC.ID_USUARIO_MODIFICA= " +idUsuario+ " ,"
-							+ "SC.FEC_ACTUALIZACION= CURRENT_TIMESTAMP() "
-					+ " WHERE SCPC.ID_CONTRATANTE ="  +idContratante+ "";
+			final QueryHelper q = new QueryHelper(UPDATE_SVT_CONVENIO_PF);
+			q.agregarParametroValues(""+AppConstantes.ID_ESTATUS_CONVENIO+"", "4");
+			q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+idUsuario+"");
+			q.agregarParametroValues("FEC_ACTUALIZACION", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+			q.addWhere("DES_FOLIO = '"+folio+"'");
+			query = q.obtenerQueryActualizar();
 		}
 		log.info("a estatus cerrado "+query);
 		String encoded = encodedQuery(query);
@@ -534,6 +536,50 @@ public class RenovarBean {
 	
 	private static String encodedQuery(String query) {
 		return DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+	}
+
+	public DatosRequest actualizarDocumentacion(VerificarDocumentacionRequest verificarDoc) {
+		DatosRequest request = new DatosRequest();
+		Map<String, Object> parametro = new HashMap<>();
+		final QueryHelper q = new QueryHelper("INSERT INTO SVC_VALIDACION_DOCUMENTOS_CONVENIO_PF ");
+		q.agregarParametroValues("INE_AFILIADO", "" + verificarDoc.getIneAfiliado() + "");
+		q.agregarParametroValues("CURP", "" + verificarDoc.getCurp() + "");
+		q.agregarParametroValues("RFC", "" + verificarDoc.getRfc()+ "");
+		q.agregarParametroValues("ACTA_NACIMIENTO", "" + verificarDoc.getActaNac() + "");
+		q.agregarParametroValues("INE_BENEFICIARIO", ""+ verificarDoc.getIneBeneficiario() + "");
+		q.agregarParametroValues("ID_CONVENIO_PF", ""+verificarDoc.getIdConvenioPf()+"");
+	//	q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"");
+		//q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		String query = q.obtenerQueryInsertar() +"$$"  + renovarDocumentacion(verificarDoc.getRenovarDoc());
+		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+		        parametro.put(AppConstantes.QUERY, encoded);
+		        parametro.put("separador","$$");
+		        parametro.put("replace","idTabla");
+		        request.setDatos(parametro);
+		
+		return request;
+	}
+
+	private String renovarDocumentacion(RenovarDocumentacionModel renovarDoc) {
+		 DatosRequest request = new DatosRequest();
+	        Map<String, Object> parametro = new HashMap<>();
+	        final QueryHelper q = new QueryHelper("INSERT INTO SVC_VALIDACION_DOCUMENTOS_RENOVACION_CONVENIO_PF");
+	        q.agregarParametroValues("ID_VALIDACION_DOCUMENTO", "idTabla");
+	        q.agregarParametroValues("CONVENIO_ANTERIOR", ""+renovarDoc.getConvenioAnterior()+"");
+	        q.agregarParametroValues("COMPROBANTE_ESTUDIOS_BENEFICIARIO", ""+renovarDoc.getComprobanteEstudios()+"");
+	        q.agregarParametroValues("ACTA_MATRIMONIO", ""+renovarDoc.getActaMatrimonio()+"");
+	        //q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
+	        q.agregarParametroValues("DECLARACION_CONCUBINATO", ""+renovarDoc.getDeclaracionConcubinato()+"");
+	        q.agregarParametroValues("CARTA_PODER", ""+renovarDoc.getCartaPoder()+"");
+	        q.agregarParametroValues("INE_TESTIGO", ""+renovarDoc.getIneTestigo()+"");
+	        q.agregarParametroValues("INE_TESTIGO_DOS", ""+renovarDoc.getIneTestigoDos()+"");
+	        //q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"" );
+			//q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+	        String query = q.obtenerQueryInsertar();
+	        String encoded = encodedQuery(query);
+	        parametro.put(AppConstantes.QUERY, encoded);
+	        request.setDatos(parametro);
+	        return query;
 	}
 
 }

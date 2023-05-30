@@ -132,6 +132,7 @@ public class BeneficiariosBean {
 		q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"");
 		q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		String query = q.obtenerQueryInsertar() +"$$"  + insertarBeneficiario(this.idContratanteConvenioPf, this.idParentesco, this.actaNac);
+		log.info(query);
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 		        parametro.put(AppConstantes.QUERY, encoded);
 		        parametro.put("separador","$$");
