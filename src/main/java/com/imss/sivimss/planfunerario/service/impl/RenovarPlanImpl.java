@@ -321,13 +321,9 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		Response<?> response;
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		VerificarDocumentacionRequest verificarDoc = gson.fromJson(datosJson, VerificarDocumentacionRequest.class);	
-		log.info("-> " +verificarDoc.getRenovarDoc().getCartaPoder());
 		try {
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-			
-		//	renovarBean = new RenovarBean(renovarRequest);
 			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
-			
 				response = providerRestTemplate.consumirServicio(renovarBean.actualizarDocumentacion(verificarDoc).getDatos(), urlConsulta + PATH_CREAR_MULTIPLE,
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
@@ -337,7 +333,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error("Error al ejecutar la query " +encoded);
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"ERROR AL ACTUALIZAR LA DOCUMENTACION REQUERIDA: Fallo al ejecutar la query", ALTA, authentication);
-			throw new IOException("5", e.getCause()) ;
+			throw new IOException("5", e.getCause());
 		}
 	}
 

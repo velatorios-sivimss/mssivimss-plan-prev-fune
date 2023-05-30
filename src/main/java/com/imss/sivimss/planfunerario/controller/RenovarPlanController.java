@@ -116,7 +116,7 @@ public class RenovarPlanController {
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("verificar-documentacion")
 	public CompletableFuture<?> verificarDocumentacionRequerida(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
-		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Imprimir Plantilla Hoja de afiliacion", IMPRIMIR, authentication);
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Verificar la documentacion requerida", ALTA, authentication);
 		Response<?> response = renovarPlan.verificarDocumentacion(request,authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));

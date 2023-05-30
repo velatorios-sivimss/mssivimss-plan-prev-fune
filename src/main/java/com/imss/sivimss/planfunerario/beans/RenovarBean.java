@@ -547,9 +547,10 @@ public class RenovarBean {
 		q.agregarParametroValues("RFC", "" + verificarDoc.getRfc()+ "");
 		q.agregarParametroValues("ACTA_NACIMIENTO", "" + verificarDoc.getActaNac() + "");
 		q.agregarParametroValues("INE_BENEFICIARIO", ""+ verificarDoc.getIneBeneficiario() + "");
+		q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 		q.agregarParametroValues("ID_CONVENIO_PF", ""+verificarDoc.getIdConvenioPf()+"");
-	//	q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"");
-		//q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"");
+		q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		String query = q.obtenerQueryInsertar() +"$$"  + renovarDocumentacion(verificarDoc.getRenovarDoc());
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 		        parametro.put(AppConstantes.QUERY, encoded);
