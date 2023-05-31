@@ -239,7 +239,8 @@ public class RenovarBean {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("SPF.FEC_VIGENCIA ")
+		//queryUtil.select("SPF.FEC_VIGENCIA ")
+		queryUtil.select("IF(SPF.IND_RENOVACION=0, (DATE_FORMAT(SPF.FEC_VIGENCIA, \"%m\")), DATE_FORMAT(RPF.FEC_VIGENCIA, \"%m\")) AS vig")
 		.from(SVT_CONVENIO_PF)
 		.leftJoin(SVT_RENOVACION_CONVENIO_PF, "SPF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS=1")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SPF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF ")
