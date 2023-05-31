@@ -21,6 +21,5 @@ public class FiltrosConvenioPFRequest {
 	private String folio;
 	private String rfc;
 	private String numIne;
-	private Integer vigencia;
 	
 }
