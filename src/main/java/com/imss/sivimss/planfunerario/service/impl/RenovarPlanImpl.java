@@ -333,7 +333,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private int getDia() {
 	SimpleDateFormat sdf = new SimpleDateFormat("dd");
 		String date = sdf.format(new Date());
-		//String date ="1";
+		//String date ="21";
 		return Integer.parseInt(date);
 	}
 	
@@ -352,6 +352,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		if (matcher.find()) {
 		    vigencia = Integer.parseInt(matcher.group(1));
 		}
+		log.info("-> " +vigencia);
 		mesVigencia = vigencia;
 	}
 
