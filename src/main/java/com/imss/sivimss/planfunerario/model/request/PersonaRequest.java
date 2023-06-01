@@ -19,7 +19,7 @@ public class PersonaRequest {
 
 	private Integer idBeneficiario;
 	private Integer idPersona;
-	
+	private Boolean estatusBenefic;
 	private String nombre;
 	private String apellidoP;
 	private String apellidoM;

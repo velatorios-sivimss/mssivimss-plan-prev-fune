@@ -45,6 +45,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private static final String MODIFICACION = "modificacion";
 	private static final String CONSULTA = "consulta";
 	private static final String IMPRIMIR = "imprimir";
+	private static final String INFORMACION_INCOMPLETA = "Informacion incompleta";
 	
 	@Autowired
 	private LogUtil logUtil;
@@ -78,7 +79,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		if(filtros.getFolio()==null && filtros.getRfc()==null && filtros.getNumIne()==null) {
-			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
+			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}
 			Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarNuevo(request, filtros).getDatos(), urlConsulta + PATH_CONSULTA,
 					authentication);
@@ -94,16 +95,14 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    			return response;
 		    	  }
 		    		// if(!validarVigencia(filtros, authentication)) {
-		    	  if(getDia()>31 || mesActual()>mesVigencia){
+		    	  if(getDia()>20 || mesActual()>mesVigencia){
 		    		    	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 		    		    	providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), usuarioDto.getIdUsuario()).getDatos(), urlConsulta + PATH_ACTUALIZAR,authentication);
 		    		    	logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 CONVENIO INACTIVO ", CONSULTA, authentication);
 		    		    	response.setMensaje("36 CONVENIO INACTIVO");
 				  			response.setDatos(null);
 				  			return response;
-		    	  
 		    		    } 
-		    		    	
 		    		if(validarFallecido(filtros, authentication)) {
 		    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A CERRADO", MODIFICACION, authentication);
 		    			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusACerrado(filtros.getFolio(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlConsulta + PATH_ACTUALIZAR, authentication);
@@ -121,7 +120,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		if(filtros.getNumeroContratante()==null || filtros.getNumeroConvenio()==null) {
-			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
+			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}
 		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarAnterior(request, filtros).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
@@ -136,7 +135,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			    			return response;
 			    	  }
 			    		//if(!validarVigenciaCtoAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), authentication)) {
-			    		 if(getDia()>31 || mesActual()>mesVigencia) {
+			    		 if(getDia()>20 || mesActual()>mesVigencia) {
 			    	         logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 			    			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlanAnterior(filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlConsulta + PATH_ACTUALIZAR, authentication);
 			    			 logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO SE ENCUENTRA INACTIVO", CONSULTA, authentication);
@@ -225,7 +224,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 
 
 	private boolean validarFallecidoCtoAnterior(Integer numContratante, Integer numConvenio, Authentication authentication) throws IOException {
-		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarFallecido(numContratante, numConvenio).getDatos(), urlConsulta + PATH_CONSULTA,
+		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarFallecidoCtoAnterior(numContratante, numConvenio).getDatos(), urlConsulta + PATH_CONSULTA,
 				authentication);
 	Object rst=response.getDatos();
 	return !rst.toString().equals("[]");
@@ -273,22 +272,6 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	log.info("-> " +rst.toString());
 	return !rst.toString().equals("[]");
 	} */
-	
-	private int getDia() {
-	SimpleDateFormat sdf = new SimpleDateFormat("dd");
-		String date = sdf.format(new Date());
-		//String date ="1";
-		return Integer.parseInt(date);
-	}
-	
-	private Integer mesActual() {
-	    SimpleDateFormat sdfMes = new SimpleDateFormat("M");
-		String date = sdfMes.format(new Date());
-		//String date ="6";
-		return Integer.parseInt(date);
-	}
-
-
 	@Override
 	public Response<?> descargarAdendaRenovacionAnual(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
@@ -327,12 +310,16 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		Response<?> response;
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		VerificarDocumentacionRequest verificarDoc = gson.fromJson(datosJson, VerificarDocumentacionRequest.class);	
+	if (verificarDoc.getIdConvenioPf()==null) {
+		throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);		
+	}
 		try {
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
-		//	providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusDoc(verificarDoc.getIdConvenioPf()).getDatos(), urlConsulta + PATH_CREAR, authentication);	
+			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusDoc(verificarDoc.getIdConvenioPf()).getDatos(), urlConsulta + PATH_CREAR, authentication);	
+			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Cambio de estatus documentacion requerida ", BAJA, authentication);
 			response = providerRestTemplate.consumirServicio(renovarBean.actualizarDocumentacion(verificarDoc).getDatos(), urlConsulta + PATH_CREAR_MULTIPLE, authentication);
-				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
+				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Se agrego correctamente la documentacion requerida", ALTA, authentication);
 				return response;						
 		}catch (Exception e) {
 			String consulta = renovarBean.actualizarDocumentacion(verificarDoc).getDatos().get("query").toString();
@@ -341,6 +328,20 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"ERROR AL ACTUALIZAR LA DOCUMENTACION REQUERIDA: Fallo al ejecutar la query", ALTA, authentication);
 			throw new IOException("5", e.getCause());
 		}
+	}
+	
+	private int getDia() {
+	SimpleDateFormat sdf = new SimpleDateFormat("dd");
+		String date = sdf.format(new Date());
+		//String date ="1";
+		return Integer.parseInt(date);
+	}
+	
+	private Integer mesActual() {
+	    SimpleDateFormat sdfMes = new SimpleDateFormat("M");
+		String date = sdfMes.format(new Date());
+		//String date ="6";
+		return Integer.parseInt(date);
 	}
 	
 

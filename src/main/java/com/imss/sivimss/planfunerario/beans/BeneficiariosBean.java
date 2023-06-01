@@ -208,15 +208,21 @@ public class BeneficiariosBean {
 
 
 
-	public  DatosRequest cambiarEstatus(int idBeneficiario) {
+	public  DatosRequest cambiarEstatus(int idBeneficiario, boolean estatus) {
 		 DatosRequest request = new DatosRequest();
 	        Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("UPDATE SVT_CONTRATANTE_BENEFICIARIOS");
-	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "!IND_aCTIVO");
-	        q.agregarParametroValues("ID_USUARIO_BAJA", ""+usuarioBaja+"" );
-			q.agregarParametroValues("FEC_BAJA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", ""+estatus+"");
+	        if(!estatus) {
+	        	 q.agregarParametroValues("ID_USUARIO_BAJA", ""+usuarioBaja+"" );
+	 			q.agregarParametroValues("FEC_BAJA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+	        }else {
+	        	  q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+usuarioBaja+"" );
+	  			q.agregarParametroValues("FEC_ACTUALIZACION", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+	        }
 			q.addWhere("ID_CONTRATANTE_BENEFICIARIOS = " + idBeneficiario);
 	        String query = q.obtenerQueryActualizar();
+	        log.info(query);
 	        String encoded = encodedQuery(query);
 	        parametro.put(AppConstantes.QUERY, encoded);
 	        request.setDatos(parametro);

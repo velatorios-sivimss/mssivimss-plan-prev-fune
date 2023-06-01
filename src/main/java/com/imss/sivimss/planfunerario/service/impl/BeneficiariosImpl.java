@@ -143,7 +143,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		benefBean.setUsuarioBaja(usuarioDto.getIdUsuario());
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 	  PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
-	  Response<?> response = providerRestTemplate.consumirServicio(benefBean.cambiarEstatus(benefRequest.getIdBeneficiario()).getDatos(), urlConsulta +PATH_ACTUALIZAR,
+	  Response<?> response = providerRestTemplate.consumirServicio(benefBean.cambiarEstatus(benefRequest.getIdBeneficiario(), benefRequest.getEstatusBenefic()).getDatos(), urlConsulta +PATH_ACTUALIZAR,
 				authentication);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", BAJA, authentication);
 	return response;
