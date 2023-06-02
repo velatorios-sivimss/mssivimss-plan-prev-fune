@@ -62,7 +62,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	 private static final String PATH_CONSULTA="generico/consulta";
 	 private static final String PATH_CREAR="generico/crear";
 	 private static final String PATH_ACTUALIZAR="generico/actualizar";
-	 private static final String PATH_CREAR_MULTIPLE="generico/crearMultiple";
+	 private static final String PATH_INSERTAR_MULTIPLE="generico/insertarMultiple";
 	 
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
@@ -316,9 +316,9 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		try {
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
-			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusDoc(verificarDoc.getIdConvenioPf()).getDatos(), urlConsulta + PATH_CREAR, authentication);	
+		//	providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusDoc(verificarDoc.getIdConvenioPf()).getDatos(), urlConsulta + PATH_CREAR, authentication);	
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Cambio de estatus documentacion requerida ", BAJA, authentication);
-			response = providerRestTemplate.consumirServicio(renovarBean.actualizarDocumentacion(verificarDoc).getDatos(), urlConsulta + PATH_CREAR_MULTIPLE, authentication);
+			response = providerRestTemplate.consumirServicio(renovarBean.actualizarDocumentacion(verificarDoc).getDatos(), urlConsulta + PATH_INSERTAR_MULTIPLE, authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Se agrego correctamente la documentacion requerida", ALTA, authentication);
 				return response;						
 		}catch (Exception e) {

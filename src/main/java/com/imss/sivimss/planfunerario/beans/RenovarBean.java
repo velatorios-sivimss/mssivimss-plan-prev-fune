@@ -531,33 +531,48 @@ public class RenovarBean {
 	public DatosRequest actualizarDocumentacion(VerificarDocumentacionRequest verificarDoc) {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
-		final QueryHelper q = new QueryHelper("INSERT INTO SVC_VALIDACION_DOCUMENTOS_CONVENIO_PF");
+		final QueryHelper q = new QueryHelper("UPDATE SVC_VALIDACION_DOCUMENTOS_CONVENIO_PF");
 		q.agregarParametroValues("IND_INE_AFILIADO", "" + verificarDoc.getIneAfiliado() + "");
 		q.agregarParametroValues("IND_CURP", "" + verificarDoc.getCurp() + "");
 		q.agregarParametroValues("IND_RFC", "" + verificarDoc.getRfc()+ "");
 		q.agregarParametroValues("IND_ACTA_NACIMIENTO", "" + verificarDoc.getActaNac() + "");
 		q.agregarParametroValues("IND_INE_BENEFICIARIO", ""+ verificarDoc.getIneBeneficiario() + "");
 		q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
-		q.agregarParametroValues(ID_CONVENIO_PF, ""+verificarDoc.getIdConvenioPf()+"");
-		q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"");
-		q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
-		//q.addWhere("ID_CONVENIO_PF = "+verificarDoc.getIdConvenioPf()+" AND IND_ACTIVO=1");
-		String query = q.obtenerQueryInsertar() +"$$"  + renovarDocumentacion(verificarDoc.getRenovarDoc());
-		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+		q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+usuarioAlta+"");
+		q.agregarParametroValues("FEC_ACTUALIZACION", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		q.addWhere("ID_VALIDACION_DOCUMENTO = "+verificarDoc.getIdValidacionDoc());
+		//String query = q.obtenerQueryActualizar();
+		String query = q.obtenerQueryActualizar() +"$$" +renovarDocumentacion(verificarDoc.getRenovarDoc(), verificarDoc.getIdValidacionDoc());
+		log.info("---> "+query);
+		String encoded = encodedQuery(query);
 		        parametro.put(AppConstantes.QUERY, encoded);
 		        parametro.put("separador","$$");
-		        parametro.put("replace","idTabla");
+		      //  parametro.put("replace","idTabla");
 		        request.setDatos(parametro);
-		
 		return request;
 	}
 
 
-	private String renovarDocumentacion(RenovarDocumentacionModel renovarDoc) {
+	private String renovarDocumentacion(RenovarDocumentacionModel renovarDoc, Integer validacionDoc) {
 		 DatosRequest request = new DatosRequest();
 	        Map<String, Object> parametro = new HashMap<>();
-	        final QueryHelper q = new QueryHelper("INSERT INTO SVC_VALIDACION_DOCUMENTOS_RENOVACION_CONVENIO_PF");
-	        q.agregarParametroValues("ID_VALIDACION_DOCUMENTO", "idTabla");
+	    	StringBuilder queries= new StringBuilder();
+	    	//queries.append("IF EXISTS (SELECT ID_VALIDACION_DOCUMENTO FROM svc_validacion_documentos_renovacion_convenio_pf WHERE ID_VALIDACION_DOCUMENTO=1) ");
+	    	  final QueryHelper qh = new QueryHelper("INSERT INTO SVC_VALIDACION_DOCUMENTOS_RENOVACION_CONVENIO_PF");
+		        qh.agregarParametroValues("ID_VALIDACION_DOCUMENTO", ""+validacionDoc+"");
+		        qh.agregarParametroValues("IND_CONVENIO_ANTERIOR", ""+renovarDoc.getConvenioAnterior()+"");
+		        qh.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS_BENEFICIARIO", ""+renovarDoc.getComprobanteEstudios()+"");
+		        qh.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+renovarDoc.getActaMatrimonio()+"");
+		        //q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
+		        qh.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+renovarDoc.getDeclaracionConcubinato()+"");
+		        qh.agregarParametroValues("IND_CARTA_PODER", ""+renovarDoc.getCartaPoder()+"");
+		        qh.agregarParametroValues("IND_INE_TESTIGO", ""+renovarDoc.getIneTestigo()+"");
+		        qh.agregarParametroValues("IND_INE_TESTIGO_DOS", ""+renovarDoc.getIneTestigoDos()+"");
+		        String query = qh.obtenerQueryInsertar(); 
+	           // String queryRep = query.replace(";", " ");
+	        queries.append(query+ "ON DUPLICATE KEY ");
+	        final QueryHelper q = new QueryHelper("UPDATE");
+	        //q.agregarParametroValues("ID_VALIDACION_DOCUMENTO", ""+validacionDoc+"");
 	        q.agregarParametroValues("IND_CONVENIO_ANTERIOR", ""+renovarDoc.getConvenioAnterior()+"");
 	        q.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS_BENEFICIARIO", ""+renovarDoc.getComprobanteEstudios()+"");
 	        q.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+renovarDoc.getActaMatrimonio()+"");
@@ -566,13 +581,16 @@ public class RenovarBean {
 	        q.agregarParametroValues("IND_CARTA_PODER", ""+renovarDoc.getCartaPoder()+"");
 	        q.agregarParametroValues("IND_INE_TESTIGO", ""+renovarDoc.getIneTestigo()+"");
 	        q.agregarParametroValues("IND_INE_TESTIGO_DOS", ""+renovarDoc.getIneTestigoDos()+"");
-	        //q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"" );
-			//q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
-	        String query = q.obtenerQueryInsertar();
-	        String encoded = encodedQuery(query);
+	        q.addWhere("");
+	        String queryUpdate = q.obtenerQueryActualizar(); 
+	        queries.append(queryUpdate);
+	        String queryFinal=queries.toString().replace("WHERE", "").replace("SET", "").replaceFirst(";", " ");
+	       // queryFinal=queries.toString().replace("SET", "");
+	        log.info("____--->> "+queryFinal);
+	        String encoded = encodedQuery(queryFinal);
 	        parametro.put(AppConstantes.QUERY, encoded);
 	        request.setDatos(parametro);
-	        return query;
+	        return queryFinal;
 	}
 	
 	public  DatosRequest cambiarEstatusDoc(Integer idConvenio) {
