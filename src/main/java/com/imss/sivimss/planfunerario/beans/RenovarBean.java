@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.xml.bind.DatatypeConverter;
 
 import com.ibm.icu.text.RuleBasedNumberFormat;
-import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.RenovarDocumentacionModel;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
 import com.imss.sivimss.planfunerario.model.request.RenovarPlanPFRequest;
@@ -457,15 +456,15 @@ public class RenovarBean {
 		if(idConvenio!=null) {
 			final QueryHelper q = new QueryHelper(UPDATE_SVT_CONVENIO_PF);
 			q.agregarParametroValues(""+AppConstantes.ID_ESTATUS_CONVENIO+"", "4");
-			q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+idUsuario+"");
-			q.agregarParametroValues("FEC_ACTUALIZACION", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+			q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"");
+			q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 			q.addWhere("ID_CONVENIO_PF = "+idConvenio+"");
 			query = q.obtenerQueryActualizar();
 		}else {
 			final QueryHelper q = new QueryHelper(UPDATE_SVT_CONVENIO_PF);
 			q.agregarParametroValues(""+AppConstantes.ID_ESTATUS_CONVENIO+"", "4");
-			q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+idUsuario+"");
-			q.agregarParametroValues("FEC_ACTUALIZACION", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+			q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"");
+			q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 			q.addWhere("DES_FOLIO = '"+folio+"'");
 			query = q.obtenerQueryActualizar();
 		}
@@ -537,17 +536,15 @@ public class RenovarBean {
 		q.agregarParametroValues("IND_RFC", "" + verificarDoc.getRfc()+ "");
 		q.agregarParametroValues("IND_ACTA_NACIMIENTO", "" + verificarDoc.getActaNac() + "");
 		q.agregarParametroValues("IND_INE_BENEFICIARIO", ""+ verificarDoc.getIneBeneficiario() + "");
-		q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
-		q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+usuarioAlta+"");
-		q.agregarParametroValues("FEC_ACTUALIZACION", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		//q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
+		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+usuarioAlta+"");
+		q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		q.addWhere("ID_VALIDACION_DOCUMENTO = "+verificarDoc.getIdValidacionDoc());
-		//String query = q.obtenerQueryActualizar();
 		String query = q.obtenerQueryActualizar() +"$$" +renovarDocumentacion(verificarDoc.getRenovarDoc(), verificarDoc.getIdValidacionDoc());
 		log.info("---> "+query);
 		String encoded = encodedQuery(query);
 		        parametro.put(AppConstantes.QUERY, encoded);
 		        parametro.put("separador","$$");
-		      //  parametro.put("replace","idTabla");
 		        request.setDatos(parametro);
 		return request;
 	}
@@ -557,7 +554,6 @@ public class RenovarBean {
 		 DatosRequest request = new DatosRequest();
 	        Map<String, Object> parametro = new HashMap<>();
 	    	StringBuilder queries= new StringBuilder();
-	    	//queries.append("IF EXISTS (SELECT ID_VALIDACION_DOCUMENTO FROM svc_validacion_documentos_renovacion_convenio_pf WHERE ID_VALIDACION_DOCUMENTO=1) ");
 	    	  final QueryHelper qh = new QueryHelper("INSERT INTO SVC_VALIDACION_DOCUMENTOS_RENOVACION_CONVENIO_PF");
 		        qh.agregarParametroValues("ID_VALIDACION_DOCUMENTO", ""+validacionDoc+"");
 		        qh.agregarParametroValues("IND_CONVENIO_ANTERIOR", ""+renovarDoc.getConvenioAnterior()+"");
@@ -568,25 +564,24 @@ public class RenovarBean {
 		        qh.agregarParametroValues("IND_CARTA_PODER", ""+renovarDoc.getCartaPoder()+"");
 		        qh.agregarParametroValues("IND_INE_TESTIGO", ""+renovarDoc.getIneTestigo()+"");
 		        qh.agregarParametroValues("IND_INE_TESTIGO_DOS", ""+renovarDoc.getIneTestigoDos()+"");
+		        qh.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"");
+		        qh.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		        String query = qh.obtenerQueryInsertar(); 
-	           // String queryRep = query.replace(";", " ");
 	        queries.append(query+ "ON DUPLICATE KEY ");
 	        final QueryHelper q = new QueryHelper("UPDATE");
-	        //q.agregarParametroValues("ID_VALIDACION_DOCUMENTO", ""+validacionDoc+"");
 	        q.agregarParametroValues("IND_CONVENIO_ANTERIOR", ""+renovarDoc.getConvenioAnterior()+"");
 	        q.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS_BENEFICIARIO", ""+renovarDoc.getComprobanteEstudios()+"");
 	        q.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+renovarDoc.getActaMatrimonio()+"");
-	        //q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 	        q.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+renovarDoc.getDeclaracionConcubinato()+"");
 	        q.agregarParametroValues("IND_CARTA_PODER", ""+renovarDoc.getCartaPoder()+"");
 	        q.agregarParametroValues("IND_INE_TESTIGO", ""+renovarDoc.getIneTestigo()+"");
 	        q.agregarParametroValues("IND_INE_TESTIGO_DOS", ""+renovarDoc.getIneTestigoDos()+"");
+	        q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+usuarioAlta+"");
+	        q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 	        q.addWhere("");
 	        String queryUpdate = q.obtenerQueryActualizar(); 
 	        queries.append(queryUpdate);
 	        String queryFinal=queries.toString().replace("WHERE", "").replace("SET", "").replaceFirst(";", " ");
-	       // queryFinal=queries.toString().replace("SET", "");
-	        log.info("____--->> "+queryFinal);
 	        String encoded = encodedQuery(queryFinal);
 	        parametro.put(AppConstantes.QUERY, encoded);
 	        request.setDatos(parametro);

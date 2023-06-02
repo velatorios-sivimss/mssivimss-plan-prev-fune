@@ -18,7 +18,6 @@ import lombok.Setter;
 public class VerificarDocumentacionRequest {
 	
 	private Integer idValidacionDoc;
-	private Integer idConvenioPf;
 	private Integer ineAfiliado;
 	private Integer curp;
 	private Integer rfc;

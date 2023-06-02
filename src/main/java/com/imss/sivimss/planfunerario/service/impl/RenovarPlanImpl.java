@@ -216,7 +216,6 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private String buildFolio(String velatorio, Integer folio) {
 	    String formatearConvenioCeros = String.format("%08d", folio);
 	    String folioConvenio= formatearConvenioCeros.substring(0,6);
-	    log.info("-> "+folioConvenio);
 	    String formatearnumConvenio = formatearConvenioCeros.substring(6,8);
 		return velatorio +"-"+folioConvenio+"-"+formatearnumConvenio;
 	}
@@ -310,16 +309,14 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		Response<?> response;
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		VerificarDocumentacionRequest verificarDoc = gson.fromJson(datosJson, VerificarDocumentacionRequest.class);	
-	if (verificarDoc.getIdConvenioPf()==null) {
+	if (verificarDoc.getIdValidacionDoc()==null) {
 		throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);		
 	}
 		try {
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
-		//	providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusDoc(verificarDoc.getIdConvenioPf()).getDatos(), urlConsulta + PATH_CREAR, authentication);	
-			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Cambio de estatus documentacion requerida ", BAJA, authentication);
 			response = providerRestTemplate.consumirServicio(renovarBean.actualizarDocumentacion(verificarDoc).getDatos(), urlConsulta + PATH_INSERTAR_MULTIPLE, authentication);
-				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Se agrego correctamente la documentacion requerida", ALTA, authentication);
+				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Se actualizo correctamente la documentacion requerida", MODIFICACION, authentication);
 				return response;						
 		}catch (Exception e) {
 			String consulta = renovarBean.actualizarDocumentacion(verificarDoc).getDatos().get("query").toString();
