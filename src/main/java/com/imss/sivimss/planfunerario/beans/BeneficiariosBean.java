@@ -177,8 +177,8 @@ public class BeneficiariosBean {
 		q.agregarParametroValues("CVE_RFC", "'" +this.rfc +"'");
 		q.agregarParametroValues("DES_CORREO", "'"+ this.correoE +"'");
 		q.agregarParametroValues("DES_TELEFONO", "'" + this.tel + "'");
-		q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+usuarioAlta+"");
-		q.agregarParametroValues("FEC_ACTUALIZACION", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+usuarioAlta+"");
+		q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		q.addWhere("ID_PERSONA = " + this.idPersona);
 		String query = q.obtenerQueryActualizar();
 		String encoded = encodedQuery(query);
@@ -196,8 +196,8 @@ public class BeneficiariosBean {
 	        q.agregarParametroValues("ID_PARENTESCO", ""+parentesco+"");
 	        q.agregarParametroValues("CVE_ACTA", "'"+acta+"'");
 	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
-	        q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+idUsuario+"" );
-			q.agregarParametroValues("FEC_ACTUALIZACION", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+	        q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"" );
+			q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 			q.addWhere("ID_PERSONA = " + idPersona);
 	        String query = q.obtenerQueryActualizar();
 	        String encoded = encodedQuery(query);
@@ -217,8 +217,8 @@ public class BeneficiariosBean {
 	        	 q.agregarParametroValues("ID_USUARIO_BAJA", ""+usuarioBaja+"" );
 	 			q.agregarParametroValues("FEC_BAJA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 	        }else {
-	        	  q.agregarParametroValues("ID_USUARIO_MODIFICA", ""+usuarioBaja+"" );
-	  			q.agregarParametroValues("FEC_ACTUALIZACION", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+	        	  q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+usuarioBaja+"" );
+	  			q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 	        }
 			q.addWhere("ID_CONTRATANTE_BENEFICIARIOS = " + idBeneficiario);
 	        String query = q.obtenerQueryActualizar();
@@ -240,7 +240,7 @@ public class BeneficiariosBean {
 				+ "JOIN SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC ON SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF "
 				+ "JOIN SVT_CONVENIO_PF PF ON SCPC.ID_CONVENIO_PF = PF.ID_CONVENIO_PF "
 				+ "JOIN SVC_PERSONA SP ON SB.ID_PERSONA = SP.ID_PERSONA "
-				+ "WHERE PF.ID_TIPO_PREVISION=2 AND SB.ID_PARENTESCO !=4 "
+				+ "WHERE PF.ID_TIPO_PREVISION=2 AND SB.IND_SINIESTROS=0 AND SB.ID_PARENTESCO !=4 "
 				+ "AND PF.ID_CONVENIO_PF= '"+palabra+"' "
 						+ "UNION "
 						+ "SELECT SCPC.ID_CONVENIO_PF AS idCovenio, SB.ID_CONTRATANTE_BENEFICIARIOS AS idBenef, "
@@ -251,10 +251,12 @@ public class BeneficiariosBean {
 						+ "FROM SVT_CONTRATANTE_BENEFICIARIOS SB "
 						+ "JOIN SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC ON SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF "
 						+ "JOIN SVT_CONVENIO_PF PF ON SCPC.ID_CONVENIO_PF = PF.ID_CONVENIO_PF "
+						+ "JOIN SVC_VALIDACION_DOCUMENTOS_CONVENIO_PF DOCPF ON PF.ID_CONVENIO_PF = DOCPF.ID_CONVENIO_PF "
+						+ "JOIN SVC_VALIDACION_DOCUMENTOS_RENOVACION_CONVENIO_PF RDOCPF ON DOCPF.ID_VALIDACION_DOCUMENTO = RDOCPF.ID_VALIDACION_DOCUMENTO "
 						+ "JOIN SVC_PERSONA SP ON SB.ID_PERSONA = SP.ID_PERSONA "
 						+ "WHERE PF.ID_CONVENIO_PF= '"+palabra+"' AND PF.ID_TIPO_PREVISION=2 "
 								+ "AND (IF(SB.ID_PARENTESCO=4 AND TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURDATE())<18, SB.ID_PARENTESCO, NULL)) "
-								+ "OR (SB.ID_PARENTESCO=4 AND SB.CVE_ACTA IS NOT NULL "
+								+ "OR (SB.ID_PARENTESCO=4 AND SB.IND_SINIESTROS=0 AND RDOCPF.IND_COMPROBANTE_ESTUDIOS_BENEFICIARIO = 1 "
 								+ "AND TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURDATE()) BETWEEN 18 AND 25) ";
 		log.info("estoy en: " +query);
 		Map<String, Object> parametros = new HashMap<>();
