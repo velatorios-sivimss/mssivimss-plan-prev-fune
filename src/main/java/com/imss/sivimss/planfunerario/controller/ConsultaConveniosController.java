@@ -112,7 +112,7 @@ public class ConsultaConveniosController {
     @Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
     @TimeLimiter(name = "msflujo")
     @PostMapping("/descargar-reporte-tabla")
-    public CompletableFuture<?> descargarReporteTabla(@RequestBody DatosRequest request, Authentication authentication) throws IOException, ParseException {
+    public CompletableFuture<?> descargarReporteTabla(@RequestBody DatosRequest request, Authentication authentication) {
         Response<?> response = consultaConveniosService.generarReporteTabla(request, authentication);
         return CompletableFuture
                 .supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));

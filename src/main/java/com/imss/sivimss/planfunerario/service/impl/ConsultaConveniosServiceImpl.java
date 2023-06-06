@@ -118,7 +118,7 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
     }
 
     @Override
-    public Response<?> consultarAfiliado(DatosRequest request, Authentication authentication) {
+    public Response<?> consultarAfiliados(DatosRequest request, Authentication authentication) {
         return null;
     }
 

@@ -66,7 +66,7 @@ public class ConsultaConvenios {
                         "if(convenio.ID_RENOVACION = 0, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA) as fechaVigenciaFin", // sacar la fecha de vigencia de la tabla de Lore
                         "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
 //                        "as situacion", // de donde se recupera la situacion
-                        "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
+//                        "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
                         "presupuesto.CAN_TOTAL as importeConvenio", // revisar con pablo para la parte de los importes, vienen de caracteristicas_presupuesto
                         "convenio.ID_ESTATUS_CONVENIO as estatusConvenio")
                 .from(SVT_CONVENIO + " convenio")
@@ -74,13 +74,11 @@ public class ConsultaConvenios {
                 .join("SVT_RENOVACION_CONVENIO_PF renovacionConvenio")
                 .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-//                .join("SVT_CONTRATANTE_BENEFICIARIOS beneficiario",
-//                        "contratanteBeneficiario.id_convenio_pf = convenio.id_convenio")
                 .join("svc_contratante contratante",
                         "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
                 .join("svt_persona personaContratante",
                         "personaContratante.id_persona = contratante.id_persona")
-                        .where("convenio.IND_TIPO_CONTRATACION = true");
+                .where("convenio.IND_TIPO_CONTRATACION = true");
         crearWhereConFiltros(queryConveniosPersona, filtros, true);
 
         SelectQueryUtil queryConveniosEmpresa = new SelectQueryUtil();
@@ -95,7 +93,7 @@ public class ConsultaConvenios {
                         "if(convenio.ID_RENOVACION = 0, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA) as fechaVigenciaFin", // sacar la fecha de vigencia de la tabla de Lore
                         "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
 //                        "as situacion", // de donde se recupera la situacion
-                        "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
+//                        "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
                         "presupuesto.CAN_TOTAL as importeConvenio", // revisar con pablo para la parte de los importes, vienen de caracteristicas_presupuesto
                         "convenio.ID_ESTATUS_CONVENIO as estatusConvenio")
                 .from(SVT_CONVENIO + " convenio")
@@ -105,12 +103,12 @@ public class ConsultaConvenios {
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVT_EMPRESA_CONVENIO_PF empresaContratante",
                         "empresaContratante.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-                        .where("convenio.IND_TIPO_CONTRATACION = true");
+                .where("convenio.IND_TIPO_CONTRATACION = true");
         crearWhereConFiltros(queryConveniosEmpresa, filtros, false);
 
-        // hacer lo mismo para los convenios por empresa
         String unionPersonaEmpresa = queryConveniosPersona.unionAll(queryConveniosEmpresa);
         String encoded = queryConveniosPersona.encrypt(unionPersonaEmpresa);
+
         request.getDatos().put(AppConstantes.QUERY, encoded);
         request.getDatos().remove(AppConstantes.DATOS);
         return request;
@@ -386,11 +384,7 @@ public class ConsultaConvenios {
                         .setParameter("curp", filtros.getCurp());
             }
             if (filtros.getNombre() != null) {
-                final String concatNombrePersona = "concat(personaContratante.NOM_PERSONA, " +
-                        "' ', " +
-                        "personaContratante.NOM_PRIMER_APELLIDO, " +
-                        "' ', " +
-                        "personaContratante.NOM_SEGUNDO_APELLIDO)";
+                // la consulta se hace sobre el nombre completo, ver si se necesitan coincidencias
                 selectQuery.where(recuperarNombrePersona("personaContratante") + " = :nombre")
                         .setParameter("nombre", filtros.getNombre());
             }

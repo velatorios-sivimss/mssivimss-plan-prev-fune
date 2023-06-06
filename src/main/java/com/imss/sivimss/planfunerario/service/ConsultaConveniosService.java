@@ -8,7 +8,7 @@ public interface ConsultaConveniosService {
     Response<?> consultarTodo(DatosRequest request, Authentication authentication);
     Response<?> consultarConvenios(DatosRequest request, Authentication authentication);
     Response<?> consultarBeneficiarios(DatosRequest request, Authentication authentication);
-    Response<?> consultarAfiliado(DatosRequest request, Authentication authentication);
+    Response<?> consultarAfiliados(DatosRequest request, Authentication authentication);
     Response<?> consultarSiniestros(DatosRequest request, Authentication authentication);
     Response<?> consultarVigencias(DatosRequest request, Authentication authentication);
     Response<?> consultarFacturas(DatosRequest request, Authentication authentication);
