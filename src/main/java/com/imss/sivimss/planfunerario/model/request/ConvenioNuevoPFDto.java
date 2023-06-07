@@ -4,21 +4,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class PersonaRequest {
+public class ConvenioNuevoPFDto {
+    @JsonProperty
+    private String folioConvenio;
+    @JsonProperty
+    private String fechaInicio;
+    @JsonProperty
+    private String fechaVigencia;
     @JsonProperty
     private String idVelatorio;
     @JsonProperty
     private String nombreVelatorio;
     @JsonProperty
-    private String indTipoContratacion;
+    private String indSiniestros;
     @JsonProperty
     private String idPromotor;
     @JsonProperty
-    private String idPersona;
+    private Integer indTipoContratacion;
     @JsonProperty
-    private String idDomicilio;
+    private PorEmpresaRequest empresa;
     @JsonProperty
-    private String idContratante;
-    @JsonProperty
-    private Persona persona;
+    private PersonaRequest persona;
 }
