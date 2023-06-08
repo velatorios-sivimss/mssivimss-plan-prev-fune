@@ -1,6 +1,9 @@
 package com.imss.sivimss.planfunerario.model.response;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 

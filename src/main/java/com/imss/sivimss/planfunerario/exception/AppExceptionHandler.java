@@ -17,7 +17,6 @@ import org.springframework.web.context.request.WebRequest;
 import com.imss.sivimss.planfunerario.util.ErrorsMessageResponse;
 import com.imss.sivimss.planfunerario.util.ValidacionErrores;
 
- 
 @ControllerAdvice // permite manejar exepciones handler de toda la aplicacion
 public class AppExceptionHandler {
 

@@ -1,24 +1,34 @@
 package com.imss.sivimss.planfunerario.model.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
+import com.imss.sivimss.planfunerario.model.BeneficiarioModel;
 
-@Data
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Setter
+@Getter
+@JsonIgnoreType(value = true)
 public class PersonaRequest {
-    @JsonProperty
-    private String idVelatorio;
-    @JsonProperty
-    private String nombreVelatorio;
-    @JsonProperty
-    private String indTipoContratacion;
-    @JsonProperty
-    private String idPromotor;
-    @JsonProperty
-    private String idPersona;
-    @JsonProperty
-    private String idDomicilio;
-    @JsonProperty
-    private String idContratante;
-    @JsonProperty
-    private Persona persona;
+
+	private Integer idBeneficiario;
+	private Integer idPersona;
+	private Boolean estatusBenefic;
+	private String nombre;
+	private String apellidoP;
+	private String apellidoM;
+	private String fechaNac;
+	private String curp;
+	private String rfc;
+	private String correoE;
+	private String tel;
+	private BeneficiarioModel beneficiario;
+		
+	
 }

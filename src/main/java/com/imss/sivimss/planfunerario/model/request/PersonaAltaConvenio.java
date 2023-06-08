@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class Persona {
+public class PersonaAltaConvenio {
     @JsonProperty
     private String matricula;
     @JsonProperty
@@ -60,7 +60,7 @@ public class Persona {
     @JsonProperty
     private String claveActa;
     @JsonProperty
-    private Persona[] beneficiarios;
+    private PersonaAltaConvenio[] beneficiarios;
     @JsonProperty
     private Documentos documentacion;
 

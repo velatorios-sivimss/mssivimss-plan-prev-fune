@@ -5,7 +5,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.imss.sivimss.planfunerario.beans.ConvenioNuevoPF;
 import com.imss.sivimss.planfunerario.model.request.PdfDto;
-import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
+import com.imss.sivimss.planfunerario.model.request.PersonaAltaConvenio;
+import com.imss.sivimss.planfunerario.model.request.PersonaConvenioRequest;
 import com.imss.sivimss.planfunerario.model.request.UsuarioDto;
 import com.imss.sivimss.planfunerario.model.response.BeneficiarioResponse;
 import com.imss.sivimss.planfunerario.model.response.BusquedaInformacionReporteResponse;
@@ -21,7 +22,10 @@ import org.springframework.stereotype.Service;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
@@ -43,7 +47,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
 
         String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
         UsuarioDto usuarioDto = json.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-        PersonaRequest persona = json.fromJson(datosJson, PersonaRequest.class);
+        PersonaConvenioRequest persona = json.fromJson(datosJson, PersonaConvenioRequest.class);
         String queryPersona = "";
         String queryDomicilio = "";
         String queryContratante = "";
