@@ -38,7 +38,7 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
     private String urlDominioConsulta;
     @Value("${endpoints.rutas.dominio-consulta-paginado}")
     private String urlDominioConsultaPaginado;
-    @Value("${endpoints.rutas.dominio-reportes-generales}")
+    @Value("${endpoints.ms-reportes}")
     private String urlReportes;
 
     private final ProviderServiceRestTemplate restTemplate;
@@ -108,32 +108,113 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
             log.error("Error al realizar las consultas para convenios");
         } catch (Exception exception) {
             log.error("Ha ocurrido un error al consultar los registros");
+            // todo mandar el mensajeResponse con el codigo correspondiente
         }
         return null;
     }
 
     @Override
     public Response<?> consultarBeneficiarios(DatosRequest request, Authentication authentication) {
+        try {
+            ConsultaGeneralRequest filtros = gson.fromJson(
+                    String.valueOf(request.getDatos().get(AppConstantes.DATOS)),
+                    ConsultaGeneralRequest.class
+            );
+            final DatosRequest datosRequest = consultaConvenios.consultarBeneficiarios(request, filtros);
+
+            return enviarPeticion(datosRequest, authentication);
+        } catch (UnsupportedEncodingException e) {
+            log.error("Error al encriptar la consulta");
+        } catch (IOException exception) {
+            log.error("Error al realizar las consultas para convenios");
+        } catch (Exception exception) {
+            log.error("Ha ocurrido un error al consultar los registros");
+            // todo - mandar el mensajeResponse con el codigo correspondiente
+        }
         return null;
     }
 
     @Override
     public Response<?> consultarAfiliados(DatosRequest request, Authentication authentication) {
+        try {
+            ConsultaGeneralRequest filtros = gson.fromJson(
+                    String.valueOf(request.getDatos().get(AppConstantes.DATOS)),
+                    ConsultaGeneralRequest.class
+            );
+            final DatosRequest datosRequest = consultaConvenios.consultarAfiliados(request, filtros);
+
+            return enviarPeticion(datosRequest, authentication);
+        } catch (UnsupportedEncodingException e) {
+            log.error("Error al encriptar la consulta");
+        } catch (IOException exception) {
+            log.error("Error al realizar las consultas para convenios");
+        } catch (Exception exception) {
+            log.error("Ha ocurrido un error al consultar los registros");
+            // todo - mandar el mensajeResponse con el codigo correspondiente
+        }
         return null;
     }
 
     @Override
     public Response<?> consultarSiniestros(DatosRequest request, Authentication authentication) {
+        try {
+            ConsultaGeneralRequest filtros = gson.fromJson(
+                    String.valueOf(request.getDatos().get(AppConstantes.DATOS)),
+                    ConsultaGeneralRequest.class
+            );
+            final DatosRequest datosRequest = consultaConvenios.consultarSiniestros(request, filtros);
+
+            return enviarPeticion(datosRequest, authentication);
+        } catch (UnsupportedEncodingException e) {
+            log.error("Error al encriptar la consulta");
+        } catch (IOException exception) {
+            log.error("Error al realizar las consultas para convenios");
+        } catch (Exception exception) {
+            log.error("Ha ocurrido un error al consultar los registros");
+            // todo - mandar el mensajeResponse con el codigo correspondiente
+        }
         return null;
     }
 
     @Override
     public Response<?> consultarVigencias(DatosRequest request, Authentication authentication) {
+        try {
+            ConsultaGeneralRequest filtros = gson.fromJson(
+                    String.valueOf(request.getDatos().get(AppConstantes.DATOS)),
+                    ConsultaGeneralRequest.class
+            );
+            final DatosRequest datosRequest = consultaConvenios.consultarVigencias(request, filtros);
+
+            return enviarPeticion(datosRequest, authentication);
+        } catch (UnsupportedEncodingException e) {
+            log.error("Error al encriptar la consulta");
+        } catch (IOException exception) {
+            log.error("Error al realizar las consultas para convenios");
+        } catch (Exception exception) {
+            log.error("Ha ocurrido un error al consultar los registros");
+            // todo - mandar el mensajeResponse con el codigo correspondiente
+        }
         return null;
     }
 
     @Override
     public Response<?> consultarFacturas(DatosRequest request, Authentication authentication) {
+        try {
+            ConsultaGeneralRequest filtros = gson.fromJson(
+                    String.valueOf(request.getDatos().get(AppConstantes.DATOS)),
+                    ConsultaGeneralRequest.class
+            );
+            final DatosRequest datosRequest = consultaConvenios.consultarFacturas(request, filtros);
+
+            return enviarPeticion(datosRequest, authentication);
+        } catch (UnsupportedEncodingException e) {
+            log.error("Error al encriptar la consulta");
+        } catch (IOException exception) {
+            log.error("Error al realizar las consultas para convenios");
+        } catch (Exception exception) {
+            log.error("Ha ocurrido un error al consultar los registros");
+            // todo - mandar el mensajeResponse con el codigo correspondiente
+        }
         return null;
     }
 

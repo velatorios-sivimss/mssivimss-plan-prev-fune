@@ -13,4 +13,5 @@ public class ConsultaGeneralRequest {
     private Integer estatusConvenio;
     // agregar los campos que faltan para el filtrado de cada seccion
 //    private String folioConvenio;
+    private String nombreBeneficiario;
 }
