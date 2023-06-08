@@ -27,11 +27,11 @@ logging:
     org.springframework.web: info
     org.hibernate: error
 
-logos:
-  msit_logo_imss: /sivimss_data/LOGOS/logoImss.png
-  msit_logo_sistema: /sivimss_data/LOGOS/logoSistema.png
+
 
 endpoints:
+#  dominio-consulta: http://localhost:8090/mssivimss-mod-catalogos/v1
+#  ms-reportes: http://localhost:8088/mssivimss-reportes-jasp/v1/generales/generar-reporte
   ms-mod-catalogos: http://localhost:8090/mssivimss-mod-catalogos/generico
   ms-reportes: http://localhost:8088/mssivimss-reportes-jpr/generales/generar-reporte
   rutas:
