@@ -39,7 +39,7 @@ public class ConvenioNuevoPF {
         queryPersona.agregarParametroValues("TIPO_PERSONA", "'" + persona.getTipoPersona() + "'");
         queryPersona.agregarParametroValues("NUM_INE", "'" + persona.getNumIne() + "'");
         queryPersona.agregarParametroValues("ID_USUARIO_ALTA", "'" + usuario + "'");
-        log.info("Query insert Persona: " + queryPersona);
+        log.info("Query insert Persona: " + queryPersona.obtenerQueryInsertar());
         return queryPersona.obtenerQueryInsertar();
     }
 
@@ -61,7 +61,7 @@ public class ConvenioNuevoPF {
         queryPersona.agregarParametroValues("TIPO_PERSONA", "'" + personaBeneficiario.getTipoPersona() + "'");
         queryPersona.agregarParametroValues("NUM_INE", "'" + personaBeneficiario.getNumIne() + "'");
         queryPersona.agregarParametroValues("ID_USUARIO_ALTA", "'" + usuario + "'");
-        log.info("Query insert Persona beneficiaria: " + queryPersona);
+        log.info("Query insert Persona beneficiaria: " + queryPersona.obtenerQueryInsertar());
         return queryPersona.obtenerQueryInsertar();
     }
 
@@ -75,7 +75,7 @@ public class ConvenioNuevoPF {
         queryDomicilio.agregarParametroValues("DES_MUNICIPIO", "'" + persona.getMunicipio() + "'");
         queryDomicilio.agregarParametroValues("DES_ESTADO", "'" + persona.getEstado() + "'");
         queryDomicilio.agregarParametroValues("ID_USUARIO_ALTA", usuario);
-        log.info("Query insert Domicilio: " + queryDomicilio);
+        log.info("Query insert Domicilio: " + queryDomicilio.obtenerQueryInsertar());
         return queryDomicilio.obtenerQueryInsertar();
     }
 
@@ -85,7 +85,7 @@ public class ConvenioNuevoPF {
         queryContratante.agregarParametroValues("CVE_MATRICULA", "'" + persona.getMatricula() + "'");
         queryContratante.agregarParametroValues("ID_DOMICILIO", "idDomicilio");
         queryContratante.agregarParametroValues("ID_USUARIO_ALTA", usuario);
-        log.info("Query insert contratante: " + queryContratante);
+        log.info("Query insert contratante: " + queryContratante.obtenerQueryInsertar());
         return queryContratante.obtenerQueryInsertar();
     }
 
@@ -101,7 +101,7 @@ public class ConvenioNuevoPF {
         querySvtConvenio.agregarParametroValues("ID_PROMOTOR", idPromotor);
         querySvtConvenio.agregarParametroValues("ID_ESTATUS_CONVENIO", "1");
         querySvtConvenio.agregarParametroValues("ID_USUARIO_ALTA", usuario);
-        log.info("Query insert convenio: " + querySvtConvenio);
+        log.info("Query insert convenio: " + querySvtConvenio.obtenerQueryInsertar());
         return querySvtConvenio.obtenerQueryInsertar();
     }
 
@@ -117,7 +117,7 @@ public class ConvenioNuevoPF {
         queryContratantePaquete.agregarParametroValues("DES_OTRA_ENFERMEDAD", "'" + persona.getPersona().getOtraEnfermedad() + "'");
         queryContratantePaquete.agregarParametroValues("ID_PAQUETE", persona.getPersona().getPaquete());
         queryContratantePaquete.agregarParametroValues("ID_USUARIO_ALTA", usuario);
-        log.info("Query insert contratante paquete: " + queryContratantePaquete);
+        log.info("Query insert contratante paquete: " + queryContratantePaquete.obtenerQueryInsertar());
         return queryContratantePaquete.obtenerQueryInsertar();
     }
 
@@ -130,7 +130,7 @@ public class ConvenioNuevoPF {
         queryContratanteBeneficiarios.agregarParametroValues("CVE_ACTA", "'" + claveActa + "'");
         queryContratanteBeneficiarios.agregarParametroValues("ID_USUARIO_ALTA", usuario);
         queryContratanteBeneficiarios.agregarParametroValues("IND_ACTIVO", "1");
-        log.info("Query insert contratante beneficiarios: " + queryContratanteBeneficiarios);
+        log.info("Query insert contratante beneficiarios: " + queryContratanteBeneficiarios.obtenerQueryInsertar());
         return queryContratanteBeneficiarios.obtenerQueryInsertar();
     }
     public String generarQueryValidacionDocumentos(PersonaConvenioRequest persona,String usuario) {
@@ -142,7 +142,7 @@ public class ConvenioNuevoPF {
         queryValidaDocumentos.agregarParametroValues("IND_INE_BENEFICIARIO", persona.getPersona().getDocumentacion().getValidaIneBeneficiario().toString());
         queryValidaDocumentos.agregarParametroValues("ID_CONVENIO_PF", "idConvenioPf");
         queryValidaDocumentos.agregarParametroValues("ID_USUARIO_ALTA", usuario);
-        log.info("Query insert validacion documentos: " + queryValidaDocumentos);
+        log.info("Query insert validacion documentos: " + queryValidaDocumentos.obtenerQueryInsertar());
         return queryValidaDocumentos.obtenerQueryInsertar();
     }
     public DatosRequest consultarPromotores() {

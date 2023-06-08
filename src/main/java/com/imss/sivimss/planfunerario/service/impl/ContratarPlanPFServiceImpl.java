@@ -76,9 +76,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         mapa.put("datosContratantePaquete", DatatypeConverter.printBase64Binary(queryContratantePaquete.getBytes("UTF-8")));
         mapa.put("datosBeneficiario", queryBeneficiario);
         mapa.put("datosContratanteBeneficiarios", queryContratanteBeneficiarios);
-        log.info("valida doc");
         mapa.put("datosValidacionDocumentos",DatatypeConverter.printBase64Binary(convenioBean.generarQueryValidacionDocumentos(persona, String.valueOf(usuarioDto.getIdUsuario())).getBytes("UTF-8")));
-        log.info("valida doc  2");
         mapa.put("idPersona", persona.getIdPersona());
         mapa.put("idContratante", persona.getIdContratante());
         mapa.put("idDomicilio", persona.getIdDomicilio());
