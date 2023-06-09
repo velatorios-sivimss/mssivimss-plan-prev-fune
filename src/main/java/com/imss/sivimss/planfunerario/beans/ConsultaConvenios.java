@@ -120,16 +120,18 @@ public class ConsultaConvenios {
 
         String unionPersonaEmpresa = queryConveniosPersona.unionAll(queryConveniosEmpresa);
         String encoded = queryConveniosPersona.encrypt(unionPersonaEmpresa);
-
-        request.getDatos().put(AppConstantes.QUERY, encoded);
-        request.getDatos().remove(AppConstantes.DATOS);
-        return request;
+//        DatosRequest datos = recuperarDatos(request, encoded);
+//        datos.getDatos().remove(AppConstantes.DATOS);
+        return recuperarDatos(request, encoded);
     }
 
+
     /**
-     * todo - add documentation
+     * Consulta los beneficiarios relacionados a un <b>Convenio PF</b>
      *
-     * @return
+     * @param request Request necesario con los par&aacute;metros para ejecutar la consulta.
+     * @param filtros Se usan para filtrar las consultas, ya sea por empresa o por persona.
+     * @return Los par&aacute;metros para realizar la consulta de <b>Beneficiarios</b>.
      */
     public DatosRequest consultarBeneficiarios(DatosRequest request, ConsultaGeneralRequest filtros) throws UnsupportedEncodingException {
         SelectQueryUtil queryBeneficiarios = new SelectQueryUtil();
@@ -198,16 +200,18 @@ public class ConsultaConvenios {
 
         // todo - agregar lo del utf-8 a los otros servicios
         String encoded = queryBeneficiarios.encrypt(unionBeneficiarios);
-        request.getDatos().put(AppConstantes.QUERY, encoded);
-        request.getDatos().remove(AppConstantes.DATOS);
-        return request;
+//        request.getDatos().put(AppConstantes.QUERY, encoded);
+//        request.getDatos().remove(AppConstantes.DATOS);
+        return recuperarDatos(request, encoded);
     }
 
 
     /**
-     * todo - add documentation
+     * Consulta los siniestros relacionados a un convenio, puede ser de tipo empresa o por persona.
      *
-     * @return
+     * @param request Request necesario con los par&aacute;metros para ejecutar la consulta.
+     * @param filtros Se usan para filtrar las consultas, ya sea por empresa o por persona.
+     * @return Los par&aacute;metros para realizar la consulta de <b>Siniestros</b>.
      */
     public DatosRequest consultarSiniestros(DatosRequest request, ConsultaGeneralRequest filtros) {
         // los siniestros tendrian que estar pagados o facturados para poder mostrarlos aca
@@ -319,15 +323,17 @@ public class ConsultaConvenios {
 
         final String query = querySiniestros.unionAll(querySiniestrosEmpresa);
         String encoded = querySiniestros.encrypt(query);
-        request.getDatos().put(AppConstantes.QUERY, encoded);
-        request.getDatos().remove(AppConstantes.DATOS);
-        return request;
+//        request.getDatos().put(AppConstantes.QUERY, encoded);
+//        request.getDatos().remove(AppConstantes.DATOS);
+        return recuperarDatos(request, encoded);
     }
 
     /**
-     * todo - add documentation
+     * Consulta de afiliados relacionados a una Empresa y esta a un Convenio PF.
      *
-     * @return
+     * @param request Request necesario con los par&aacute;metros para ejecutar la consulta.
+     * @param filtros Se usan para filtrar las consultas, ya sea por empresa o por persona.
+     * @return Los par&aacute;metros para realizar la consulta de <b>Afiliados</b>.
      */
     public DatosRequest consultarAfiliados(DatosRequest request, ConsultaGeneralRequest filtros) throws UnsupportedEncodingException {
         // la consulta por nombre aplica para buscar solo en la empresa o para buscar un afiliado?
@@ -368,15 +374,16 @@ public class ConsultaConvenios {
 
         final String query = queryAfiliados.build();
         final String encoded = queryAfiliados.encrypt(query);
-        request.getDatos().put(AppConstantes.QUERY, encoded);
-        request.getDatos().remove(AppConstantes.DATOS);
-        return request;
+
+        return recuperarDatos(request, encoded);
     }
 
     /**
-     * todo - add documentation
+     * Consulta las vigencias de los convenios, por empresa o por persona.
      *
-     * @return
+     * @param request Request necesario con los par&aacute;metros para ejecutar la consulta.
+     * @param filtros Se usan para filtrar las consultas, ya sea por empresa o por persona.
+     * @return Los par&aacute;metros para realizar la consulta de <b>Vigencias</b>.
      */
     public DatosRequest consultarVigencias(DatosRequest request, ConsultaGeneralRequest filtros) {
         // buscar a Lore para ver de que tablas vamos a sacar al info necesaria para la consulta
@@ -421,25 +428,25 @@ public class ConsultaConvenios {
 
         final String query = queryVigencias.unionAll(queryVigenciasEmpresa);
         String encoded = queryVigencias.encrypt(query);
-        request.getDatos().put(AppConstantes.QUERY, encoded);
-        request.getDatos().remove(AppConstantes.DATOS);
-        return request;
+
+        return recuperarDatos(request, encoded);
     }
 
 
     /**
-     * todo - add documentation
+     * Consulta las facturas relacionadas a un convenio PF.
      *
-     * @return
+     * @param request Request necesario con los par&aacute;metros para ejecutar la consulta.
+     * @param filtros Se usan para filtrar las consultas, ya sea por empresa o por persona.
+     * @return Los par&aacute;metros para realizar la consulta de <b>Facturas</b>.
      */
     public DatosRequest consultarFacturas(DatosRequest request, ConsultaGeneralRequest filtros) {
         // consultar los pagos
         // ver como relaciono los filtros para que se pueda implementar en esta parte
         SelectQueryUtil queryFacturas = new SelectQueryUtil();
         String encoded = queryFacturas.encrypt(queryFacturas.build());
-        request.getDatos().put(AppConstantes.QUERY, encoded);
-        request.getDatos().remove(AppConstantes.DATOS);
-        return request;
+
+        return recuperarDatos(request, encoded);
     }
 
     /**
@@ -515,5 +522,23 @@ public class ConsultaConvenios {
      */
     private static String recuperarEdad(String aliasTabla) {
         return "TIMESTAMPDIFF(YEAR, " + aliasTabla + ".FEC_NAC, CURDATE()) as " + ALIAS_EDAD;
+    }
+
+    /**
+     * Recupera los el objeto DatosRequest, para ejecutar la consulta.
+     *
+     * @param request
+     * @param encoded
+     * @return
+     */
+    private static DatosRequest recuperarDatos(DatosRequest request, String encoded) {
+        DatosRequest datos = new DatosRequest();
+        System.out.println(request);
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put(AppConstantes.QUERY, encoded);
+        parametros.put("pagina", request.getDatos().get("pagina"));
+        parametros.put("tamanio", request.getDatos().get("tamanio"));
+        datos.setDatos(parametros);
+        return datos;
     }
 }

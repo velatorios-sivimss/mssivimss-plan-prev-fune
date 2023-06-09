@@ -69,7 +69,9 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
             consultas.put("beneficiarios", consultaConvenios.consultarBeneficiarios(request, filtros));
             consultas.put("siniestros", consultaConvenios.consultarSiniestros(request, filtros));
             consultas.put("vigencias", consultaConvenios.consultarVigencias(request, filtros));
-            consultas.put("facturas", consultaConvenios.consultarFacturas(request, filtros));
+            // armar la consulta para las facturas
+            // hay que armar la tabla con lo que vimos que puede ser de utilidad
+//            consultas.put("facturas", consultaConvenios.consultarFacturas(request, filtros));
 
 //            procesarConsultas(consultas, authentication);
 //            for (Map.Entry<String, DatosRequest> consulta : consultas.entrySet()) {
@@ -225,7 +227,6 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
 
     /**
      * Manda las consultas a la siguiente capa de los servicios para ejecutar el query.
-     * todo - procesar consultas deberia regresar una lista con cada una de las respuestas
      *
      * @param consultas
      * @param authentication
@@ -248,17 +249,8 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
                             }
                             return response;
                         }
-//                        entry -> recuperarRespuestas(entry.getValue(), authentication)
                 ));
 
-        // hacer las peticiones por cada consulta
-        // y recuperar cada respuesta e irla colocando en un map o un arreglo las peticiones
-//        final Response<?> response = restTemplate.consumirServicio(
-//                new DatosRequest(),
-//                urlDominioConsulta,
-//                authentication
-//
-//        );
         validarRespuesta((HashMap<String, Response<?>>) respuestas);
 
         return respuestas;
