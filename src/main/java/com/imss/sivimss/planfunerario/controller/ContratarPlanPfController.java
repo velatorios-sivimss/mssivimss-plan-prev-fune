@@ -40,6 +40,15 @@ public class ContratarPlanPfController {
         return CompletableFuture
                 .supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
     }
+    @CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+    @Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+    @TimeLimiter(name = "msflujo")
+    @PostMapping("agregar-convenio-pf/empresa")
+    public CompletableFuture<?> agregarConvenioNuevoPFEmpresa(@RequestBody DatosRequest request, Authentication authentication) throws IOException {
+        Response<?> response = servicio.agregarConvenioNuevoPFEmpresa(request, authentication);
+        return CompletableFuture
+                .supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+    }
 
     @CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
     @Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
