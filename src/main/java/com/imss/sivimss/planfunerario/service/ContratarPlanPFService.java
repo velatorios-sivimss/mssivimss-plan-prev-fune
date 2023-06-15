@@ -19,5 +19,4 @@ public interface ContratarPlanPFService {
     Response<?> activarDesactivarConvenio(DatosRequest request, Authentication authentication) throws IOException;
     Response<?> modificarConvenioPersona(DatosRequest request, Authentication authentication) throws IOException;
     Response<?> modificarConvenioEmpresa(DatosRequest request, Authentication authentication) throws IOException;
-    String obtenerIdPersona(String curp, String rfc,Authentication authentication) throws IOException;
 }

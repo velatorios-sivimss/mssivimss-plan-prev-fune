@@ -31,7 +31,6 @@ public class ProviderServiceRestTemplate {
 	public Response<?> consumirServicio(Map<String, Object> dato, String url, Authentication authentication)
 			throws IOException {
 		try {
-			log.info("---222" + dato);
 			Response<?> respuestaGenerado = restTemplateUtil.sendPostRequestByteArrayToken(url,
 					new EnviarDatosRequest(dato), jwtTokenProvider.createToken((String) authentication.getPrincipal()),
 					Response.class);

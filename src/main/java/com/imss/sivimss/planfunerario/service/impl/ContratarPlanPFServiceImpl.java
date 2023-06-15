@@ -34,7 +34,8 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
     private ProviderServiceRestTemplate providerRestTemplate;
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ContratarPlanPFServiceImpl.class);
     JsonParser jsonParser = new JsonParser();
-    ConvenioNuevoPF convenioBean = new ConvenioNuevoPF();
+    @Autowired
+    private ConvenioNuevoPF convenioBean;
     Gson json = new Gson();
     @Autowired
     ModelMapper modelMapper;
@@ -52,7 +53,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
             queryPersona = convenioBean.generarQueryPersona(persona.getPersona(), usuarioDto.getIdUsuario().toString());
         }
         if (persona.getIdContratante() == null) {
-            queryContratante = convenioBean.generarQueryContratante(persona.getPersona(), usuarioDto.getIdUsuario().toString(),authentication);
+            queryContratante = convenioBean.generarQueryContratante(persona.getPersona(), usuarioDto.getIdUsuario().toString());
         }
         if (persona.getIdDomicilio() == null) {
             queryDomicilio = convenioBean.generarQueryDomicilio(persona.getPersona().getCalle(), persona.getPersona().getNumeroExterior(),
@@ -84,7 +85,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
 
     @Override
     public Response<?> agregarConvenioNuevoPFEmpresa(DatosRequest request, Authentication authentication) throws IOException {
-        String banderaDatosEncontrados = "0";
+
         String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
         UsuarioDto usuarioDto = json.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
         EmpresaAltaConvenio empresa = json.fromJson(datosJson, EmpresaAltaConvenio.class);
@@ -93,33 +94,14 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
                 empresa.getEmpresa().getNumeroInterior(), empresa.getEmpresa().getCp(), empresa.getEmpresa().getColonia(),
                 empresa.getEmpresa().getMunicipio(), empresa.getEmpresa().getEstado(), usuarioDto.getIdUsuario().toString());
         String queryEmpresaConvenioPF = convenioBean.generarQueryEmpresaConvenioPf(empresa.getEmpresa(), usuarioDto.getIdUsuario().toString());
-        String[] personas = new String[empresa.getEmpresa().getPersonas().length];
-        String[] contratantes = new String[empresa.getEmpresa().getPersonas().length];
-        String[] beneficiarios = new String[obtenerNumeroBeneficiarios(empresa.getEmpresa().getPersonas())];
-        String[] personasBeneficiarios = new String[obtenerNumeroBeneficiarios(empresa.getEmpresa().getPersonas())];
-        String[] queryContratantePaquete = new String[empresa.getEmpresa().getPersonas().length];
-        for (int i = 0; i < empresa.getEmpresa().getPersonas().length; i++) {
-            contratantes[i] = DatatypeConverter.printBase64Binary(convenioBean.generarQueryContratante(empresa.getEmpresa().getPersonas()[i], usuarioDto.getIdUsuario().toString(),authentication).getBytes("UTF-8"));
-            for (int j = 0; j < empresa.getEmpresa().getPersonas()[i].getBeneficiarios().length; j++) {
-                personasBeneficiarios[j] = DatatypeConverter.printBase64Binary(convenioBean.generarQueryPersona(empresa.getEmpresa().getPersonas()[i], usuarioDto.getIdUsuario().toString()).getBytes("UTF-8"));
-                beneficiarios[j] = DatatypeConverter.printBase64Binary(convenioBean.generarQueryContratanteBeneficiarios(
-                        empresa.getEmpresa().getPersonas()[i].getBeneficiarios()[j].getParentesco(),
-                        empresa.getEmpresa().getPersonas()[i].getBeneficiarios()[j].getClaveActa(),
-                        usuarioDto.getIdUsuario().toString(),
-                        empresa.getEmpresa().getPersonas()[i],authentication).getBytes("UTF-8"));
-            }
-            queryContratantePaquete[i] = DatatypeConverter.printBase64Binary(convenioBean.generarQueryContratantePaqueteEmpresa(empresa.getEmpresa().getPersonas()[i], usuarioDto.getIdUsuario().toString(),authentication).getBytes("UTF-8"));
-        }
 
+        log.info("--------- datos a enviar ----------");
         HashMap mapa = new HashMap();
         mapa.put("datosConvenio", DatatypeConverter.printBase64Binary(queryConvenioPf.getBytes("UTF-8")));
         mapa.put("datosDireccion", DatatypeConverter.printBase64Binary(queryDomicilio.getBytes("UTF-8")));
         mapa.put("datosEmpresaConvenio", DatatypeConverter.printBase64Binary(queryEmpresaConvenioPF.getBytes("UTF-8")));
-        mapa.put("datosPersonas", personas);
-        mapa.put("datosContratantesEmpresaConvenio", contratantes);
-        mapa.put("datosPersonasBeneficiario", personasBeneficiarios);
-        mapa.put("datosBeneficiarios", beneficiarios);
-        mapa.put("datosContratantePaquete", queryContratantePaquete);
+        mapa.put("datosPersonas", empresa.getEmpresa().getPersonas());
+        mapa.put("usuario", usuarioDto.getIdUsuario().toString());
         return providerRestTemplate.consumirServicio(mapa, urlDominio + "/convenioPf/insertConvenios/empresa", authentication);
     }
 
@@ -131,43 +113,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         return numBeneficiarios;
     }
 
-    @Override
-    public String obtenerIdPersona(String curp, String rfc,Authentication authentication) throws IOException {
-       try {
-           ConvenioNuevoPF bbean = new ConvenioNuevoPF();
-           log.info("cb " + bbean.busquedaPersonas(curp,rfc));
-           String consulta = bbean.busquedaPersonas(curp,rfc);
-           DatosRequest dr = new DatosRequest();
-           Map<String, Object> parametro = new HashMap<>();
-           String encoded = DatatypeConverter.printBase64Binary(consulta.getBytes());
-           parametro.put(AppConstantes.QUERY, encoded);
-           dr.setDatos(parametro);
-           log.info("dr impl -> " + dr.getDatos());
-           Response<?> respuesta = providerRestTemplate.consumirServicio(dr.getDatos(), urlDominio + "/generico/consulta", authentication);
-           log.info("res -> " + respuesta);
-           if (!respuesta.getDatos().toString().equals("[]")) {
-               log.info("entre if contrario respuesta vacia");
-               JsonObject objeto = (JsonObject) jsonParser.parse((String) respuesta.getDatos());
-               String idPersona = String.valueOf(objeto.get("idPersona"));
-               log.info("idP -> " + idPersona);
-               return idPersona;
-           }
-           return "sin registro";
-       }catch (Exception e){
-           e.printStackTrace();
-       }
-        return "sin registro";
-    }
 
-    public String obtenerIdContratante(String idPersona,Authentication authentication) throws IOException {
-        Response<?> respuesta = providerRestTemplate.consumirServicio(convenioBean.busquedaContratante(idPersona).getDatos(), urlDominio + "/generico/consulta", authentication);
-        if (!respuesta.getDatos().toString().equals("[]")) {
-            JsonObject objeto = (JsonObject) jsonParser.parse((String) respuesta.getDatos());
-            String idContratante = String.valueOf(objeto.get("idContratante"));
-            return idContratante;
-        }
-        return "sin registro";
-    }
 
     @Override
     public Response<?> consultaPromotores(DatosRequest request, Authentication authentication) throws IOException {
