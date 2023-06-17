@@ -627,7 +627,7 @@ public class ConsultaConvenios {
         parametros.put("rfc", filtros.getRfc());
         parametros.put("estatusConvenio", filtros.getEstatusConvenio());
 
-        parametros.put("ruta", filtros.getRuta());
+        parametros.put("rutaNombreReporte", filtros.getRuta());
         parametros.put("tipoReporte", filtros.getTipoReporte());
         return parametros;
     }
