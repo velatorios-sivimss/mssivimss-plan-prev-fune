@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.imss.sivimss.planfunerario.beans.ConsultaConvenios;
 import com.imss.sivimss.planfunerario.model.request.ConsultaGeneralRequest;
+import com.imss.sivimss.planfunerario.model.request.DatosReporteRequest;
 import com.imss.sivimss.planfunerario.service.ConsultaConveniosService;
 import com.imss.sivimss.planfunerario.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -207,22 +208,57 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
                     ConsultaGeneralRequest.class
             );
             final DatosRequest datosRequest = consultaConvenios.consultarFacturas(request, filtros);
+            // todo - validar la respuesta y eso
 
             return enviarPeticion(datosRequest, authentication);
         } catch (UnsupportedEncodingException e) {
-            log.error("Error al encriptar la consulta");
+            // todo - crear una funciona para generar el response cuando haya una excepcion
+            log.error("Error al encriptar la consulta.");
+            log.error(e.getMessage());
+//            final Response<?> response = getErrorResponse();
+            return MensajeResponseUtil.mensajeResponse(getErrorResponse(), "Error al procesar la consulta");
         } catch (IOException exception) {
             log.error("Error al realizar las consultas para convenios");
+            return MensajeResponseUtil.mensajeResponse(getErrorResponse(), "Error al realizar la peticion");
         } catch (Exception exception) {
             log.error("Ha ocurrido un error al consultar los registros");
             // todo - mandar el mensajeResponse con el codigo correspondiente
+            return MensajeResponseUtil.mensajeResponse(getErrorResponse(), "Error al realizar la peticion");
         }
-        return null;
+//        return null;
+    }
+
+    private static Response<?> getErrorResponse() {
+        final Response<?> response = new Response<>();
+        response.setError(true);
+        response.setCodigo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        return response;
     }
 
     @Override
     public Response<?> generarReporteTabla(DatosRequest request, Authentication authentication) {
-        return null;
+        try {
+
+            DatosReporteRequest filtros = gson.fromJson(
+                    String.valueOf(request.getDatos().get(AppConstantes.DATOS)),
+                    DatosReporteRequest.class
+            );
+            Map<String, Object> parametrosReporte = consultaConvenios.recuperarDatosFormatoTabla(filtros);
+            return restTemplate.consumirServicioReportes(
+                    parametrosReporte,
+//                    filtros.getRuta(),
+//                    filtros.getTipoReporte(),
+                    urlReportes,
+                    authentication
+            );
+        } catch (Exception ex) {
+            log.error("Error al crear el reporte", ex);
+            Response<?> respuesta = new Response<>();
+            respuesta.setCodigo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            respuesta.setMensaje("");
+            respuesta.setError(true);
+            return MensajeResponseUtil.mensajeResponse(respuesta, "Error al generar el reporte");
+        }
     }
 
     /**

@@ -5,13 +5,9 @@ import lombok.Getter;
 
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ConsultaGeneralRequest {
-    private String folioConvenio;
-    private String rfc;
-    private String nombre; // a que se refiere este nombre
-    private String curp;
-    private Integer estatusConvenio;
+public class ConsultaGeneralRequest extends FiltrosGeneralesDto {
     // agregar los campos que faltan para el filtrado de cada seccion
-//    private String folioConvenio;
+    private String numeroFactura;
+    private String folioSiniestro;
     private String nombreBeneficiario;
 }
