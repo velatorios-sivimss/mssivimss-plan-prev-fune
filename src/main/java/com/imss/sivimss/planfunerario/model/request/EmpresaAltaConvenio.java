@@ -6,6 +6,8 @@ import lombok.Data;
 @Data
 public class EmpresaAltaConvenio {
     @JsonProperty
+    private String folioConvenio;
+    @JsonProperty
     private String idVelatorio;
     @JsonProperty
     private String nombreVelatorio;

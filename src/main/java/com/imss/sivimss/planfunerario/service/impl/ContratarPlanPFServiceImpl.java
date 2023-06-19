@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.imss.sivimss.planfunerario.beans.ConvenioNuevoPF;
+import com.imss.sivimss.planfunerario.beans.ModificarConvenioNuevoPf;
 import com.imss.sivimss.planfunerario.model.request.*;
 import com.imss.sivimss.planfunerario.model.response.BeneficiarioResponse;
 import com.imss.sivimss.planfunerario.model.response.BusquedaInformacionReporteResponse;
@@ -36,6 +37,8 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
     JsonParser jsonParser = new JsonParser();
     @Autowired
     private ConvenioNuevoPF convenioBean;
+
+    ModificarConvenioNuevoPf modificar = new ModificarConvenioNuevoPf();
     Gson json = new Gson();
     @Autowired
     ModelMapper modelMapper;
@@ -104,15 +107,6 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         mapa.put("usuario", usuarioDto.getIdUsuario().toString());
         return providerRestTemplate.consumirServicio(mapa, urlDominio + "/convenioPf/insertConvenios/empresa", authentication);
     }
-
-    public Integer obtenerNumeroBeneficiarios(PersonaAltaConvenio[] persona) {
-        Integer numBeneficiarios = 0;
-        for (int p = 0; p < persona.length; p++) {
-            numBeneficiarios = persona[p].getBeneficiarios().length;
-        }
-        return numBeneficiarios;
-    }
-
 
 
     @Override
@@ -205,15 +199,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         return new Response<>();
     }
 
-    @Override
-    public Response<?> modificarConvenioPersona(DatosRequest request, Authentication authentication) throws IOException {
-        return null;
-    }
 
-    @Override
-    public Response<?> modificarConvenioEmpresa(DatosRequest request, Authentication authentication) throws IOException {
-        return null;
-    }
 
     public BusquedaInformacionReporteResponse buscarInformacionReporte(String folioConvenio, Authentication authentication) throws IOException {
         BusquedaInformacionReporteResponse resultadoBusquedaInfo;

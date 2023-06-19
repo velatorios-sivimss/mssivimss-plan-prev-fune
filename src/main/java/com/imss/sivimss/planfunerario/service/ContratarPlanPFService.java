@@ -17,6 +17,5 @@ public interface ContratarPlanPFService {
     Response<?> busquedaFolioEmpresa(DatosRequest request, Authentication authentication) throws IOException;
     Response<?> busquedaRfcEmpresa(DatosRequest request, Authentication authentication) throws IOException;
     Response<?> activarDesactivarConvenio(DatosRequest request, Authentication authentication) throws IOException;
-    Response<?> modificarConvenioPersona(DatosRequest request, Authentication authentication) throws IOException;
-    Response<?> modificarConvenioEmpresa(DatosRequest request, Authentication authentication) throws IOException;
+
 }

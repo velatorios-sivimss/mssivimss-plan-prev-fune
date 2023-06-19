@@ -1,6 +1,7 @@
 package com.imss.sivimss.planfunerario.controller;
 
 import com.imss.sivimss.planfunerario.service.ContratarPlanPFService;
+import com.imss.sivimss.planfunerario.service.ModificarConvenioPfService;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.ProviderServiceRestTemplate;
 import com.imss.sivimss.planfunerario.util.Response;
@@ -27,6 +28,9 @@ public class ContratarPlanPfController {
 
     @Autowired
     private ContratarPlanPFService servicio;
+
+    @Autowired
+    private ModificarConvenioPfService servicioModificar;
     @Autowired
     private ProviderServiceRestTemplate providerRestTemplate;
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ContratarPlanPfController.class);
@@ -116,6 +120,25 @@ public class ContratarPlanPfController {
     @PostMapping("activar-desactivar-convenio")
     public CompletableFuture<?> activarDesactivarConvenio(@RequestBody DatosRequest request, Authentication authentication) throws IOException, ParseException {
         Response<?> response = servicio.activarDesactivarConvenio(request, authentication);
+        return CompletableFuture
+                .supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+    }
+
+    @CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+    @Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+    @TimeLimiter(name = "msflujo")
+    @PostMapping("modificar-convenio-pf")
+    public CompletableFuture<?> modificarConvenio(@RequestBody DatosRequest request, Authentication authentication) throws IOException, ParseException {
+        Response<?> response = servicioModificar.modificarConvenioPersona(request, authentication);
+        return CompletableFuture
+                .supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+    }
+    @CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+    @Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+    @TimeLimiter(name = "msflujo")
+    @PostMapping("modificar-convenio-pf-empresa")
+    public CompletableFuture<?> modificarConvenioEmpresa(@RequestBody DatosRequest request, Authentication authentication) throws IOException, ParseException {
+        Response<?> response = servicioModificar.modificarConvenioEmpresa(request, authentication);
         return CompletableFuture
                 .supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
     }

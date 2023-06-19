@@ -220,6 +220,7 @@ public class ConvenioNuevoPF {
                 .where("SP.CVE_RFC = " + rfc)
                 .or("SP.CVE_CURP = " + curp);
         String consulta = query.build();
+        log.info(consulta);
         String encoded = DatatypeConverter.printBase64Binary(consulta.getBytes());
         parametro.put(AppConstantes.QUERY, encoded);
         dr.setDatos(parametro);
