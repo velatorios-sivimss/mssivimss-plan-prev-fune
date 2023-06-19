@@ -1,5 +1,8 @@
 package com.imss.sivimss.planfunerario.util;
 
+import javax.xml.bind.DatatypeConverter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
@@ -7,7 +10,7 @@ import java.util.*;
  * Utiler&iacute;a para crear consultas select.
  *
  * @author esa
- * @version 1.1.0
+ * @version 1.0.2
  */
 public class SelectQueryUtil {
     // constantes
@@ -27,6 +30,12 @@ public class SelectQueryUtil {
     private static final String GROUP_BY = "GROUP BY";
     private static final String LIMIT = "LIMIT";
     private static final String UNION = "UNION";
+    private static final String ALL = "ALL";
+    private static final String UNION_ALL = UNION + " " + ALL;
+    private static final String EXCEPT = "EXCEPT";
+    private static final String EXCEPT_ALL = EXCEPT + " " + ALL;
+    private static final String INTERSECT = "INTERSECT";
+    private static final String INTERSECT_ALL = INTERSECT + " " + ALL;
     // campos
     private final List<String> tablas = new ArrayList<>();
     private List<String> columnas = new ArrayList<>();
@@ -323,35 +332,94 @@ public class SelectQueryUtil {
     }
 
     /**
-     * Agrega una cláusula UNION a la consulta actual, uniendo el resultado de la consulta actual con la
+     * Agrega una cla&uacute;sula <b>{@code UNION}</b> a la consulta actual, uniendo el resultado de la consulta actual con la
      * consulta generada por el objeto SelectQueryUtil proporcionado.
      *
      * @param selectQuery el objeto SelectQueryUtil que representa la consulta a unir
-     * @return una cadena que representa la consulta actual con la cláusula UNION y la consulta proporcionada unida
+     * @return una cadena que representa la consulta actual con la cla&uacute;sula <b>{@code UNION}</b> y la consulta proporcionada unida
      * @throws IllegalStateException si no se ha agregado una sentencia SELECT previamente
      * @since 1.0.1
      */
     public String union(SelectQueryUtil selectQuery) {
-        if (!isSelectCalled) {
-            throw new IllegalStateException("No se puede llamar union(...) sin haber agregado la sentencia select");
-        }
-        return this.union(selectQuery.build());
+        validarSelectCalled();
+        return this.union(selectQuery.build(), false);
+    }
+
+
+    /**
+     * Agrega la cla&uacute;sula <b>{@code UNION}</b> a la consulta actual, une el resultado del query actual
+     * con un segundo query, para poder mantener el orden en el que se requiere hacer el <b>{@code UNION}</b>
+     *
+     * @param selectQuery el objeto SelectQueryUtil que representa la consulta a unir
+     * @return una cadena que representa la consulta actual con la cla&uacute;sula <b>{@code UNION ALL}</b> y la consulta proporcionada
+     * unida
+     * @see #union(SelectQueryUtil)
+     * @since 1.0.2
+     */
+    public String unionAll(SelectQueryUtil selectQuery) {
+        validarSelectCalled();
+        return this.union(selectQuery.build(), true);
     }
 
     /**
-     * Une la consulta actual con una consulta generada a partir de la cadena proporcionada usando la cláusula
-     * <b>{@code UNION}</b>.
+     * Agrega la cla&uacute;sula <b>{@code EXCEPT}</b> a la consulta actual, une el resultado del query actual
+     * con un segundo query, para poder mantener el orden en el que se requiere hacer el <b>{@code EXCEPT}</b>
      *
-     * @param build la cadena que representa la consulta a unir
-     * @return una cadena que representa la consulta actual con la cláusula UNION y la consulta proporcionada unida
-     * @since 1.0.1
+     * @param selectQuery el objeto SelectQueryUtil que representa la consulta a concatenar a la primer consulta
+     * @return una cadena que representa la consulta actual con la cla&uacute;sula <b>{@code EXCEPT}</b> y la consulta proporcionada
+     * juntas
+     * @see #exceptAll(SelectQueryUtil)
+     * @since 1.0.2
      */
-    private String union(String build) {
-        final String queryUnion = this.build();
-        return queryUnion + SPACE +
-                UNION +
-                SPACE +
-                build;
+    public String except(SelectQueryUtil selectQuery) {
+        validarSelectCalled();
+        return this.except(selectQuery.build(), false);
+    }
+
+
+    /**
+     * Agrega la cla&uacute;sula <b>{@code EXCEPT ALL}</b> a la consulta actual, une el resultado del query actual
+     * con un segundo query, para poder mantener el orden en el que se requiere hacer el <b>{@code EXCEPT ALL}</b>
+     *
+     * @param selectQuery el objeto SelectQueryUtil que representa la consulta a concatenar a la primer consulta
+     * @return una cadena que representa la consulta actual con la cla&uacute;sula <b>{@code EXCEPT ALL}</b> y la consulta proporcionada
+     * juntas
+     * @see #except(SelectQueryUtil)
+     * @since 1.0.2
+     */
+    public String exceptAll(SelectQueryUtil selectQuery) {
+        validarSelectCalled();
+        return this.except(selectQuery.build(), true);
+    }
+
+    /**
+     * Agrega la cla&uacute;sula <b>{@code INTERSECT}</b> a la consulta actual, une el resultado del query actual
+     * con un segundo query, para poder mantener el orden en el que se requiere hacer el <b>{@code INTERSECT}</b>
+     *
+     * @param selectQuery el objeto SelectQueryUtil que representa la consulta a concatenar a la primer consulta
+     * @return una cadena que representa la consulta actual con la cla&uacute;sula <b>{@code INTERSECT}</b> y la consulta proporcionada
+     * juntas
+     * @see #intersectAll(SelectQueryUtil)
+     * @since 1.0.2
+     */
+    public String intersect(SelectQueryUtil selectQuery) {
+        validarSelectCalled();
+        return this.intersect(selectQuery.build(), false);
+    }
+
+    /**
+     * Agrega la cla&uacute;sula <b>{@code INTERSECT ALL}</b> a la consulta actual, une el resultado del query actual
+     * con un segundo query, para poder mantener el orden en el que se requiere hacer el <b>{@code INTERSECT ALL}</b>
+     *
+     * @param selectQuery el objeto SelectQueryUtil que representa la consulta a concatenar a la primer consulta
+     * @return una cadena que representa la consulta actual con la cla&uacute;sula <b>{@code INTERSECT ALL}</b> y la consulta proporcionada
+     * juntas
+     * @see #intersect(SelectQueryUtil)
+     * @since 1.0.2
+     */
+    public String intersectAll(SelectQueryUtil selectQuery) {
+        validarSelectCalled();
+        return this.intersect(selectQuery.build(), true);
     }
 
     /**
@@ -373,6 +441,76 @@ public class SelectQueryUtil {
         addGroupBy(stringBuilder);
 
         return stringBuilder.toString();
+    }
+
+    /**
+     * Recupera el query generado ya encriptado y usando utf-8
+     *
+     * @return
+     * @since 1.0.2
+     */
+    public String encrypt(String query) {
+        return DatatypeConverter
+                .printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Recupera el query generado ya encriptado y usando utf-8
+     *
+     * @return
+     * @since 1.0.2
+     */
+    public String encrypt(String query, String coding) throws UnsupportedEncodingException {
+        return DatatypeConverter
+                .printBase64Binary(query.getBytes(coding));
+    }
+
+    /**
+     * Une la consulta actual con una consulta generada a partir de la cadena proporcionada usando la cláusula
+     * <b>{@code UNION}</b>.
+     *
+     * @param build la cadena que representa la consulta a unir
+     * @return una cadena que representa la consulta actual con la cláusula UNION y la consulta proporcionada unida
+     * @since 1.0.1
+     */
+    private String union(String build, boolean isAll) {
+        final String queryUnion = this.build();
+        return queryUnion + SPACE +
+                (isAll ? UNION_ALL : UNION) +
+                SPACE +
+                build;
+    }
+
+    /**
+     * Crea la sentencia <b>{@code EXCEPT}</b> o <b>{@code EXCEPT ALL}</b>
+     *
+     * @param build es la consulta que se va a agregar a la consulta actual
+     * @param isAll es una bandera que verifica si se agrega o no la palaba <b>{@code ALL}</b>
+     * @return Las sentencias con la instrucci&oacute;n <b>{@code EXCEPT}</b> o <b>{@code EXCEPT ALL}</b>
+     * @since 1.0.2
+     */
+    private String except(String build, boolean isAll) {
+        final String queryUnion = this.build();
+        return queryUnion + SPACE +
+                (isAll ? EXCEPT_ALL : EXCEPT) +
+                SPACE +
+                build;
+    }
+
+    /**
+     * Crea la sentencia <b>{@code INTERSECT}</b> o <b>{@code INTERSECT ALL}</b>
+     *
+     * @param build es la consulta que se va a agregar a la consulta actual
+     * @param isAll es una bandera que verifica si se agrega o no la palaba <b>{@code ALL}</b>
+     * @return Las sentencias con la instrucci&oacute;n <b>{@code INTERSECT}</b> o <b>{@code EXCEPT ALL}</b>
+     * @since 1.0.2
+     */
+    private String intersect(String build, boolean isAll) {
+        final String queryUnion = this.build();
+        return queryUnion + SPACE +
+                (isAll ? INTERSECT_ALL : INTERSECT) +
+                SPACE +
+                build;
     }
 
     /**
@@ -523,7 +661,6 @@ public class SelectQueryUtil {
                 stringBuilder.append(join.getTipo());
                 stringBuilder.append(SPACE);
                 stringBuilder.append(join.getTabla());
-                stringBuilder.append(SPACE).append(ON).append(SPACE);
                 agregarCondicionesJoin(stringBuilder, join);
             }
         }
@@ -539,6 +676,7 @@ public class SelectQueryUtil {
     private void agregarCondicionesJoin(StringBuilder stringBuilder, Join join) {
         final List<String> condicionesTemp = join.getOn();
         if (!condicionesTemp.isEmpty()) {
+            stringBuilder.append(SPACE).append(ON).append(SPACE);
             for (int index = 0; index < condicionesTemp.size(); index++) {
                 String condicion = condicionesTemp.get(index);
                 agregarParametros(stringBuilder, index, condicion, condicionesTemp);
@@ -576,6 +714,18 @@ public class SelectQueryUtil {
                 "#" + tipo +
                 SPACE +
                 condicion;
+    }
+
+    /**
+     * Valida si la funci&oacute;n <b>{@code select()}</b> ya se ha invocado.
+     *
+     * @see SelectQueryUtil#select(String...)
+     * @since 1.0.2
+     */
+    private void validarSelectCalled() {
+        if (!isSelectCalled) {
+            throw new IllegalStateException("No se puede crear el query sin haber agregado la sentencia select");
+        }
     }
 
 }

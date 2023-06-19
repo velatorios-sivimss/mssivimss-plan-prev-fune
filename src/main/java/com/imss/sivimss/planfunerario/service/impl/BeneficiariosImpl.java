@@ -39,15 +39,14 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	@Autowired
 	private LogUtil logUtil;
 	
-	@Value("${endpoints.dominio-consulta}")
+	@Value("${endpoints.rutas.dominio-consulta}")
 	private String urlConsulta;
-	
+	@Value("${endpoints.rutas.dominio-actualizar}")
+	private String urlActualizar;
+
 	@Value("${endpoints.ms-reportes}")
 	private String urlReportes;
-	
-	 private static final String PATH_CONSULTA="generico/consulta";
-	 private static final String PATH_ACTUALIZAR="generico/actualizar";
-	 
+
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
 	
@@ -57,7 +56,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 
 	@Override
 	public Response<?> buscarBeneficiarios(DatosRequest request, Authentication authentication) throws IOException {
-		return providerRestTemplate.consumirServicio(benefBean.beneficiarios(request).getDatos(), urlConsulta + PATH_CONSULTA,
+		return providerRestTemplate.consumirServicio(benefBean.beneficiarios(request).getDatos(), urlConsulta,
 				authentication);
 	}
 
@@ -66,7 +65,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 	FiltrosBeneficiariosRequest filtros = gson.fromJson(datosJson, FiltrosBeneficiariosRequest.class);
 	log.info("convenio: " +filtros.getIdConvenioPF());
-		return providerRestTemplate.consumirServicio(benefBean.detalleBeneficiarios(request, filtros.getIdBeneficiario(), filtros.getIdConvenioPF()).getDatos(), urlConsulta + PATH_CONSULTA,
+		return providerRestTemplate.consumirServicio(benefBean.detalleBeneficiarios(request, filtros.getIdBeneficiario(), filtros.getIdConvenioPF()).getDatos(), urlConsulta,
 				authentication);
 	}
 
@@ -111,12 +110,12 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		if(benefRequest.getIdPersona()==null) {
 		throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
 		}
-			response = providerRestTemplate.consumirServicio(benefBean.editarPersona().getDatos(), urlConsulta + PATH_ACTUALIZAR,
+			response = providerRestTemplate.consumirServicio(benefBean.editarPersona().getDatos(), urlActualizar,
 					authentication);
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", MODIFICACION, authentication);
 			if(response.getCodigo()==200) {
 				providerRestTemplate.consumirServicio(benefBean.editarBeneficiario(benefRequest.getIdPersona(), usuarioDto.getIdUsuario(),
-						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getActaNac()).getDatos(), urlConsulta + PATH_ACTUALIZAR,
+						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getActaNac()).getDatos(), urlActualizar,
 						authentication);
 			}else {
 				String consulta = benefBean.editarBeneficiario(benefRequest.getIdPersona(), usuarioDto.getIdUsuario(),
@@ -143,7 +142,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		benefBean.setUsuarioBaja(usuarioDto.getIdUsuario());
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 	  PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
-	  Response<?> response = providerRestTemplate.consumirServicio(benefBean.cambiarEstatus(benefRequest.getIdBeneficiario(), benefRequest.getEstatusBenefic()).getDatos(), urlConsulta +PATH_ACTUALIZAR,
+	  Response<?> response = providerRestTemplate.consumirServicio(benefBean.cambiarEstatus(benefRequest.getIdBeneficiario(), benefRequest.getEstatusBenefic()).getDatos(), urlActualizar,
 				authentication);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", BAJA, authentication);
 	return response;
@@ -152,7 +151,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	@Override
 	public Response<?> buscarBeneficiariosPlanAnterior(DatosRequest request, Authentication authentication)
 			throws IOException {
-		return providerRestTemplate.consumirServicio(benefBean.beneficiariosPlanAnterior(request).getDatos(), urlConsulta + PATH_CONSULTA,
+		return providerRestTemplate.consumirServicio(benefBean.beneficiariosPlanAnterior(request).getDatos(), urlConsulta,
 				authentication);
 	}
 		
