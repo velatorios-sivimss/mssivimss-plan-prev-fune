@@ -27,8 +27,12 @@ import java.util.Map;
 
 @Service
 public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
-    @Value("${endpoints.dominio-consulta}")
-    private String urlDominio;
+    @Value("${endpoints.rutas.dominio-consulta}")
+    private String urlDominioConsulta;
+    @Value("${endpoints.ms-dominio-convenios}")
+    private String urlDominioConvenio;
+    @Value("${endpoints.rutas.dominio-consulta}")
+    private String urlDominioActualizar;
     @Value("${endpoints.ms-reportes}")
     private String urlReportes;
     @Autowired
@@ -83,7 +87,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         mapa.put("idPersona", persona.getIdPersona());
         mapa.put("idContratante", persona.getIdContratante());
         mapa.put("idDomicilio", persona.getIdDomicilio());
-        return providerRestTemplate.consumirServicio(mapa, urlDominio + "/convenioPf/insertConvenios", authentication);
+        return providerRestTemplate.consumirServicio(mapa, urlDominioConvenio, authentication);
     }
 
     @Override
@@ -111,7 +115,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
 
     @Override
     public Response<?> consultaPromotores(DatosRequest request, Authentication authentication) throws IOException {
-        return providerRestTemplate.consumirServicio(convenioBean.consultarPromotores().getDatos(), urlDominio + "/generico/consulta", authentication);
+        return providerRestTemplate.consumirServicio(convenioBean.consultarPromotores().getDatos(), urlDominioConsulta, authentication);
     }
 
     @Override
@@ -119,14 +123,14 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         JsonObject objeto = (JsonObject) jsonParser.parse((String) request.getDatos().get(AppConstantes.DATOS));
         String curp = String.valueOf(objeto.get("curp"));
         String rfc = String.valueOf(objeto.get("rfc"));
-        return providerRestTemplate.consumirServicio(convenioBean.consultarCurpRfc(curp, rfc).getDatos(), urlDominio + "/generico/consulta", authentication);
+        return providerRestTemplate.consumirServicio(convenioBean.consultarCurpRfc(curp, rfc).getDatos(), urlDominioConsulta, authentication);
     }
 
     @Override
     public Response<?> consultaCP(DatosRequest request, Authentication authentication) throws IOException {
         JsonObject objeto = (JsonObject) jsonParser.parse((String) request.getDatos().get(AppConstantes.DATOS));
         String cp = String.valueOf(objeto.get("cp"));
-        return providerRestTemplate.consumirServicio(convenioBean.consultarCP(cp).getDatos(), urlDominio + "/generico/consulta", authentication);
+        return providerRestTemplate.consumirServicio(convenioBean.consultarCP(cp).getDatos(), urlDominioConsulta, authentication);
     }
 
     @Override
@@ -146,10 +150,10 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         BusquedaPersonaFolioResponse busquedaFolio = new BusquedaPersonaFolioResponse();
         JsonObject objeto = (JsonObject) jsonParser.parse((String) request.getDatos().get(AppConstantes.DATOS));
         String folioConvenio = String.valueOf(objeto.get("folioConvenio"));
-        Response<?> responseContratante = providerRestTemplate.consumirServicio(convenioBean.busquedaFolioPersona(folioConvenio).getDatos(), urlDominio + "/generico/consulta", authentication);
+        Response<?> responseContratante = providerRestTemplate.consumirServicio(convenioBean.busquedaFolioPersona(folioConvenio).getDatos(), urlDominioConsulta, authentication);
         if (!responseContratante.getDatos().toString().equals("[]")) {
             contratanteResponse = Arrays.asList(modelMapper.map(responseContratante.getDatos(), ContratanteResponse[].class));
-            beneficiariosResponse = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(convenioBean.busquedaBeneficiarios(folioConvenio).getDatos(), urlDominio + "/generico/consulta", authentication).getDatos(), BeneficiarioResponse[].class));
+            beneficiariosResponse = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(convenioBean.busquedaBeneficiarios(folioConvenio).getDatos(), urlDominioConsulta, authentication).getDatos(), BeneficiarioResponse[].class));
             busquedaFolio.setDatosContratante(contratanteResponse.get(0));
             busquedaFolio.setBeneficiarios(beneficiariosResponse);
             busquedaFolio.setFolioConvenio(folioConvenio);
@@ -169,7 +173,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
     public Response<?> busquedaFolioEmpresa(DatosRequest request, Authentication authentication) throws IOException {
         JsonObject objeto = (JsonObject) jsonParser.parse((String) request.getDatos().get(AppConstantes.DATOS));
         String folioConvenio = String.valueOf(objeto.get("folioConvenio"));
-        return providerRestTemplate.consumirServicio(convenioBean.busquedaFolioEmpresa(folioConvenio).getDatos(), urlDominio + "/generico/consulta", authentication);
+        return providerRestTemplate.consumirServicio(convenioBean.busquedaFolioEmpresa(folioConvenio).getDatos(), urlDominioConsulta, authentication);
     }
 
     @Override
@@ -177,7 +181,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         log.info("- Se entra a consulta rfc empresa -");
         JsonObject objeto = (JsonObject) jsonParser.parse((String) request.getDatos().get(AppConstantes.DATOS));
         String rfc = String.valueOf(objeto.get("rfc"));
-        return providerRestTemplate.consumirServicio(convenioBean.busquedaRfcEmpresa(rfc).getDatos(), urlDominio + "/generico/consulta", authentication);
+        return providerRestTemplate.consumirServicio(convenioBean.busquedaRfcEmpresa(rfc).getDatos(), urlDominioConsulta, authentication);
     }
 
     @Override
@@ -189,10 +193,10 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         switch (bandera) {
             case "1":
                 log.info("Activando convenio");
-                return providerRestTemplate.consumirServicio(convenioBean.cambiarEstatusConvenio("2", folioConvenio, usuarioDto).getDatos(), urlDominio + "/generico/actualizar", authentication);
+                return providerRestTemplate.consumirServicio(convenioBean.cambiarEstatusConvenio("2", folioConvenio, usuarioDto).getDatos(), urlDominioActualizar, authentication);
             case "0":
                 log.info("Desactivando convenio");
-                return providerRestTemplate.consumirServicio(convenioBean.cambiarEstatusConvenio("3", folioConvenio, usuarioDto).getDatos(), urlDominio + "/generico/actualizar", authentication);
+                return providerRestTemplate.consumirServicio(convenioBean.cambiarEstatusConvenio("3", folioConvenio, usuarioDto).getDatos(), urlDominioActualizar, authentication);
             default:
                 log.warn("No se pudo activar o desactivar el convenio");
         }
@@ -203,7 +207,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
 
     public BusquedaInformacionReporteResponse buscarInformacionReporte(String folioConvenio, Authentication authentication) throws IOException {
         BusquedaInformacionReporteResponse resultadoBusquedaInfo;
-        Response<?> respuestaBusqueda = providerRestTemplate.consumirServicio(convenioBean.busquedaFolioParaReporte(folioConvenio).getDatos(), urlDominio + "/generico/consulta", authentication);
+        Response<?> respuestaBusqueda = providerRestTemplate.consumirServicio(convenioBean.busquedaFolioParaReporte(folioConvenio).getDatos(), urlDominioConsulta, authentication);
         List<BusquedaInformacionReporteResponse> infoReporte = Arrays.asList(modelMapper.map(respuestaBusqueda.getDatos(), BusquedaInformacionReporteResponse[].class));
         resultadoBusquedaInfo = infoReporte.get(0);
         return resultadoBusquedaInfo;
