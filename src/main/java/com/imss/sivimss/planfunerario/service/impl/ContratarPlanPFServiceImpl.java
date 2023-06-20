@@ -4,10 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.imss.sivimss.planfunerario.beans.ConvenioNuevoPF;
-import com.imss.sivimss.planfunerario.model.request.PdfDto;
-import com.imss.sivimss.planfunerario.model.request.PersonaAltaConvenio;
-import com.imss.sivimss.planfunerario.model.request.PersonaConvenioRequest;
-import com.imss.sivimss.planfunerario.model.request.UsuarioDto;
+import com.imss.sivimss.planfunerario.beans.ModificarConvenioNuevoPf;
+import com.imss.sivimss.planfunerario.model.request.*;
 import com.imss.sivimss.planfunerario.model.response.BeneficiarioResponse;
 import com.imss.sivimss.planfunerario.model.response.BusquedaInformacionReporteResponse;
 import com.imss.sivimss.planfunerario.model.response.BusquedaPersonaFolioResponse;
@@ -37,7 +35,10 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
     private ProviderServiceRestTemplate providerRestTemplate;
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ContratarPlanPFServiceImpl.class);
     JsonParser jsonParser = new JsonParser();
-    ConvenioNuevoPF convenioBean = new ConvenioNuevoPF();
+    @Autowired
+    private ConvenioNuevoPF convenioBean;
+
+    ModificarConvenioNuevoPf modificar = new ModificarConvenioNuevoPf();
     Gson json = new Gson();
     @Autowired
     ModelMapper modelMapper;
@@ -58,15 +59,17 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
             queryContratante = convenioBean.generarQueryContratante(persona.getPersona(), usuarioDto.getIdUsuario().toString());
         }
         if (persona.getIdDomicilio() == null) {
-            queryDomicilio = convenioBean.generarQueryDomicilio(persona.getPersona(), usuarioDto.getIdUsuario().toString());
+            queryDomicilio = convenioBean.generarQueryDomicilio(persona.getPersona().getCalle(), persona.getPersona().getNumeroExterior(),
+                    persona.getPersona().getNumeroInterior(), persona.getPersona().getCp(), persona.getPersona().getColonia(),
+                    persona.getPersona().getMunicipio(), persona.getPersona().getEstado(), usuarioDto.getIdUsuario().toString());
         }
-        String queryConvenioPf = convenioBean.generarQueryConvenioPf(persona.getNombreVelatorio(), persona.getIdPromotor(), persona.getIdVelatorio(), usuarioDto.getIdUsuario().toString());
+        String queryConvenioPf = convenioBean.generarQueryConvenioPf(persona.getNombreVelatorio(), persona.getIdPromotor(), persona.getIdVelatorio(), usuarioDto.getIdUsuario().toString(), "1");
         String queryContratantePaquete = convenioBean.generarQueryContratantePaquete(persona, usuarioDto.getIdUsuario().toString());
         String[] queryBeneficiario = new String[persona.getPersona().getBeneficiarios().length];
         String[] queryContratanteBeneficiarios = new String[persona.getPersona().getBeneficiarios().length];
         for (int i = 0; i < persona.getPersona().getBeneficiarios().length; i++) {
             queryBeneficiario[i] = DatatypeConverter.printBase64Binary(convenioBean.generarQueryPersonaBeneficiaria(persona.getPersona().getBeneficiarios()[i], usuarioDto.getIdUsuario().toString()).getBytes("UTF-8"));
-            queryContratanteBeneficiarios[i] = DatatypeConverter.printBase64Binary(convenioBean.generarQueryContratanteBeneficiarios(persona.getPersona().getBeneficiarios()[i].getParentesco(), persona.getPersona().getClaveActa(), usuarioDto.getIdUsuario().toString()).getBytes("UTF-8"));
+            queryContratanteBeneficiarios[i] = DatatypeConverter.printBase64Binary(convenioBean.generarQueryContratanteBeneficiarios(persona.getPersona().getBeneficiarios()[i].getParentesco(), persona.getPersona().getClaveActa(), usuarioDto.getIdUsuario().toString(),persona.getPersona(),authentication).getBytes("UTF-8"));
         }
         HashMap mapa = new HashMap();
         mapa.put("datosPersonaContratante", DatatypeConverter.printBase64Binary(queryPersona.getBytes("UTF-8")));
@@ -76,12 +79,35 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         mapa.put("datosContratantePaquete", DatatypeConverter.printBase64Binary(queryContratantePaquete.getBytes("UTF-8")));
         mapa.put("datosBeneficiario", queryBeneficiario);
         mapa.put("datosContratanteBeneficiarios", queryContratanteBeneficiarios);
-        mapa.put("datosValidacionDocumentos",DatatypeConverter.printBase64Binary(convenioBean.generarQueryValidacionDocumentos(persona, String.valueOf(usuarioDto.getIdUsuario())).getBytes("UTF-8")));
+        mapa.put("datosValidacionDocumentos", DatatypeConverter.printBase64Binary(convenioBean.generarQueryValidacionDocumentos(persona, String.valueOf(usuarioDto.getIdUsuario())).getBytes("UTF-8")));
         mapa.put("idPersona", persona.getIdPersona());
         mapa.put("idContratante", persona.getIdContratante());
         mapa.put("idDomicilio", persona.getIdDomicilio());
         return providerRestTemplate.consumirServicio(mapa, urlDominio + "/convenioPf/insertConvenios", authentication);
     }
+
+    @Override
+    public Response<?> agregarConvenioNuevoPFEmpresa(DatosRequest request, Authentication authentication) throws IOException {
+
+        String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
+        UsuarioDto usuarioDto = json.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+        EmpresaAltaConvenio empresa = json.fromJson(datosJson, EmpresaAltaConvenio.class);
+        String queryConvenioPf = convenioBean.generarQueryConvenioPf(empresa.getNombreVelatorio(), empresa.getIdPromotor(), empresa.getIdVelatorio(), usuarioDto.getIdUsuario().toString(), "0");
+        String queryDomicilio = convenioBean.generarQueryDomicilio(empresa.getEmpresa().getCalle(), empresa.getEmpresa().getNumeroExterior(),
+                empresa.getEmpresa().getNumeroInterior(), empresa.getEmpresa().getCp(), empresa.getEmpresa().getColonia(),
+                empresa.getEmpresa().getMunicipio(), empresa.getEmpresa().getEstado(), usuarioDto.getIdUsuario().toString());
+        String queryEmpresaConvenioPF = convenioBean.generarQueryEmpresaConvenioPf(empresa.getEmpresa(), usuarioDto.getIdUsuario().toString());
+
+        log.info("--------- datos a enviar ----------");
+        HashMap mapa = new HashMap();
+        mapa.put("datosConvenio", DatatypeConverter.printBase64Binary(queryConvenioPf.getBytes("UTF-8")));
+        mapa.put("datosDireccion", DatatypeConverter.printBase64Binary(queryDomicilio.getBytes("UTF-8")));
+        mapa.put("datosEmpresaConvenio", DatatypeConverter.printBase64Binary(queryEmpresaConvenioPF.getBytes("UTF-8")));
+        mapa.put("datosPersonas", empresa.getEmpresa().getPersonas());
+        mapa.put("usuario", usuarioDto.getIdUsuario().toString());
+        return providerRestTemplate.consumirServicio(mapa, urlDominio + "/convenioPf/insertConvenios/empresa", authentication);
+    }
+
 
     @Override
     public Response<?> consultaPromotores(DatosRequest request, Authentication authentication) throws IOException {
@@ -172,6 +198,8 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         }
         return new Response<>();
     }
+
+
 
     public BusquedaInformacionReporteResponse buscarInformacionReporte(String folioConvenio, Authentication authentication) throws IOException {
         BusquedaInformacionReporteResponse resultadoBusquedaInfo;

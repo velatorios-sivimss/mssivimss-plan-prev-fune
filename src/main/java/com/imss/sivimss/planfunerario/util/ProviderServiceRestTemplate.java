@@ -41,6 +41,7 @@ public class ProviderServiceRestTemplate {
 		}
 	}
 
+
 	public Response<?> consumirServicioReportes(Map<String, Object> dato,
 			String url, Authentication authentication) throws IOException {
 		try {
