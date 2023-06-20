@@ -69,9 +69,10 @@ public class ConsultaConvenios {
                         "if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO) as fechaVigenciaInicio", // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
                         "if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA) as fechaVigenciaFin", // sacar la fecha de vigencia de la tabla de Lore
                         "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
-                        "'Situacion' as situacion", // de donde se recupera la situacion
+                        "'Situacion' as situacion", // de donde se recupera la situacion, todavia no se ha resuelto la duda
 //                        "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
-                        "presupuesto.CAN_PRESUPUESTO as importeConvenio", // revisar con pablo para la parte de los importes, vienen de caracteristicas_presupuesto
+//                        "presupuesto.CAN_PRESUPUESTO as importeConvenio", // revisar con pablo para la parte de los importes, vienen de caracteristicas_presupuesto
+                        "paquete.MON_PRECIO as importeConvenio", // revisar con pablo para la parte de los importes, vienen de caracteristicas_presupuesto
                         "convenio.ID_ESTATUS_CONVENIO as estatusConvenio")
                 .from(SVT_CONVENIO + " convenio")
 //                .from(SVT_CONVENIO + " convenio", "SVT_RENOVACION_CONVENIO_PF renovacionConvenio")
@@ -83,8 +84,8 @@ public class ConsultaConvenios {
                 .join("SVT_PAQUETE paquete",
                         "paquete.ID_PAQUETE = contratanteConvenio.ID_PAQUETE")
 
-                .join("SVC_CARACTERISTICAS_PRESUPUESTO presupuesto",
-                        "presupuesto.ID_PAQUETE = paquete.ID_PAQUETE")
+//                .join("SVC_CARACTERISTICAS_PRESUPUESTO presupuesto",
+//                        "presupuesto.ID_PAQUETE = paquete.ID_PAQUETE")
 
                 .join("SVC_CONTRATANTE contratante",
                         "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
@@ -112,8 +113,8 @@ public class ConsultaConvenios {
                         "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
                         "'Situacion' as situacion", // de donde se recupera la situacion
 //                        "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
-                        "presupuesto.CAN_PRESUPUESTO as importeConvenio", // revisar con pablo para la parte de los importes, vienen de caracteristicas_presupuesto
-//                        "paquete.MON_PRECIO as importeConvenio", // revisar con pablo para la parte de los importes, vienen de caracteristicas_presupuesto
+//                        "presupuesto.CAN_PRESUPUESTO as importeConvenio", // revisar con pablo para la parte de los importes, vienen de caracteristicas_presupuesto
+                        "paquete.MON_PRECIO as importeConvenio", // revisar con pablo para la parte de los importes, vienen de caracteristicas_presupuesto
                         "convenio.ID_ESTATUS_CONVENIO as estatusConvenio")
                 .from(SVT_CONVENIO + " convenio")
 //                .from(SVT_CONVENIO + " convenio", "SVT_RENOVACION_CONVENIO_PF renovacionConvenio")
@@ -125,8 +126,8 @@ public class ConsultaConvenios {
                 .join("SVT_PAQUETE paquete",
                         "paquete.ID_PAQUETE = contratanteConvenio.ID_PAQUETE")
 
-                .join("SVC_CARACTERISTICAS_PRESUPUESTO presupuesto",
-                        "presupuesto.ID_PAQUETE = paquete.ID_PAQUETE")
+//                .join("SVC_CARACTERISTICAS_PRESUPUESTO presupuesto",
+//                        "presupuesto.ID_PAQUETE = paquete.ID_PAQUETE")
 
                 .join("SVT_EMPRESA_CONVENIO_PF empresaContratante",
                         "empresaContratante.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
@@ -458,7 +459,7 @@ public class ConsultaConvenios {
                         "personaContratante.DES_RFC as rfc",
                         recuperarNombrePersona("personaContratante", "cliente"),
                         "factura.CAN_TOTAL as total",
-                        "factura.id_estatus_factura as estatusFactura"
+                        "factura.ID_ESTATUS_FACTURA as estatusFactura"
                 )
 
                 .from("SVT_FACTURA factura")
