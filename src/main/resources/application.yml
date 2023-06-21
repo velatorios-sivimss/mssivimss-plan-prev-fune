@@ -30,7 +30,7 @@ logging:
 
 
 endpoints:
-  ms-mod-catalogos: ${msit_MOD_CATALOGOS}
+  ms-mod-catalogos: ${msit_CATALOGOS}
   ms-reportes: ${msit_REPORTES_GENERALES}
   ms-dominio-convenios: ${msit_MOD_CATALOGO_MULTIPLE}
   rutas:
