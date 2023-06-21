@@ -223,8 +223,32 @@ public class ConvenioNuevoPF {
     public DatosRequest consultarCurpRfc(String curp, String rfc) {
         DatosRequest dr = new DatosRequest();
         Map<String, Object> parametro = new HashMap<>();
+        if(rfc.equals("\"\"")){
+            log.info("dentro if");
+            SelectQueryUtil query = new SelectQueryUtil();
+            query.select("SP.ID_PERSONA as idPersona","SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss", "SP.NOM_PERSONA AS nomPersona",
+                            "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
+                            "SP.NUM_SEXO AS sexo", "SP.FEC_NAC AS fechaNacimiento", "SP.ID_PAIS AS idPais", "SP.ID_ESTADO AS idEstado",
+                            "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIPO_PERSONA AS tipoPersona")
+                    .from("SVC_CONTRATANTE SC")
+                    .leftJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
+                    .where("SP.CVE_CURP = " + curp);
+            String consulta = query.build();
+            String encoded = DatatypeConverter.printBase64Binary(consulta.getBytes());
+            parametro.put(AppConstantes.QUERY, encoded);
+            dr.setDatos(parametro);
+            return dr;
+        }
+        String consultaElse = busquedaRfcCurp(curp, rfc);
+        String encoded = DatatypeConverter.printBase64Binary(consultaElse.getBytes());
+        parametro.put(AppConstantes.QUERY, encoded);
+        dr.setDatos(parametro);
+        return dr;
+    }
+
+    public String busquedaRfcCurp(String curp, String rfc) {
         SelectQueryUtil query = new SelectQueryUtil();
-        query.select("SP.ID_PERSONA as idPersona","SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss", "SP.NOM_PERSONA AS nomPersona",
+        query.select("SP.ID_PERSONA as idPersona", "SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss", "SP.NOM_PERSONA AS nomPersona",
                         "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
                         "SP.NUM_SEXO AS sexo", "SP.FEC_NAC AS fechaNacimiento", "SP.ID_PAIS AS idPais", "SP.ID_ESTADO AS idEstado",
                         "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIPO_PERSONA AS tipoPersona")
@@ -233,11 +257,7 @@ public class ConvenioNuevoPF {
                 .where("SP.CVE_RFC = " + rfc)
                 .or("SP.CVE_CURP = " + curp);
         String consulta = query.build();
-        log.info(consulta);
-        String encoded = DatatypeConverter.printBase64Binary(consulta.getBytes());
-        parametro.put(AppConstantes.QUERY, encoded);
-        dr.setDatos(parametro);
-        return dr;
+        return consulta;
     }
 
     public DatosRequest consultarCP(String cp) {
