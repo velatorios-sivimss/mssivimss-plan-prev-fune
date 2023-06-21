@@ -77,6 +77,16 @@ public class ContratarPlanPfController {
     @CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
     @Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
     @TimeLimiter(name = "msflujo")
+    @PostMapping("consulta-paquetes")
+    public CompletableFuture<?> consultaPaquetes(@RequestBody DatosRequest request, Authentication authentication) throws IOException {
+        Response<?> response = servicio.consultaPaquetes(request, authentication) ;
+        return CompletableFuture
+                .supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+    }
+
+    @CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+    @Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+    @TimeLimiter(name = "msflujo")
     @PostMapping("consulta-cp")
     public CompletableFuture<?> consultaCp(@RequestBody DatosRequest request, Authentication authentication) throws IOException {
         Response<?> response = servicio.consultaCP(request, authentication) ;

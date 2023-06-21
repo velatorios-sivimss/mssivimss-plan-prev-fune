@@ -207,6 +207,19 @@ public class ConvenioNuevoPF {
         return dr;
     }
 
+    public DatosRequest consultaPaquetes(){
+        DatosRequest dr = new DatosRequest();
+        Map<String, Object> parametro = new HashMap<>();
+        SelectQueryUtil query = new SelectQueryUtil();
+        query.select("SP.ID_PAQUETE AS idPaquete", "SP.DES_NOM_PAQUETE AS nomPaquete", "SP.DES_PAQUETE AS descPaquete")
+                .from("SVT_PAQUETE SP").where("SP.IND_ACTIVO = 1");
+        String consulta = query.build();
+        String encoded = DatatypeConverter.printBase64Binary(consulta.getBytes());
+        parametro.put(AppConstantes.QUERY, encoded);
+        dr.setDatos(parametro);
+        return dr;
+    }
+
     public DatosRequest consultarCurpRfc(String curp, String rfc) {
         DatosRequest dr = new DatosRequest();
         Map<String, Object> parametro = new HashMap<>();
