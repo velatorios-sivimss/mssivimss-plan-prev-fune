@@ -62,7 +62,7 @@ public class RenovarBean {
 	public static final String ID_CONVENIO_PF = "ID_CONVENIO_PF";
 	
 	
-	public DatosRequest buscarNuevo(DatosRequest request, FiltrosConvenioPFRequest filtros) {
+	public DatosRequest buscarNuevo(DatosRequest request, FiltrosConvenioPFRequest filtros, String formatFec) {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SCP.DES_FOLIO AS folio",
@@ -77,10 +77,10 @@ public class RenovarBean {
 				 "SCPC.ID_PAQUETE AS idPaquete",
 				 "PAQ.DES_PAQUETE AS tipoPaquete",
 				 "SCP.ID_ESTATUS_CONVENIO AS estatusConvenio",
-				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y')), DATE_FORMAT(RPF.FEC_INICIO, '%d/%m/%Y')) AS fechaInicio",
-				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%d/%m/%Y')) AS fechaVigencia",
-				// "DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y') AS fechaInicio",
-				// "DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y') AS fechaVigencia",
+				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO, '"+formatFec+"')), DATE_FORMAT(RPF.FEC_INICIO, '"+formatFec+"')) AS fechaInicio",
+				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_VIGENCIA, '"+formatFec+"')), DATE_FORMAT(RPF.FEC_VIGENCIA, '"+formatFec+"')) AS fechaVigencia",
+				// "DATE_FORMAT(SCP.FEC_INICIO, '"+formatFec+"') AS fechaInicio",
+				 //"DATE_FORMAT(SCP.FEC_VIGENCIA, '"+formatFec+"') AS fechaVigencia",
 				 "SD.DES_CALLE AS calle",
 				 "SD.NUM_EXTERIOR AS numExt",
 				 "SD.NUM_INTERIOR AS numInt",
@@ -142,7 +142,7 @@ public class RenovarBean {
 	    return request;
 	}
 
-	public DatosRequest buscarAnterior(DatosRequest request, FiltrosConvenioPFRequest filtros ) {
+	public DatosRequest buscarAnterior(DatosRequest request, FiltrosConvenioPFRequest filtros, String formatFec ) {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SCP.DES_FOLIO AS folio",
@@ -157,8 +157,8 @@ public class RenovarBean {
 				 "SCPC.ID_PAQUETE AS idPaquete",
 				 "PAQ.DES_PAQUETE AS tipoPaquete",
 				 "SCP.ID_ESTATUS_CONVENIO AS estatusConvenio",
-				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO,'%d/%m/%Y')), DATE_FORMAT(RPF.FEC_INICIO, '%d/%m/%Y')) AS fechaInicio",
-				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%d/%m/%Y')) AS fechaVigencia",
+				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO,'"+formatFec+"')), DATE_FORMAT(RPF.FEC_INICIO, '"+formatFec+"')) AS fechaInicio",
+				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_VIGENCIA, '"+formatFec+"')), DATE_FORMAT(RPF.FEC_VIGENCIA, '"+formatFec+"')) AS fechaVigencia",
 				 "SD.DES_CALLE AS calle",
 				 "SD.NUM_EXTERIOR AS numExt",
 				 "SD.NUM_INTERIOR AS numInt",
@@ -555,7 +555,6 @@ public class RenovarBean {
 		        qh.agregarParametroValues("IND_CONVENIO_ANTERIOR", ""+renovarDoc.getConvenioAnterior()+"");
 		        qh.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS_BENEFICIARIO", ""+renovarDoc.getComprobanteEstudios()+"");
 		        qh.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+renovarDoc.getActaMatrimonio()+"");
-		        //q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 		        qh.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+renovarDoc.getDeclaracionConcubinato()+"");
 		        qh.agregarParametroValues("IND_CARTA_PODER", ""+renovarDoc.getCartaPoder()+"");
 		        qh.agregarParametroValues("IND_INE_TESTIGO", ""+renovarDoc.getIneTestigo()+"");
