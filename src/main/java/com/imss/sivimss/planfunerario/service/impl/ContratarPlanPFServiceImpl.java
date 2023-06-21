@@ -119,6 +119,11 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
     }
 
     @Override
+    public Response<?> consultaPaquetes(DatosRequest request, Authentication authentication) throws IOException {
+        return providerRestTemplate.consumirServicio(convenioBean.consultaPaquetes().getDatos(), urlDominio + "/generico/consulta", authentication);
+    }
+
+    @Override
     public Response<?> validaCurpRfc(DatosRequest request, Authentication authentication) throws IOException {
         JsonObject objeto = (JsonObject) jsonParser.parse((String) request.getDatos().get(AppConstantes.DATOS));
         String curp = String.valueOf(objeto.get("curp"));
