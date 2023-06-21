@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class PersonaConvenioRequest {
+public class EmpresaAltaConvenio {
     @JsonProperty
     private String folioConvenio;
     @JsonProperty
@@ -16,11 +16,5 @@ public class PersonaConvenioRequest {
     @JsonProperty
     private String idPromotor;
     @JsonProperty
-    private String idPersona;
-    @JsonProperty
-    private String idDomicilio;
-    @JsonProperty
-    private String idContratante;
-    @JsonProperty
-    private PersonaAltaConvenio persona;
+    private PorEmpresaRequest empresa;
 }

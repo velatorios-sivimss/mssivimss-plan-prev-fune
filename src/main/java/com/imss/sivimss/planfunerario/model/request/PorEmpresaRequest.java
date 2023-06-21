@@ -32,5 +32,5 @@ public class PorEmpresaRequest {
     @JsonProperty
     private String correoElectronico;
     @JsonProperty
-    private PersonaRequest[] personas;
+    private PersonaAltaConvenio[] personas;
 }
