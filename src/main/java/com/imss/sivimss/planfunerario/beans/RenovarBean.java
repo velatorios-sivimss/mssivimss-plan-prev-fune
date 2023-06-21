@@ -93,7 +93,7 @@ public class RenovarBean {
 				 "SCP.IND_RENOVACION AS indRenovacion",
 				 "GROUP_CONCAT(CONCAT(SP2.NOM_PERSONA, ' '", 
 				  "SP2.NOM_PRIMER_APELLIDO, ' '", 
-				  "SP2.NOM_SEGUNDO_APELLIDO)) AS beneficiarios")
+				  "SP2.NOM_SEGUNDO_APELLIDO, '\n')) AS beneficiarios")
 		.from("SVT_CONVENIO_PF SCP")
 		.leftJoin(SVT_RENOVACION_CONVENIO_PF, "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS=1")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
@@ -164,7 +164,7 @@ public class RenovarBean {
 				 "SD.NUM_INTERIOR AS numInt",
 				 "CP.CVE_CODIGO_POSTAL AS cp",
 				 "CP.DES_ESTADO AS estado",
-				 "CP.DES_MNPIO AS municipio",
+				 "CP.DES_MNPIO AS municipio ",
 				 "SP.DES_TELEFONO AS telefono",
 				 "SP.DES_CORREO AS correo",
 		 " PAQ.MON_COSTO_REFERENCIA AS costoRenovacion",
@@ -310,7 +310,7 @@ public class RenovarBean {
 		q.agregarParametroValues("DES_FOLIO_ADENDA", "'" + folioAdenda + "'");
 		q.agregarParametroValues("DES_DATOS_BANCARIOS", "'" + this.datosBancarios + "'");
 		q.agregarParametroValues("FEC_VIGENCIA", "DATE_ADD('"+ this.vigencia +"', INTERVAL 365 DAY)");
-		q.agregarParametroValues("IND_ESTATUS", "1");
+		q.agregarParametroValues("IND_ESTATUS", "0");
 		q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"");
 		q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		String query = q.obtenerQueryInsertar();
