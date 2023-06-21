@@ -32,8 +32,7 @@ logging:
 endpoints:
   ms-mod-catalogos: ${msit_MOD_CATALOGOS}
   ms-reportes: ${msit_REPORTES_GENERALES}
-  ms-insert-multiple: ${msit_MOD_CATALOGO_MULTIPLE}
-  ms-dominio-convenios: ${endpoints.ms-insert-multiple}/convenioPf
+  ms-dominio-convenios: ${msit_MOD_CATALOGO_MULTIPLE}
   rutas:
     dominio-crear-convenio: ${endpoints.ms-dominio-convenios}/insertConvenios
     dominio-actualizar-convenio: ${endpoints.ms-dominio-convenios}/modificarConvenio
