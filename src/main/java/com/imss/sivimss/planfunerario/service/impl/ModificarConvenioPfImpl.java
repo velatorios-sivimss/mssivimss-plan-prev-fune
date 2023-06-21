@@ -24,8 +24,8 @@ import java.util.HashMap;
 @Service
 
 public class ModificarConvenioPfImpl implements ModificarConvenioPfService {
-    @Value("${endpoints.dominio-consulta}")
-    private String urlDominio;
+    @Value("${endpoints.rutas.dominio-actualizar-convenio}")
+    private String urlDominioConvenioModificar;
     @Value("${endpoints.ms-reportes}")
     private String urlReportes;
     @Autowired
@@ -55,7 +55,7 @@ public class ModificarConvenioPfImpl implements ModificarConvenioPfService {
         mapa.put("datosDomicilioContratante",DatatypeConverter.printBase64Binary(consultaModificaDomicilio.getBytes("UTF-8")));
         mapa.put("beneficiariosContratante",queryBeneficiarios);
         mapa.put("folioConvenio",persona.getFolioConvenio());
-        return providerRestTemplate.consumirServicio(mapa, urlDominio + "/convenioPf/modificarConvenio", authentication);
+        return providerRestTemplate.consumirServicio(mapa, urlDominioConvenioModificar, authentication);
     }
 
     @Override
@@ -74,6 +74,6 @@ public class ModificarConvenioPfImpl implements ModificarConvenioPfService {
         mapa.put("datosPersonas", empresa.getEmpresa().getPersonas());
         mapa.put("usuario", usuarioDto.getIdUsuario().toString());
         mapa.put("folioConvenio",empresa.getFolioConvenio());
-        return providerRestTemplate.consumirServicio(mapa, urlDominio + "/convenioPf/modificarConvenio/empresa", authentication);
+        return providerRestTemplate.consumirServicio(mapa, urlDominioConvenioModificar + "/empresa", authentication);
     }
 }
