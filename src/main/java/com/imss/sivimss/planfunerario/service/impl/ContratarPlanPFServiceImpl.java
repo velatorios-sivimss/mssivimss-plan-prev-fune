@@ -29,12 +29,12 @@ import java.util.Map;
 public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
     @Value("${endpoints.rutas.dominio-consulta}")
     private String urlDominioConsulta;
-    @Value("${endpoints.ms-dominio-convenios}")
-    private String urlDominioConvenio;
     @Value("${endpoints.rutas.dominio-consulta}")
     private String urlDominioActualizar;
     @Value("${endpoints.ms-reportes}")
     private String urlReportes;
+    @Value("${endpoints.ms-dominio-convenios}")
+    private String urlDominioConvenios;
     @Autowired
     private ProviderServiceRestTemplate providerRestTemplate;
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ContratarPlanPFServiceImpl.class);
@@ -87,7 +87,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         mapa.put("idPersona", persona.getIdPersona());
         mapa.put("idContratante", persona.getIdContratante());
         mapa.put("idDomicilio", persona.getIdDomicilio());
-        return providerRestTemplate.consumirServicio(mapa, urlDominioConvenio, authentication);
+        return providerRestTemplate.consumirServicio(mapa, urlDominioConvenios + "/insertConvenios", authentication);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         mapa.put("datosEmpresaConvenio", DatatypeConverter.printBase64Binary(queryEmpresaConvenioPF.getBytes("UTF-8")));
         mapa.put("datosPersonas", empresa.getEmpresa().getPersonas());
         mapa.put("usuario", usuarioDto.getIdUsuario().toString());
-        return providerRestTemplate.consumirServicio(mapa, urlDominio + "/convenioPf/insertConvenios/empresa", authentication);
+        return providerRestTemplate.consumirServicio(mapa, urlDominioConvenios + "/insertConvenios/empresa", authentication);
     }
 
 
@@ -120,7 +120,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
 
     @Override
     public Response<?> consultaPaquetes(DatosRequest request, Authentication authentication) throws IOException {
-        return providerRestTemplate.consumirServicio(convenioBean.consultaPaquetes().getDatos(), urlDominio + "/generico/consulta", authentication);
+        return providerRestTemplate.consumirServicio(convenioBean.consultaPaquetes().getDatos(), urlDominioConsulta, authentication);
     }
 
     @Override
