@@ -30,22 +30,18 @@ logging:
 
 
 endpoints:
-#  dominio-consulta: http://localhost:8090/mssivimss-mod-catalogos/v1
-#  ms-reportes: http://localhost:8088/mssivimss-reportes-jasp/v1/generales/generar-reporte
-#  ms-mod-catalogos: http://localhost:8090/mssivimss-mod-catalogos/v1/generico
-#  ms-reportes: http://localhost:8088/mssivimss-reportes-jpr/generales/generar-reporte
-#  ms-dominio-convenios: http://localhost:8090/mssivimss-mod-catalogos/v1/convenioPf/insertConvenios
   ms-mod-catalogos: ${msit_MOD_CATALOGOS}
   ms-reportes: ${msit_REPORTES_GENERALES}
-  ms-dominio-convenios: ${endpoints.ms-mod-catalogos}/convenioPf
+  ms-insert-multiple: ${msit_MOD_CATALOGO_MULTIPLE}
+  ms-dominio-convenios: ${endpoints.ms-insert-multiple}/convenioPf
   rutas:
     dominio-crear-convenio: ${endpoints.ms-dominio-convenios}/insertConvenios
     dominio-actualizar-convenio: ${endpoints.ms-dominio-convenios}/modificarConvenio
-    dominio-consulta: ${endpoints.ms-mod-catalogos}/generico/consulta
-    dominio-consulta-paginado: ${endpoints.ms-mod-catalogos}/generico/paginado
+    dominio-consulta: ${endpoints.ms-mod-catalogos}/consulta
+    dominio-consulta-paginado: ${endpoints.ms-mod-catalogos}/paginado
     dominio-crear: ${endpoints.ms-mod-catalogos}/generico/crear
-    dominio-crear-multiple: ${endpoints.ms-mod-catalogos}/generico/crearMultiple
-    dominio-actualizar: ${endpoints.ms-mod-catalogos}/generico/actualizar
+    dominio-crear-multiple: ${endpoints.ms-mod-catalogos}/crearMultiple
+    dominio-actualizar: ${endpoints.ms-mod-catalogos}/actualizar
 
 jwt:
   secretkey-flujo: ${msit_SECRET_KEY}
