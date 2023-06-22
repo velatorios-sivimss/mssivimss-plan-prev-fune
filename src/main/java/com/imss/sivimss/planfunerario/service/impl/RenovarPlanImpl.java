@@ -59,6 +59,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private String urlCrear;
 	@Value("${endpoints.rutas.dominio-crear-multiple}")
 	private String urlCrearMultiple;
+	@Value("${endpoints.rutas.dominio-insertar-multiple}")
+	private String urlInsertarMultiple;
 	@Value("${endpoints.rutas.dominio-actualizar}")
 	private String urlActualizar;
 
@@ -120,7 +122,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-		if(filtros.getNumeroContratante()==null || filtros.getNumeroConvenio()==null) {
+		if(filtros.getNumeroConvenio()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}
 		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarAnterior(request, filtros).getDatos(), urlConsulta,
@@ -316,7 +318,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		try {
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
-			response = providerRestTemplate.consumirServicio(renovarBean.actualizarDocumentacion(verificarDoc).getDatos(), urlCrearMultiple, authentication);
+			response = providerRestTemplate.consumirServicio(renovarBean.actualizarDocumentacion(verificarDoc).getDatos(), urlInsertarMultiple, authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Se actualizo correctamente la documentacion requerida", MODIFICACION, authentication);
 				return response;						
 		}catch (Exception e) {
