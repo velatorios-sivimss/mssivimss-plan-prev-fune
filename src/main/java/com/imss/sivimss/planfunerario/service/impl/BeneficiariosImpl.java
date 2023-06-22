@@ -41,6 +41,8 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	
 	@Value("${endpoints.rutas.dominio-consulta}")
 	private String urlConsulta;
+	@Value("${endpoints.rutas.dominio-crear-multiple}")
+	private String urlCrearMultiple;
 	@Value("${endpoints.rutas.dominio-actualizar}")
 	private String urlActualizar;
 
@@ -82,7 +84,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 			if(benefRequest.getBeneficiario().getIdContratanteConvenioPf()==null || benefRequest.getBeneficiario().getIdParentesco()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
 			}
-				response = providerRestTemplate.consumirServicio(benefBean.insertarPersona().getDatos(), urlConsulta + "/generico/crearMultiple",
+				response = providerRestTemplate.consumirServicio(benefBean.insertarPersona().getDatos(), urlCrearMultiple,
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
 				return response;		
