@@ -63,9 +63,11 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private String urlInsertarMultiple;
 	@Value("${endpoints.rutas.dominio-actualizar}")
 	private String urlActualizar;
-
 	@Value("${endpoints.ms-reportes}")
 	private String urlReportes;
+	@Value("${formato-fecha}")
+	private String fecFormat;
+
 
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
@@ -84,7 +86,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		if(filtros.getFolio()==null && filtros.getRfc()==null && filtros.getNumIne()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}
-			Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarNuevo(request, filtros).getDatos(), urlConsulta,
+			Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarNuevo(request, filtros, fecFormat).getDatos(), urlConsulta,
 					authentication);
 			Object rst = response.getDatos();
 		      if(rst.toString().equals("[]")){
@@ -125,7 +127,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		if(filtros.getNumeroConvenio()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}
-		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarAnterior(request, filtros).getDatos(), urlConsulta,
+		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarAnterior(request, filtros, fecFormat).getDatos(), urlConsulta,
 				authentication);
 	      if(response.getDatos().toString().equals("[]")){
 	    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getNumeroConvenio(), CONSULTA, authentication);

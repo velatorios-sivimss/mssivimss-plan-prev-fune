@@ -62,7 +62,7 @@ public class RenovarBean {
 	public static final String ID_CONVENIO_PF = "ID_CONVENIO_PF";
 	
 	
-	public DatosRequest buscarNuevo(DatosRequest request, FiltrosConvenioPFRequest filtros) {
+	public DatosRequest buscarNuevo(DatosRequest request, FiltrosConvenioPFRequest filtros, String fecFormat) {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SCP.DES_FOLIO AS folio",
@@ -72,12 +72,13 @@ public class RenovarBean {
 				 "SP.NOM_PERSONA AS nombre",
 				 "SP.NOM_PRIMER_APELLIDO AS primerApellido",
 				 "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
-				 "SCP.ID_TIPO_PREVISION AS tipoPrevision",
+				 "SCP.ID_TIPO_PREVISION AS idTipoPf",
+				 "IF(SCP.ID_TIPO_PREVISION=1, 'Previsión funeraria plan nuevo', 'Previsión funeraria plan anterior') AS tipoPrevision",
 				 "SCPC.ID_PAQUETE AS idPaquete",
 				  "PAQ.DES_PAQUETE AS tipoPaquete",
 				 "SCP.ID_ESTATUS_CONVENIO AS estatusConvenio",
-				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y')), DATE_FORMAT(RPF.FEC_INICIO, '%d/%m/%Y')) AS fechaInicio",
-				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%d/%m/%Y')) AS fechaVigencia",
+				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO, '"+fecFormat+"')), DATE_FORMAT(RPF.FEC_INICIO, '"+fecFormat+"')) AS fechaInicio",
+				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_VIGENCIA, '"+fecFormat+"')), DATE_FORMAT(RPF.FEC_VIGENCIA, '"+fecFormat+"')) AS fechaVigencia",
 				// "DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y') AS fechaInicio",
 				// "DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y') AS fechaVigencia",
 				 "SD.DES_CALLE AS calle",
@@ -92,7 +93,7 @@ public class RenovarBean {
 				 "SCP.IND_RENOVACION AS indRenovacion",
 				 "GROUP_CONCAT(CONCAT(SP2.NOM_PERSONA, ' '", 
 				  "SP2.NOM_PRIMER_APELLIDO, ' '", 
-				  "SP2.NOM_SEGUNDO_APELLIDO, ' ')) AS beneficiarios")
+				  "SP2.NOM_SEGUNDO_APELLIDO)) AS beneficiarios")
 		.from("SVT_CONVENIO_PF SCP")
 		.leftJoin(SVT_RENOVACION_CONVENIO_PF, "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS=1")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
@@ -141,7 +142,7 @@ public class RenovarBean {
 	    return request;
 	}
 
-	public DatosRequest buscarAnterior(DatosRequest request, FiltrosConvenioPFRequest filtros ) {
+	public DatosRequest buscarAnterior(DatosRequest request, FiltrosConvenioPFRequest filtros, String fecFormat ) {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SCP.DES_FOLIO AS folio",
@@ -151,12 +152,13 @@ public class RenovarBean {
 				 "SP.NOM_PERSONA AS nombre",
 				 "SP.NOM_PRIMER_APELLIDO AS primerApellido",
 				 "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
-				 "SCP.ID_TIPO_PREVISION AS tipoPrevision",
+				 "SCP.ID_TIPO_PREVISION AS idTipoPf",
+				 "IF(SCP.ID_TIPO_PREVISION=1, 'Previsión funeraria plan nuevo', 'Previsión funeraria plan anterior') AS tipoPrevision",
 				 "SCPC.ID_PAQUETE AS idPaquete",
 				 "PAQ.DES_PAQUETE AS tipoPaquete",
 				 "SCP.ID_ESTATUS_CONVENIO AS estatusConvenio",
-				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO,'%d/%m/%Y')), DATE_FORMAT(RPF.FEC_INICIO, '%d/%m/%Y')) AS fechaInicio",
-				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%d/%m/%Y')) AS fechaVigencia",
+				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO, '"+fecFormat+"')), DATE_FORMAT(RPF.FEC_INICIO, '"+fecFormat+"')) AS fechaInicio",
+				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_VIGENCIA, '"+fecFormat+"')), DATE_FORMAT(RPF.FEC_VIGENCIA, '"+fecFormat+"')) AS fechaVigencia",
 				 "SD.DES_CALLE AS calle",
 				 "SD.NUM_EXTERIOR AS numExt",
 				 "SD.NUM_INTERIOR AS numInt",
