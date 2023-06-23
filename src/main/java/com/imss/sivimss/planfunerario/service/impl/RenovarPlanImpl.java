@@ -98,7 +98,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    			return response;
 		    	  }
 		    		// if(!validarVigencia(filtros, authentication)) {
-		    	  if(getDia()>20 || mesActual()>mesVigencia){
+		    	  if(getDia()>31 || mesActual()>mesVigencia){
 		    		    	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 		    		    	providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar,authentication);
 		    		    	logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 CONVENIO INACTIVO ", CONSULTA, authentication);
@@ -138,7 +138,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			    			return response;
 			    	  }
 			    		//if(!validarVigenciaCtoAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio(), authentication)) {
-			    		 if(getDia()>20 || mesActual()>mesVigencia) {
+			    		 if(getDia()>31 || mesActual()>mesVigencia) {
 			    	         logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 			    			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlanAnterior(filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
 			    			 logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO SE ENCUENTRA INACTIVO", CONSULTA, authentication);
@@ -173,12 +173,11 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	        String fecha=anioMes.format(dateF);
 	        log.info("-> "+fecha);
 	        renovarBean.setVigencia(fecha);
-			String velatorio= renovarRequest.getVelatorio().substring(0,3).toUpperCase();
-		Integer contador = contadorRenovaciones(renovarRequest.getIdConvenioPf(), authentication);
-	Integer folio=101+contador;	
-				 String folioAdenda=buildFolio(velatorio,folio);
+			//String velatorio= renovarRequest.getVelatorio().substring(0,3).toUpperCase();
+		Integer contador = contadorRenovaciones(renovarRequest.getIdConvenioPf(), authentication) +1;	
+				 String folioAdenda=buildFolio(contador,renovarRequest.getFolio());
 				 renovarBean.setFolioAdenda(folioAdenda);
-				    log.info("->" +folioAdenda);
+				    log.info(" adenda ->" +folioAdenda);
 				response = providerRestTemplate.consumirServicio(renovarBean.renovarPlan().getDatos(), urlCrear,
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
@@ -216,11 +215,11 @@ public class RenovarPlanImpl implements RenovarPlanService {
 
 
 
-	private String buildFolio(String velatorio, Integer folio) {
-	    String formatearConvenioCeros = String.format("%08d", folio);
-	    String folioConvenio= formatearConvenioCeros.substring(0,6);
-	    String formatearnumConvenio = formatearConvenioCeros.substring(6,8);
-		return velatorio +"-"+folioConvenio+"-"+formatearnumConvenio;
+	private String buildFolio(Integer contador, String folio) {
+	    String formatearConvenioCeros = String.format("%02d", contador);
+	  //  String folioConvenio= formatearConvenioCeros.substring(0,6);
+	    //String formatearnumConvenio = formatearConvenioCeros.substring(6,8);
+		return folio+"-"+formatearConvenioCeros;
 	}
 
 
