@@ -34,6 +34,7 @@ public class AppConstantes {
 	public static final String FEC_ACTUALIZACION="FEC_ACTUALIZACION";
 	public static final String RUTA="rutaNombreReporte";
 	public static final String TIPO="tipoReporte";
+	public static final String EXITO = "Exito";
 	
 	private AppConstantes() {
 	    throw new IllegalStateException("AppConstantes class");

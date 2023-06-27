@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -220,11 +221,67 @@ public class ConvenioNuevoPF {
         return dr;
     }
 
+    public DatosRequest obtenerPaquetes(Integer idVelatorio) {
+        DatosRequest datosRequest = new DatosRequest();
+        Map<String, Object>parametros= new HashMap<>();
+        SelectQueryUtil selectQueryUtilPaquete= new SelectQueryUtil();
+        SelectQueryUtil selectQueryUtilUnionPaqueteRegion= new SelectQueryUtil();
+        SelectQueryUtil selectQueryUtilUnionPaqueteVelatorio= new SelectQueryUtil();
+        SelectQueryUtil selectQueryUtilUnionPaqueteServicio= new SelectQueryUtil();
+        SelectQueryUtil selectQueryUtilUnionPaqueteArticulo= new SelectQueryUtil();
+
+        selectQueryUtilUnionPaqueteVelatorio.select("SP.ID_PAQUETE","SP.DES_NOM_PAQUETE","SP.DES_PAQUETE")
+                .from("SVT_PAQUETE SP")
+                .innerJoin("SVT_PAQUETE_VELATORIO SPV", "SP.ID_PAQUETE=SPV.ID_PAQUETE")
+                .where("SP.IND_ACTIVO = 1")
+                .and("SPV.ID_VELATORIO = "+idVelatorio);
+
+        selectQueryUtilUnionPaqueteRegion.select("SP.ID_PAQUETE","SP.DES_NOM_PAQUETE","SP.DES_PAQUETE")
+                .from("SVT_PAQUETE SP")
+                .where("SP.IND_ACTIVO =1 ")
+                .and("SP.IND_REGION =1");
+
+        selectQueryUtilUnionPaqueteServicio.select("SPS.ID_PAQUETE")
+                .from("SVT_PROVEEDOR SP")
+                .innerJoin("SVT_CONTRATO SC", "SC.ID_PROVEEDOR = SP.ID_PROVEEDOR")
+                .innerJoin("SVT_CONTRATO_SERVICIO SCS", "SCS.ID_CONTRATO = SC.ID_CONTRATO")
+                .innerJoin("SVT_SERVICIO SS", "SS.ID_SERVICIO = SCS.ID_SERVICIO")
+                .innerJoin("SVT_PAQUETE_SERVICIO SPS", "SPS.ID_SERVICIO = SS.ID_SERVICIO")
+                .where("SP.IND_ACTIVO =1 ")
+                .and("SPS.IND_ACTIVO = 1")
+                .and("SP.ID_TIPO_PROVEEDOR =1")
+                .and("SC.FEC_FIN_VIG >= CURRENT_DATE()")
+                .and("SP.FEC_VIGENCIA >= CURRENT_DATE()")
+                .and("SC.IND_ACTIVO =1");
+
+        selectQueryUtilUnionPaqueteArticulo.select("DISTINCT SPA.ID_PAQUETE")
+                .from("SVT_INVENTARIO_ARTICULO STI")
+                .innerJoin("SVT_ARTICULO STA", "STA.ID_ARTICULO =STI.ID_ARTICULO")
+                .innerJoin("SVC_CATEGORIA_ARTICULO SCA", "SCA.ID_CATEGORIA_ARTICULO = STA.ID_CATEGORIA_ARTICULO")
+                .innerJoin("SVT_PAQUETE_ARTICULO SPA", "SPA.ID_CATEGORIA_ARTICULO = SCA.ID_CATEGORIA_ARTICULO")
+                .where("STI.IND_ESTATUS = 0")
+                .and("STI.ID_TIPO_ASIGNACION_ART IN (1,3)");
+
+        String queryPaqueteRegion=selectQueryUtilUnionPaqueteVelatorio.union(selectQueryUtilUnionPaqueteRegion);
+        String queryPaqueteServiciosArticulos=selectQueryUtilUnionPaqueteServicio.union(selectQueryUtilUnionPaqueteArticulo);
+
+        selectQueryUtilPaquete.select("PAQUETES.ID_PAQUETE AS idPaquete","PAQUETES.DES_NOM_PAQUETE AS nomPaquete", "PAQUETES.DES_PAQUETE AS descPaquete")
+                .from("("+queryPaqueteRegion+") PAQUETES")
+                .where("PAQUETES.ID_PAQUETE IN("+queryPaqueteServiciosArticulos+")");
+
+        String query=selectQueryUtilPaquete.build();
+        log.info(query);
+
+        String encoded=DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+        parametros.put(AppConstantes.QUERY, encoded);
+        datosRequest.setDatos(parametros);
+        return datosRequest;
+    }
+
     public DatosRequest consultarCurpRfc(String curp, String rfc) {
         DatosRequest dr = new DatosRequest();
         Map<String, Object> parametro = new HashMap<>();
         if(rfc.equals("\"\"")){
-            log.info("dentro if");
             SelectQueryUtil query = new SelectQueryUtil();
             query.select("SP.ID_PERSONA as idPersona","SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss", "SP.NOM_PERSONA AS nomPersona",
                             "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
