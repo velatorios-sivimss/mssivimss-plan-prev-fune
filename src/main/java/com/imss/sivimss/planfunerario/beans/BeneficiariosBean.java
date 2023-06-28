@@ -38,6 +38,8 @@ public class BeneficiariosBean {
 	private String curp;
 	private String rfc;
 	private String actaNac;
+	private Integer indActa;
+	private Integer indIne;
 	private String correoE;
 	private String tel;
 	private Integer usuarioAlta;
@@ -57,6 +59,8 @@ public class BeneficiariosBean {
 		this.actaNac = beneficiarioRequest.getBeneficiario().getActaNac();
 		this.correoE = beneficiarioRequest.getCorreoE();
 		this.tel = beneficiarioRequest.getTel();
+		this.indActa = beneficiarioRequest.getBeneficiario().getIndActa();
+		this.indIne = beneficiarioRequest.getBeneficiario().getIndIne();
 	}
 
 	//TABLAS
@@ -107,15 +111,16 @@ public class BeneficiariosBean {
 				 "SP.NOM_PERSONA AS nombre",
 				 "SP.NOM_PRIMER_APELLIDO AS primerApellido",
 				 "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
-				 " TIMESTAMPDIFF(YEAR, SP.FEC_nac, CURRENT_TIMESTAMP()) AS edad",
-			    " PAR.DES_PARENTESCO AS parentesco",
-				 " SP.CVE_CURP AS curp",
-				 " SP.CVE_RFC AS rfc",
-				 " SP.DES_CORREO AS correo",
-				 " SP.DES_TELEFONO AS tel",
-				 " SB.CVE_ACTA AS acta",
-				 " SP.ID_PERSONA AS idPersona",
-				 " SB.IND_ACTIVO AS estatus")
+				 "TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURRENT_TIMESTAMP()) AS edad",
+			    "PAR.DES_PARENTESCO AS parentesco",
+				 "SP.CVE_CURP AS curp",
+				 "SP.CVE_RFC AS rfc",
+				 "SP.DES_CORREO AS correo",
+				 "SP.DES_TELEFONO AS tel",
+				 "SB.IND_ACTA_NACIMIENTO AS indActa",
+				 "SB.IND_INE_BENEFICIARIO AS indIne",
+				 "SP.ID_PERSONA AS idPersona",
+				 "SB.IND_ACTIVO AS estatus")
 		.from(SVT_CONTRATANTE_BENEFICIARIOS)
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF)
 		.join(SVC_PERSONA, " SB.ID_PERSONA = SP.ID_PERSONA")
@@ -146,7 +151,7 @@ public class BeneficiariosBean {
 		q.agregarParametroValues("DES_TELEFONO", "'" + this.tel + "'");
 		q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"");
 		q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
-		String query = q.obtenerQueryInsertar() +"$$"  + insertarBeneficiario(this.idContratanteConvenioPf, this.idParentesco, this.actaNac);
+		String query = q.obtenerQueryInsertar() +"$$"  + insertarBeneficiario(this.idContratanteConvenioPf, this.idParentesco, this.indActa, this.indIne);
 		log.info(query);
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 		        parametro.put(AppConstantes.QUERY, encoded);
@@ -159,14 +164,21 @@ public class BeneficiariosBean {
 
 
 
-	private String insertarBeneficiario(Integer idContratanteConvenioPf, Integer parentesco, String actaNac) {
+	private String insertarBeneficiario(Integer idContratanteConvenioPf, Integer parentesco, Integer indActa, Integer indIne) {
 		 DatosRequest request = new DatosRequest();
 	        Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("INSERT INTO SVT_CONTRATANTE_BENEFICIARIOS");
 	        q.agregarParametroValues("ID_CONTRATANTE_PAQUETE_CONVENIO_PF", ""+idContratanteConvenioPf+"");
 	        q.agregarParametroValues("ID_PERSONA", "idTabla");
 	        q.agregarParametroValues("ID_PARENTESCO", ""+parentesco+"");
-	        q.agregarParametroValues("CVE_ACTA", "'"+actaNac+"'");
+	      //  q.agregarParametroValues("CVE_ACTA", "'"+actaNac+"'");
+	        if(indActa!=null) {
+	        	q.agregarParametroValues("IND_ACTA_NACIMIENTO", ""+indActa+"");	
+	        }
+	        if(indIne!=null) {
+	        	   q.agregarParametroValues("IND_INE_BENEFICIARIO", ""+indIne+"");   	
+	        }
+	     
 	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 	        q.agregarParametroValues("IND_SINIESTROS", "0");
 	        q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"" );

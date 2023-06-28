@@ -18,6 +18,8 @@ public class BeneficiarioModel {
 	
 	private Integer idContratanteConvenioPf;
 	private Integer idParentesco;
+	private Integer indActa;
+	private Integer indIne;
 	private String actaNac;
 
 
