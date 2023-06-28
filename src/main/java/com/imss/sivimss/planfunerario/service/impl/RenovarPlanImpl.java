@@ -124,7 +124,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-		if(filtros.getNumeroConvenio()==null) {
+		if(filtros.getNumeroConvenio()==null && filtros.getNumeroContratante()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}
 		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarAnterior(request, filtros, fecFormat).getDatos(), urlConsulta,
