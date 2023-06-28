@@ -79,8 +79,6 @@ public class RenovarBean {
 				 "SCP.ID_ESTATUS_CONVENIO AS estatusConvenio",
 				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_INICIO, '"+fecFormat+"')), DATE_FORMAT(RPF.FEC_INICIO, '"+fecFormat+"')) AS fechaInicio",
 				 "IF(SCP.IND_RENOVACION=0, (DATE_FORMAT(SCP.FEC_VIGENCIA, '"+fecFormat+"')), DATE_FORMAT(RPF.FEC_VIGENCIA, '"+fecFormat+"')) AS fechaVigencia",
-				// "DATE_FORMAT(SCP.FEC_INICIO, '%d/%m/%Y') AS fechaInicio",
-				// "DATE_FORMAT(SCP.FEC_VIGENCIA, '%d/%m/%Y') AS fechaVigencia",
 				 "SD.DES_CALLE AS calle",
 				 "SD.NUM_EXTERIOR AS numExt",
 				 "SD.NUM_INTERIOR AS numInt",
@@ -411,14 +409,12 @@ public class RenovarBean {
 			q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 			q.addWhere(ID_CONVENIO_PF+"="+idConvenio+"");
 			query = q.obtenerQueryActualizar();
-		/*
-			query = "UPDATE SVT_CONVENIO_PF SC "
+		/*		query = "UPDATE SVT_CONVENIO_PF SC "
 					+ "JOIN SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC ON SC.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF "
 					+ "SET SC.ID_ESTATUS_CONVENIO = 3,"
 					+ "SC.ID_USUARIO_MODIFICA= " +idUsuario+ " ,"
 							+ "SC.FEC_ACTUALIZACION= CURRENT_TIMESTAMP() "
-					+ "WHERE SCPC.ID_CONTRATANTE = "  +idContratante+"";
-		} */
+					+ "WHERE SCPC.ID_CONTRATANTE = "  +idContratante+"";} */
 		log.info("renovar -> "+query);
 		String encoded = encodedQuery(query);
 		parametro.put(AppConstantes.QUERY, encoded);
@@ -431,21 +427,15 @@ public class RenovarBean {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		String query;
-		if(idConvenio!=null) {
 			final QueryHelper q = new QueryHelper(UPDATE_SVT_CONVENIO_PF);
 			q.agregarParametroValues(""+AppConstantes.ID_ESTATUS_CONVENIO+"", "4");
 			q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"");
 			q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
-			q.addWhere("ID_CONVENIO_PF = "+idConvenio+"");
-			query = q.obtenerQueryActualizar();
-		}else {
-			final QueryHelper q = new QueryHelper(UPDATE_SVT_CONVENIO_PF);
-			q.agregarParametroValues(""+AppConstantes.ID_ESTATUS_CONVENIO+"", "4");
-			q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"");
-			q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
-			q.addWhere("DES_FOLIO = '"+folio+"'");
-			query = q.obtenerQueryActualizar();
-		}
+			if(idConvenio!=null) {
+				q.addWhere("ID_CONVENIO_PF = "+idConvenio+"");
+			}else {
+				q.addWhere("DES_FOLIO = '"+folio+"'");
+			}query = q.obtenerQueryActualizar();
 		log.info("a estatus cerrado "+query);
 		String encoded = encodedQuery(query);
 		parametro.put(AppConstantes.QUERY, encoded);
