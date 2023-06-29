@@ -58,11 +58,11 @@ public class ConvenioNuevoPF {
         queryPersona.agregarParametroValues("NOM_PERSONA", "'" + personaBeneficiario.getNombre() + "'");
         queryPersona.agregarParametroValues("NOM_PRIMER_APELLIDO", "'" + personaBeneficiario.getPrimerApellido() + "'");
         queryPersona.agregarParametroValues("NOM_SEGUNDO_APELLIDO", "'" + personaBeneficiario.getSegundoApellido() + "'");
-        queryPersona.agregarParametroValues("NUM_SEXO", "'" + personaBeneficiario.getSexo() + "'");
+       // queryPersona.agregarParametroValues("NUM_SEXO", "'" + personaBeneficiario.getSexo() + "'");
         queryPersona.agregarParametroValues("DES_OTRO_SEXO", "'" + personaBeneficiario.getOtroSexo() + "'");
         queryPersona.agregarParametroValues("FEC_NAC", "'" + personaBeneficiario.getFechaNacimiento() + "'");
         queryPersona.agregarParametroValues("ID_PAIS", "'" + personaBeneficiario.getPais() + "'");
-        queryPersona.agregarParametroValues("ID_ESTADO", "'" + personaBeneficiario.getEstado() + "'");
+        //queryPersona.agregarParametroValues("ID_ESTADO", "'" + personaBeneficiario.getEstado() + "'");
         queryPersona.agregarParametroValues("DES_TELEFONO", "'" + personaBeneficiario.getTelefono() + "'");
         queryPersona.agregarParametroValues("DES_CORREO", "'" + personaBeneficiario.getCorreoElectronico() + "'");
         queryPersona.agregarParametroValues("TIPO_PERSONA", "'" + personaBeneficiario.getTipoPersona() + "'");

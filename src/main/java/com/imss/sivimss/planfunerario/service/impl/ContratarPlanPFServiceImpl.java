@@ -71,6 +71,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         String[] queryBeneficiario = new String[persona.getPersona().getBeneficiarios().length];
         String[] queryContratanteBeneficiarios = new String[persona.getPersona().getBeneficiarios().length];
         for (int i = 0; i < persona.getPersona().getBeneficiarios().length; i++) {
+            persona.getPersona().getBeneficiarios()[i].setPais(persona.getPersona().getPais());
             queryBeneficiario[i] = DatatypeConverter.printBase64Binary(convenioBean.generarQueryPersonaBeneficiaria(persona.getPersona().getBeneficiarios()[i], usuarioDto.getIdUsuario().toString()).getBytes("UTF-8"));
             queryContratanteBeneficiarios[i] = DatatypeConverter.printBase64Binary(convenioBean.generarQueryContratanteBeneficiarios(persona.getPersona().getBeneficiarios()[i].getParentesco(), persona.getPersona().getClaveActa(), usuarioDto.getIdUsuario().toString(), persona.getPersona(), authentication).getBytes("UTF-8"));
         }
