@@ -16,6 +16,7 @@ import lombok.Setter;
 @JsonIgnoreType(value = true)
 public class FiltrosConvenioPFRequest {
 
+	private Integer tipoPrevision;
 	private Integer numeroConvenio;
 	private Integer numeroContratante;
 	private String folio;

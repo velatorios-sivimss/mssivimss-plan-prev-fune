@@ -126,7 +126,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		benefBean = new BeneficiariosBean(benefRequest);
 		benefBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 		
-		if(benefRequest.getIdPersona()==null) {
+		if(benefRequest.getIdPersona()==null && benefRequest.getIdBeneficiario()==null) {
 		throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
 		}
 			response = providerRestTemplate.consumirServicio(benefBean.editarPersona().getDatos(), urlActualizar,
@@ -134,7 +134,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", MODIFICACION, authentication);
 			if(response.getCodigo()==200) {
 				providerRestTemplate.consumirServicio(benefBean.editarBeneficiario(benefRequest.getIdPersona(), usuarioDto.getIdUsuario(),
-						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getActaNac()).getDatos(), urlActualizar,
+						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getIndActa(), benefRequest.getBeneficiario().getIndIne()).getDatos(), urlActualizar,
 						authentication);
 			}
 			if(response.getCodigo()==200 && benefRequest.getTipoContratacion()==2) {

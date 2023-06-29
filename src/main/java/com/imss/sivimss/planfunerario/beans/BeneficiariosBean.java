@@ -258,12 +258,18 @@ public class BeneficiariosBean {
 
 
 
-	public DatosRequest editarBeneficiario(Integer idPersona, Integer idUsuario, Integer parentesco, String acta) {
+	public DatosRequest editarBeneficiario(Integer idPersona, Integer idUsuario, Integer parentesco, Integer indActa, Integer indIne) {
 		 DatosRequest request = new DatosRequest();
 	        Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("UPDATE SVT_CONTRATANTE_BENEFICIARIOS");
 	        q.agregarParametroValues(ID_PARENTESCO, ""+parentesco+"");
-	        q.agregarParametroValues("CVE_ACTA", "'"+acta+"'");
+	       // q.agregarParametroValues("CVE_ACTA", "'"+acta+"'");
+	        if(indActa!=null) {
+	        	 q.agregarParametroValues("IND_ACTA_NACIMIENTO", ""+indActa+""); 	
+	        }
+	       if(indIne!=null) {
+	    	   q.agregarParametroValues("IND_INE_BENEFICIARIO", ""+indIne+"");   
+	       }
 	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 	        q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"" );
 			q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
@@ -379,10 +385,10 @@ public class BeneficiariosBean {
 	        q.agregarParametroValues("ID_CONTRATANTE_PAQUETE_CONVENIO_PF", ""+this.idContratanteConvenioPf+"");
 	        q.agregarParametroValues("ID_PERSONA", ID_TABLA);
 	        q.agregarParametroValues(ID_PARENTESCO, ""+this.idParentesco+"");
-	        if(indActa!=null) {
+	        if(this.indActa!=null) {
 	        	q.agregarParametroValues("IND_ACTA_NACIMIENTO", ""+this.indActa+"");	
 	        }
-	        if(indIne!=null) {
+	        if(this.indIne!=null) {
 	        	   q.agregarParametroValues("IND_INE_BENEFICIARIO", ""+this.indIne+"");   	
 	        }
 	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
@@ -405,7 +411,7 @@ public class BeneficiariosBean {
 	        q.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+this.indDeclaracionConcubinato+"");	
 	        q.agregarParametroValues(AppConstantes.ID_USUARIO_MODIFICA, ""+usuarioAlta+"" );
 			q.agregarParametroValues(AppConstantes.FEC_ACTUALIZACION, ""+AppConstantes.CURRENT_TIMESTAMP+"");
-		    q.addWhere("ID_CONTRATANTE_BENEFICIARIO= " +this.idBeneficiario);
+		    q.addWhere("ID_CONTRATANTE_BENEFICIARIOS= " +this.idBeneficiario);
 	        String query = q.obtenerQueryActualizar();
 	        String encoded = encodedQuery(query);
 	        parametro.put(AppConstantes.QUERY, encoded);

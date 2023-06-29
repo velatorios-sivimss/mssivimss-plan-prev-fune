@@ -86,7 +86,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		if(filtros.getFolio()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}
-			Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarNuevo(request, filtros, fecFormat).getDatos(), urlConsulta,
+		filtros.setTipoPrevision(1);
+			Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarConvenio(request, filtros, fecFormat).getDatos(), urlConsulta,
 					authentication);
 			Object rst = response.getDatos();
 		      if(rst.toString().equals("[]")){
@@ -99,7 +100,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    			response.setDatos(null);
 		    			return response;
 		    	  }
-		    	  if(getDia()>20 || mesActual()>mesVigencia){
+		    	  if(getDia()>21 || mesActual()>mesVigencia){
 		    		    	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 		    		    	providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar,authentication);
 		    		    	logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 CONVENIO INACTIVO ", CONSULTA, authentication);
@@ -126,7 +127,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		if(filtros.getNumeroConvenio()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}
-		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarAnterior(request, filtros, fecFormat).getDatos(), urlConsulta,
+		filtros.setTipoPrevision(2);
+		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarConvenio(request, filtros, fecFormat).getDatos(), urlConsulta,
 				authentication);
 	      if(response.getDatos().toString().equals("[]")){
 	    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getNumeroConvenio(), CONSULTA, authentication);
