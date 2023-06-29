@@ -136,13 +136,10 @@ public class BeneficiariosImpl implements BeneficiariosService{
 				providerRestTemplate.consumirServicio(benefBean.editarBeneficiario(benefRequest.getIdPersona(), usuarioDto.getIdUsuario(),
 						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getActaNac()).getDatos(), urlActualizar,
 						authentication);
-			}else {
-				String consulta = benefBean.editarBeneficiario(benefRequest.getIdPersona(), usuarioDto.getIdUsuario(),
-						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getActaNac()).getDatos().get(""+AppConstantes.QUERY+"").toString();
-				String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
-				log.error("Error al ejecutar la query" +encoded);
-				logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),ERROR, MODIFICACION, authentication);
-				throw new BadRequestException(HttpStatus.BAD_REQUEST, " 5 FALLO AL ACTUALIZAR EL BENEFICIARIO ");		
+			}
+			if(response.getCodigo()==200 && benefRequest.getTipoContratacion()==2) {
+				providerRestTemplate.consumirServicio(benefBean.editarDocPlanAnterior().getDatos(), urlActualizar,
+						authentication);	
 			}
 			
 			return response;		

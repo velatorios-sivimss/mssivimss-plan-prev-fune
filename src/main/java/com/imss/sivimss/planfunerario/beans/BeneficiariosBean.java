@@ -217,7 +217,7 @@ public class BeneficiariosBean {
         q.agregarParametroValues("IND_CARTA_PODER", ""+this.indCartaPoder+"");  
         q.agregarParametroValues("IND_INE_TESTIGO", ""+this.indIneTestigo+""); 
         q.agregarParametroValues("IND_INE_TESTIGO_DOS", ""+this.indIneTestigoDos+""); 
-        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
+       // q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
         q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"" );
 		q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
         String query = q.obtenerQueryInsertar();
@@ -342,14 +342,6 @@ public class BeneficiariosBean {
 	    request.setDatos(parametros);
 	    return request;
 	}
-	
-	private static String obtieneQuery(SelectQueryUtil queryUtil) {
-        return queryUtil.build();
-    }
-	
-	private static String encodedQuery(String query) {
-        return DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
-    }
 
 	public DatosRequest  insertarPersona() {
 		DatosRequest request = new DatosRequest();
@@ -393,12 +385,37 @@ public class BeneficiariosBean {
 	        q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"" );
 			q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 	        String query = q.obtenerQueryInsertar()+"$$" +insertarDocPlanAnterior();
-	        log.info("estoy aqui "+query);
 	        String encoded = encodedQuery(query);
 	        parametro.put(AppConstantes.QUERY, encoded);
 	        request.setDatos(parametro);
 	        return query;
 	}
 
+	public DatosRequest editarDocPlanAnterior() {
+		 DatosRequest request = new DatosRequest();
+			Map<String, Object> parametro = new HashMap<>();
+	        final QueryHelper q = new QueryHelper("UPDATE SVT_BENEFICIARIOS_DOCUMENTACION_PLAN_ANTERIOR");
+	        q.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS", ""+this.indComprobanteEstudios+"");
+	        q.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+this.indActaMatrimonio+"");
+	        q.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+this.indDeclaracionConcubinato+"");	
+	        q.agregarParametroValues(AppConstantes.ID_USUARIO_MODIFICA, ""+usuarioAlta+"" );
+			q.agregarParametroValues(AppConstantes.FEC_ACTUALIZACION, ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		    q.addWhere("ID_CONTRATANTE_BENEFICIARIO= " +this.idBeneficiario);
+	        String query = q.obtenerQueryActualizar();
+	        String encoded = encodedQuery(query);
+	        parametro.put(AppConstantes.QUERY, encoded);
+	        request.setDatos(parametro);
+		return request;
+	}
+	
+	private static String obtieneQuery(SelectQueryUtil queryUtil) {
+        return queryUtil.build();
+    }
+	
+	private static String encodedQuery(String query) {
+        return DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+    }
 
+
+	
 }
