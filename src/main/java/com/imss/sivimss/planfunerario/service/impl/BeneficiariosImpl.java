@@ -175,8 +175,12 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	public Response<?> buscarCatalogos(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		CatalogosRequest filtros = gson.fromJson(datosJson, CatalogosRequest.class);
-		if(filtros.getIdCatalogo()==1) {
-			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogos(request).getDatos(), urlConsulta,
+		if(filtros.getIdCatalogo()==1 && filtros.getIdConvenio()!=null) {
+			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogosDocRequerida(request, filtros.getIdConvenio()).getDatos(), urlConsulta,
+					authentication);
+		}
+		if(filtros.getIdCatalogo()==2) {
+			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogosParentescos(request).getDatos(), urlConsulta,
 					authentication);
 		}else {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, "INFORMACION INCOMPLETA");			

@@ -330,7 +330,7 @@ public class BeneficiariosBean {
 	    return request;
 	}
 	
-	public DatosRequest  buscarCatalogos(DatosRequest request) {
+	public DatosRequest  buscarCatalogosParentescos(DatosRequest request) {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("DES_PARENTESCO AS parentesco",
@@ -408,6 +408,31 @@ public class BeneficiariosBean {
 		return request;
 	}
 	
+	public DatosRequest buscarCatalogosDocRequerida(DatosRequest request, Integer idConvenio) {
+		Map<String, Object> parametros = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("SVD.ID_VALIDACION_DOCUMENTO AS idValidacionDoc",
+				"CONCAT(SP.NOM_PERSONA, ' '",
+				 "SP.NOM_PRIMER_APELLIDO, ' '",
+				 "SP.NOM_SEGUNDO_APELLIDO) AS contratante",
+				 "SV.DES_VELATORIO AS velatorio",
+				 "IND_INE_AFILIADO AS ineAfiliado",
+				 "IND_CURP AS curpAfiliado",
+				 "IND_RFC AS rfcAfiliado")
+		.from("SVC_VALIDACION_DOCUMENTOS_CONVENIO_PF SVD")
+		.join(SVT_CONVENIO_PF, "SVD.ID_CONVENIO_PF=PF.ID_CONVENIO_PF")
+        .join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "PF.ID_CONVENIO_PF =SCPC.ID_CONVENIO_PF")
+        .join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
+        .join(SVC_PERSONA, "SC.ID_PERSONA=SP.ID_PERSONA") 
+        .join("SVC_VELATORIO SV", "PF.ID_VELATORIO = SV.ID_VELATORIO")
+        .where("SVD.ID_CONVENIO_PF=" +idConvenio);
+		String query = obtieneQuery(queryUtil);
+	   String encoded = encodedQuery(query);
+	   parametros.put(AppConstantes.QUERY, encoded);
+	    request.setDatos(parametros);
+	    return request;
+	}
+	
 	private static String obtieneQuery(SelectQueryUtil queryUtil) {
         return queryUtil.build();
     }
@@ -416,6 +441,4 @@ public class BeneficiariosBean {
         return DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
     }
 
-
-	
 }

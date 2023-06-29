@@ -17,5 +17,6 @@ import lombok.Setter;
 public class CatalogosRequest {
 	
 	private Integer idCatalogo;
+	private Integer idConvenio;
 
 }
