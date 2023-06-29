@@ -6,8 +6,6 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
-import com.imss.sivimss.planfunerario.exception.BadRequestException;
-import com.imss.sivimss.planfunerario.model.BeneficiarioModel;
 import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
@@ -87,6 +85,16 @@ public class BeneficiariosBean {
 	//COLUMNAS
 	public static final String SP_ID_PERSONA = "SP.ID_PERSONA";
 	public static final String SB_ID_CONTRATANTE_BENEFICIARIOS = "SB.ID_CONTRATANTE_BENEFICIARIOS";
+	public static final String ID_PARENTESCO = "ID_PARENTESCO";
+	public static final String NOM_PERSONA = "NOM_PERSONA";
+	public static final String NOM_PRIMER_APELLIDO = "NOM_PRIMER_APELLIDO";
+	public static final String NOM_SEGUNDO_APELLIDO = "NOM_SEGUNDO_APELLIDO";
+	public static final String FEC_NAC = "FEC_NAC";
+	public static final String CVE_CURP = "CVE_CURP";
+	public static final String CVE_RFC = "CVE_RFC";
+	public static final String DES_CORREO = "DES_CORREO";
+	public static final String DES_TELEFONO = "DES_TELEFONO";
+	public static final String ID_TABLA = "idTabla";
 	
 	//JOIN
 	public static final String SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF = "SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF";
@@ -108,7 +116,7 @@ public class BeneficiariosBean {
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF)
 		.join(SVC_PERSONA, " SB.ID_PERSONA = SP.ID_PERSONA")
 		.join(SVT_CONVENIO_PF, SCPC_ID_CONVENIO_PF_PF_ID_CONVENIO_PF);
-	//	queryUtil.where("PF.ID_TIPO_PREVISION= 1");
+      	queryUtil.where("PF.ID_TIPO_PREVISION= 1");
 		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio").and("SB.IND_SINIESTROS=0")
 		.setParameter("idConvenio", Integer.parseInt(palabra));
 		String query = obtieneQuery(queryUtil);
@@ -156,22 +164,20 @@ public class BeneficiariosBean {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVC_PERSONA ");
-		q.agregarParametroValues("NOM_PERSONA", "'" + this.nombre + "'");
-		q.agregarParametroValues("NOM_PRIMER_APELLIDO", "'" + this.apellidoP + "'");
-		q.agregarParametroValues("NOM_SEGUNDO_APELLIDO", "'" + this.apellidoM + "'");
-		q.agregarParametroValues("FEC_NAC", "'" + this.fechaNac + "'");
-		q.agregarParametroValues("CVE_CURP", "'"+ this.curp + "'");
-		q.agregarParametroValues("CVE_RFC", "'" +this.rfc +"'");
-		q.agregarParametroValues("DES_CORREO", "'"+ this.correoE +"'");
-		q.agregarParametroValues("DES_TELEFONO", "'" + this.tel + "'");
-		q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"");
-		q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
-		String query = q.obtenerQueryInsertar();// +"$$"  + insertarBeneficiario(this.idContratanteConvenioPf, this.idParentesco, this.indActa, this.indIne);
+		q.agregarParametroValues(NOM_PERSONA, "'" + this.nombre + "'");
+		q.agregarParametroValues(NOM_PRIMER_APELLIDO, "'" + this.apellidoP + "'");
+		q.agregarParametroValues(NOM_SEGUNDO_APELLIDO, "'" + this.apellidoM + "'");
+		q.agregarParametroValues(FEC_NAC, "'" + this.fechaNac + "'");
+		q.agregarParametroValues(CVE_CURP, "'"+ this.curp + "'");
+		q.agregarParametroValues(CVE_RFC, "'" +this.rfc +"'");
+		q.agregarParametroValues(DES_CORREO, "'"+ this.correoE +"'");
+		q.agregarParametroValues(DES_TELEFONO, "'" + this.tel + "'");
+		q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, ""+usuarioAlta+"");
+		q.agregarParametroValues(AppConstantes.FEC_ALTA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		String query = q.obtenerQueryInsertar();
 		log.info(query);
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 		        parametro.put(AppConstantes.QUERY, encoded);
-		     //   parametro.put("separador","$$");
-		       // parametro.put("replace","idTabla");
 		        request.setDatos(parametro);
 		return request;
 	}
@@ -184,7 +190,7 @@ public class BeneficiariosBean {
 	        final QueryHelper q = new QueryHelper("INSERT INTO SVT_CONTRATANTE_BENEFICIARIOS");
 	        q.agregarParametroValues("ID_CONTRATANTE_PAQUETE_CONVENIO_PF", ""+this.idContratanteConvenioPf+"");
 	        q.agregarParametroValues("ID_PERSONA", ""+id+"");
-	        q.agregarParametroValues("ID_PARENTESCO", ""+this.idParentesco+"");
+	        q.agregarParametroValues(ID_PARENTESCO, ""+this.idParentesco+"");
 	        if(indActa!=null) {
 	        	q.agregarParametroValues("IND_ACTA_NACIMIENTO", ""+this.indActa+"");	
 	        }
@@ -193,13 +199,13 @@ public class BeneficiariosBean {
 	        }
 	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 	        q.agregarParametroValues("IND_SINIESTROS", "0");
-	        q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"" );
-			q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+	        q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, ""+usuarioAlta+"" );
+			q.agregarParametroValues(AppConstantes.FEC_ALTA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
 	        String query = q.obtenerQueryInsertar()+"$$" +insertarDocPlanAnterior();
 	        log.info("estoy aqui "+query);
 	        String encoded = encodedQuery(query);
 	        parametro.put("separador","$$");
-		    parametro.put("replace","idTabla");
+		    parametro.put("replace",ID_TABLA);
 	        parametro.put(AppConstantes.QUERY, encoded);
 	        request.setDatos(parametro);
 	        return request;
@@ -210,7 +216,7 @@ public class BeneficiariosBean {
 		 DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
         final QueryHelper q = new QueryHelper("INSERT INTO SVT_BENEFICIARIOS_DOCUMENTACION_PLAN_ANTERIOR");
-        q.agregarParametroValues("ID_CONTRATANTE_BENEFICIARIO", "idTabla");
+        q.agregarParametroValues("ID_CONTRATANTE_BENEFICIARIO", ID_TABLA);
         q.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS", ""+this.indComprobanteEstudios+"");
         q.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+this.indActaMatrimonio+"");
         q.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+this.indDeclaracionConcubinato+"");	
@@ -218,8 +224,8 @@ public class BeneficiariosBean {
         q.agregarParametroValues("IND_INE_TESTIGO", ""+this.indIneTestigo+""); 
         q.agregarParametroValues("IND_INE_TESTIGO_DOS", ""+this.indIneTestigoDos+""); 
        // q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
-        q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"" );
-		q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+        q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, ""+usuarioAlta+"" );
+		q.agregarParametroValues(AppConstantes.FEC_ALTA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
         String query = q.obtenerQueryInsertar();
         String encoded = encodedQuery(query);
         parametro.put(AppConstantes.QUERY, encoded);
@@ -232,14 +238,14 @@ public class BeneficiariosBean {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("UPDATE SVC_PERSONA ");
-		q.agregarParametroValues(" NOM_PERSONA", "'" + this.nombre + "'");
-		q.agregarParametroValues("NOM_PRIMER_APELLIDO", "'" + this.apellidoP + "'");
-		q.agregarParametroValues("NOM_SEGUNDO_APELLIDO", "'" + this.apellidoM + "'");
-		q.agregarParametroValues("FEC_NAC", "'" + this.fechaNac + "'");
-		q.agregarParametroValues("CVE_CURP", "'"+ this.curp + "'");
-		q.agregarParametroValues("CVE_RFC", "'" +this.rfc +"'");
-		q.agregarParametroValues("DES_CORREO", "'"+ this.correoE +"'");
-		q.agregarParametroValues("DES_TELEFONO", "'" + this.tel + "'");
+		q.agregarParametroValues(NOM_PERSONA, "'" + this.nombre + "'");
+		q.agregarParametroValues(NOM_PRIMER_APELLIDO, "'" + this.apellidoP + "'");
+		q.agregarParametroValues(NOM_SEGUNDO_APELLIDO, "'" + this.apellidoM + "'");
+		q.agregarParametroValues(FEC_NAC, "'" + this.fechaNac + "'");
+		q.agregarParametroValues(CVE_CURP, "'"+ this.curp + "'");
+		q.agregarParametroValues(CVE_RFC, "'" +this.rfc +"'");
+		q.agregarParametroValues(DES_CORREO, "'"+ this.correoE +"'");
+		q.agregarParametroValues(DES_TELEFONO, "'" + this.tel + "'");
 		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+usuarioAlta+"");
 		q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		q.addWhere("ID_PERSONA = " + this.idPersona);
@@ -256,7 +262,7 @@ public class BeneficiariosBean {
 		 DatosRequest request = new DatosRequest();
 	        Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("UPDATE SVT_CONTRATANTE_BENEFICIARIOS");
-	        q.agregarParametroValues("ID_PARENTESCO", ""+parentesco+"");
+	        q.agregarParametroValues(ID_PARENTESCO, ""+parentesco+"");
 	        q.agregarParametroValues("CVE_ACTA", "'"+acta+"'");
 	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 	        q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"" );
@@ -346,22 +352,22 @@ public class BeneficiariosBean {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVC_PERSONA ");
-		q.agregarParametroValues(" NOM_PERSONA", "'" + this.nombre + "'");
-		q.agregarParametroValues("NOM_PRIMER_APELLIDO", "'" + this.apellidoP + "'");
-		q.agregarParametroValues("NOM_SEGUNDO_APELLIDO", "'" + this.apellidoM + "'");
-		q.agregarParametroValues("FEC_NAC", "'" + this.fechaNac + "'");
-		q.agregarParametroValues("CVE_CURP", "'"+ this.curp + "'");
-		q.agregarParametroValues("CVE_RFC", "'" +this.rfc +"'");
-		q.agregarParametroValues("DES_CORREO", "'"+ this.correoE +"'");
-		q.agregarParametroValues("DES_TELEFONO", "'" + this.tel + "'");
-		q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"");
-		q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		q.agregarParametroValues(NOM_PERSONA, "'" + this.nombre + "'");
+		q.agregarParametroValues(NOM_PRIMER_APELLIDO, "'" + this.apellidoP + "'");
+		q.agregarParametroValues(NOM_SEGUNDO_APELLIDO, "'" + this.apellidoM + "'");
+		q.agregarParametroValues(FEC_NAC, "'" + this.fechaNac + "'");
+		q.agregarParametroValues(CVE_CURP, "'"+ this.curp + "'");
+		q.agregarParametroValues(CVE_RFC, "'" +this.rfc +"'");
+		q.agregarParametroValues(DES_CORREO, "'"+ this.correoE +"'");
+		q.agregarParametroValues(DES_TELEFONO, "'" + this.tel + "'");
+		q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, ""+usuarioAlta+"");
+		q.agregarParametroValues(AppConstantes.FEC_ALTA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		String query = q.obtenerQueryInsertar() +"$$"  + insertarBeneficiario();
 		log.info(query);
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 		        parametro.put(AppConstantes.QUERY, encoded);
 		        parametro.put("separador","$$");
-		        parametro.put("replace","idTabla");
+		        parametro.put("replace",ID_TABLA);
 		        request.setDatos(parametro);
 		return request;
 	}
@@ -371,8 +377,8 @@ public class BeneficiariosBean {
 	        Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("INSERT INTO SVT_CONTRATANTE_BENEFICIARIOS");
 	        q.agregarParametroValues("ID_CONTRATANTE_PAQUETE_CONVENIO_PF", ""+this.idContratanteConvenioPf+"");
-	        q.agregarParametroValues("ID_PERSONA", "idTabla");
-	        q.agregarParametroValues("ID_PARENTESCO", ""+this.idParentesco+"");
+	        q.agregarParametroValues("ID_PERSONA", ID_TABLA);
+	        q.agregarParametroValues(ID_PARENTESCO, ""+this.idParentesco+"");
 	        if(indActa!=null) {
 	        	q.agregarParametroValues("IND_ACTA_NACIMIENTO", ""+this.indActa+"");	
 	        }
