@@ -21,4 +21,6 @@ public interface BeneficiariosService {
 
 	Response<?> buscarBeneficiariosPlanAnterior(DatosRequest request, Authentication authentication)throws IOException;
 
+	Response<?> buscarCatalogos(DatosRequest request, Authentication authentication)throws IOException;
+
 }
