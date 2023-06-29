@@ -38,9 +38,10 @@ endpoints:
     dominio-actualizar-convenio: ${endpoints.ms-dominio-convenios}/modificarConvenio
     dominio-consulta: ${endpoints.ms-mod-catalogos}/consulta
     dominio-consulta-paginado: ${endpoints.ms-mod-catalogos}/paginado
-    dominio-crear: ${endpoints.ms-mod-catalogos}/generico/crear
+    dominio-crear: ${endpoints.ms-mod-catalogos}/crear
     dominio-crear-multiple: ${endpoints.ms-mod-catalogos}/crearMultiple
     dominio-actualizar: ${endpoints.ms-mod-catalogos}/actualizar
+    dominio-insertar-multiple: ${endpoints.ms-mod-catalogos}/insertarMultiple
 
 jwt:
   secretkey-flujo: ${msit_SECRET_KEY}

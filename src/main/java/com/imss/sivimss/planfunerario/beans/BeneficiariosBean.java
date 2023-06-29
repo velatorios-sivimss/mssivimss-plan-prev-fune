@@ -67,6 +67,7 @@ public class BeneficiariosBean {
 	
 	//COLUMNAS
 	public static final String SP_ID_PERSONA = "SP.ID_PERSONA";
+	public static final String SB_ID_CONTRATANTE_BENEFICIARIOS = "SB.ID_CONTRATANTE_BENEFICIARIOS";
 	
 	//JOIN
 	public static final String SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF = "SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF";
@@ -77,7 +78,8 @@ public class BeneficiariosBean {
 		Map<String, Object> parametros = new HashMap<>();
 		String palabra = request.getDatos().get("palabra").toString();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("SCPC.ID_CONVENIO_PF AS idCovenio, SB.ID_CONTRATANTE_BENEFICIARIOS AS idBenef",
+		queryUtil.select("SCPC.ID_CONVENIO_PF AS idConvenio",
+				SB_ID_CONTRATANTE_BENEFICIARIOS +" AS idBenef",
 				"CONCAT(SP.NOM_PERSONA,' '",
 				"SP.NOM_PRIMER_APELLIDO, ' '",
 				"SP.NOM_SEGUNDO_APELLIDO) AS nombre",
@@ -100,7 +102,8 @@ public class BeneficiariosBean {
 		
 	public DatosRequest detalleBeneficiarios(DatosRequest request, Integer idBeneficiario, Integer idConvenio) {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF AS idCovenio, SB.ID_CONTRATANTE_BENEFICIARIOS AS idBenef",
+		queryUtil.select("SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF AS idConvenio", 
+				SB_ID_CONTRATANTE_BENEFICIARIOS +" AS idBenef",
 				 "SP.NOM_PERSONA AS nombre",
 				 "SP.NOM_PRIMER_APELLIDO AS primerApellido",
 				 "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
@@ -251,7 +254,7 @@ public class BeneficiariosBean {
 				+ "SP.NOM_PRIMER_APELLIDO, ' ',"
 				+ "SP.NOM_SEGUNDO_APELLIDO) AS nombre",
 				SP_ID_PERSONA +" AS idPersona")
-		      .from("SVT_CONTRATANTE_BENEFICIARIOS SB")
+		      .from(SVT_CONTRATANTE_BENEFICIARIOS)
 		      .join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF)
 		      .join(SVT_CONVENIO_PF, SCPC_ID_CONVENIO_PF_PF_ID_CONVENIO_PF)
 		      .join(SVC_PERSONA, "SB.ID_PERSONA = SP.ID_PERSONA");
@@ -262,7 +265,7 @@ public class BeneficiariosBean {
 				"SB.ID_CONTRATANTE_BENEFICIARIOS AS idBenef",
 				"CONCAT(SP.NOM_PERSONA,' ', SP.NOM_PRIMER_APELLIDO, ' ', SP.NOM_SEGUNDO_APELLIDO) AS nombre",
 				"SP.ID_PERSONA AS idPersona")
-				.from("SVT_CONTRATANTE_BENEFICIARIOS SB")
+				.from(SVT_CONTRATANTE_BENEFICIARIOS)
 				 .join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF)
 			      .join(SVT_CONVENIO_PF, SCPC_ID_CONVENIO_PF_PF_ID_CONVENIO_PF)
 			      .join("SVC_VALIDACION_DOCUMENTOS_CONVENIO_PF DOCPF", "PF.ID_CONVENIO_PF = DOCPF.ID_CONVENIO_PF")
