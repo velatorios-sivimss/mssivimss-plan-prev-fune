@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
+import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
@@ -437,6 +438,36 @@ public class BeneficiariosBean {
         .join(SVC_PERSONA, "SC.ID_PERSONA=SP.ID_PERSONA") 
         .join("SVC_VELATORIO SV", "PF.ID_VELATORIO = SV.ID_VELATORIO")
         .where("SVD.ID_CONVENIO_PF=" +idConvenio);
+		String query = obtieneQuery(queryUtil);
+	   String encoded = encodedQuery(query);
+	   parametros.put(AppConstantes.QUERY, encoded);
+	    request.setDatos(parametros);
+	    return request;
+	}
+	
+	public DatosRequest buscarCatalogosInfoConvenioActual(DatosRequest request, Integer idConvenio, String fecFormat) {
+		Map<String, Object> parametros = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("PF.ID_TIPO_PREVISION AS idTipoPrevision",
+				"IF(PF.ID_TIPO_PREVISION=1,'Prevision funeraria plan nuevo', 'Prevision funeraria plan anterior') AS tipoPrevision",
+				 "SCPC.ID_PAQUETE AS idPaquete",
+				 "PAQ.DES_PAQUETE AS tipoPaquete",
+				 "PAQ.MON_COSTO_REFERENCIA AS cuotaRecuperacion",
+				 "MAX(DATE_FORMAT(RPF.FEC_INICIO, '"+fecFormat+"')) AS fecInicio",
+				 "MAX(DATE_FORMAT(RPF.FEC_VIGENCIA, '"+fecFormat+"')) AS fecVigencia",
+				 "SMP.DESC_METODO_PAGO AS tipoPago",
+				 "PF.ID_ESTATUS_CONVENIO AS estatusConvenio",
+				 "DATE_FORMAT(PF.FEC_INICIO, '"+fecFormat+"') AS fechaContratacion",
+				 "MAX(DATE_FORMAT(RPF.FEC_ALTA, '"+fecFormat+"')) AS fechaRenovacion")
+		.from(SVT_CONVENIO_PF)
+		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "PF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
+        .join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
+        .join("SVT_RENOVACION_CONVENIO_PF RPF", "PF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF")
+        .leftJoin("SVT_PAGO_BITACORA SPB", "PF.DES_FOLIO = SPB.CVE_FOLIO") 
+        .leftJoin("SVT_PAGO_DETALLE SPD", "SPB.ID_PAGO_BITACORA = SPD.ID_PAGO_BITACORA")
+        .leftJoin("SVC_METODO_PAGO SMP", "SPD.ID_METODO_PAGO = SMP.ID_METODO_PAGO")
+        .where("PF.ID_CONVENIO_PF=" +idConvenio)
+        .groupBy("PF.ID_CONVENIO_PF");
 		String query = obtieneQuery(queryUtil);
 	   String encoded = encodedQuery(query);
 	   parametros.put(AppConstantes.QUERY, encoded);

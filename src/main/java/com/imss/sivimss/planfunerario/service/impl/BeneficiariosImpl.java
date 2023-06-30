@@ -48,6 +48,8 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	private String urlCrear;
 	@Value("${endpoints.rutas.dominio-actualizar}")
 	private String urlActualizar;
+	@Value("${formato-fecha}")
+	private String fecFormat;
 
 	@Value("${endpoints.ms-reportes}")
 	private String urlReportes;
@@ -179,7 +181,11 @@ public class BeneficiariosImpl implements BeneficiariosService{
 			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogosDocRequerida(request, filtros.getIdConvenio()).getDatos(), urlConsulta,
 					authentication);
 		}
-		if(filtros.getIdCatalogo()==2) {
+		if(filtros.getIdCatalogo()==2 && filtros.getIdConvenio()!=null) {
+			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogosInfoConvenioActual(request, filtros.getIdConvenio(), fecFormat).getDatos(), urlConsulta,
+					authentication);
+		}
+		if(filtros.getIdCatalogo()==3) {
 			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogosParentescos(request).getDatos(), urlConsulta,
 					authentication);
 		}else {
