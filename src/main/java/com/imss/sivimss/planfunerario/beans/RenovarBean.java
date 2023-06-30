@@ -417,7 +417,7 @@ public class RenovarBean {
 	envioDatos.put(""+AppConstantes.RUTA+"", reporte.getRutaNombreReporte());
 	envioDatos.put(""+AppConstantes.TIPO+"", reporte.getTipoReporte());
 	envioDatos.put("folio", reporte.getFolio());
-	envioDatos.put("planPF", "CONVENIO PF NUEVO");
+	envioDatos.put("planPF", "Prevision Funeraria Plan Nuevo");
 	return envioDatos;
 	}
 
@@ -441,7 +441,7 @@ public class RenovarBean {
 		envioDatos.put(""+AppConstantes.RUTA+"", reporteDto.getRutaNombreReporte());
 		envioDatos.put(""+AppConstantes.TIPO+"", reporteDto.getTipoReporte());
 		envioDatos.put(ID_CONVENIO, reporteDto.getIdConvenio());
-		envioDatos.put("tipoConvenio", "CONVENIO PLAN ANTERIOR");
+		envioDatos.put("tipoConvenio", "Previsión Funeraria Plan Anterior");
 		envioDatos.put("nombreFibeso", " ");
 		envioDatos.put("observaciones", reporteDto.getObservaciones());
 		return envioDatos;
