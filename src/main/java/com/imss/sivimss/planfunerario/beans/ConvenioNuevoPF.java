@@ -418,13 +418,13 @@ public class ConvenioNuevoPF {
         datosPdf.put("costoPaquete", infoReporte.getMonPrecio());// sacar datos de query
         datosPdf.put("nombreTitular", infoReporte.getNombrePersona() + " " + infoReporte.getPrimerApellido() + " " + infoReporte.getSegundoApellido());// sacar datos de query
         datosPdf.put("rfc", infoReporte.getRfc());// sacar datos de query
-        datosPdf.put("folioConvenio", pdfDto.getFolioConvenio());// sacar datos de query
+        datosPdf.put("idConvenio", pdfDto.getIdConvenio());// sacar datos de query
         datosPdf.put("ciudadExpedicion", pdfDto.getCiudadExpedicion());// sacar datos de query
         datosPdf.put("fechaExpedicion", pdfDto.getFechaExpedicion());// sacar datos de query
         return datosPdf;
     }
 
-    public DatosRequest busquedaFolioParaReporte(String folioConvenio) {
+    public DatosRequest busquedaFolioParaReporte(String idConvenio) {
         DatosRequest dr = new DatosRequest();
         Map<String, Object> parametro = new HashMap<>();
         SelectQueryUtil querySelect = new SelectQueryUtil();
@@ -436,7 +436,7 @@ public class ConvenioNuevoPF {
                 .leftJoin("SVT_PAQUETE PAQ", "CPF.ID_PAQUETE = PAQ.ID_PAQUETE")
                 .leftJoin("SVC_CONTRATANTE SC", "CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE")
                 .leftJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
-                .where("SCP.DES_FOLIO = '" + folioConvenio + "'")
+                .where("SCP.ID_CONVENIO_PF = '" + idConvenio + "'")
                 .groupBy("SCP.DES_FOLIO");
         String consulta = querySelect.build();
         String encoded = DatatypeConverter.printBase64Binary(consulta.getBytes());
