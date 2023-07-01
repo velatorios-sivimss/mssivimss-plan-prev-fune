@@ -83,10 +83,11 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-		if(filtros.getFolio()==null && filtros.getRfc()==null && filtros.getNumIne()==null) {
+		if(filtros.getFolio()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}
-			Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarNuevo(request, filtros, fecFormat).getDatos(), urlConsulta,
+		filtros.setTipoPrevision(1);
+			Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarConvenio(request, filtros, fecFormat).getDatos(), urlConsulta,
 					authentication);
 			Object rst = response.getDatos();
 		      if(rst.toString().equals("[]")){
@@ -99,7 +100,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    			response.setDatos(null);
 		    			return response;
 		    	  }
-		    	  if(getDia()>31 || mesActual()>mesVigencia){
+		    	  if(getDia()>21 || mesActual()>mesVigencia){
 		    		    	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 		    		    	providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar,authentication);
 		    		    	logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 CONVENIO INACTIVO ", CONSULTA, authentication);
@@ -123,10 +124,11 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-		if(filtros.getNumeroConvenio()==null && filtros.getNumeroContratante()==null) {
+		if(filtros.getNumeroConvenio()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}
-		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarAnterior(request, filtros, fecFormat).getDatos(), urlConsulta,
+		filtros.setTipoPrevision(2);
+		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarConvenio(request, filtros, fecFormat).getDatos(), urlConsulta,
 				authentication);
 	      if(response.getDatos().toString().equals("[]")){
 	    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getNumeroConvenio(), CONSULTA, authentication);
@@ -138,7 +140,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			    			response.setDatos(null);
 			    			return response;
 			    	  }
-			    		 if(getDia()>31 || mesActual()>mesVigencia) {
+			    		 if(getDia()>20 || mesActual()>mesVigencia) {
 			    	         logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 			    			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlanAnterior(filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
 			    			 logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO SE ENCUENTRA INACTIVO", CONSULTA, authentication);
@@ -186,6 +188,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 					providerRestTemplate.consumirServicio(renovarBean.actualizarEstatusRenovacionConvenio(renovarRequest.getIdConvenioPf(), fecha).getDatos(), urlActualizar,
 							authentication);
 				}
+				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CAMBIO DE ESTATUS REGISTRO CONVENIO OK", BAJA, authentication);
 					return response;						
 		}catch (Exception e) {
 			String consulta = renovarBean.renovarPlan().getDatos().get("query").toString();
@@ -252,23 +255,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	obtieneMesVigencia(fec);
 	return !rst.toString().equals("[]");
 	}
-
-	/*private boolean validarVigencia(FiltrosConvenioPFRequest filtros, Authentication authentication) throws IOException {
-		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validaVigencia(filtros).getDatos(), urlConsulta + PATH_CONSULTA,
-				authentication);
-	Object rst=response.getDatos();
-	log.info("-> " +rst.toString());
-	return !rst.toString().equals("[]");
-	} 
 	
-	 private boolean validarVigenciaCtoAnterior(Integer numContratante, Integer numConvenio,
-			Authentication authentication) throws IOException {
-		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarVigenciaCtoAnterior(numContratante, numConvenio).getDatos(), urlConsulta + PATH_CONSULTA,
-				authentication);
-	Object rst=response.getDatos();
-	log.info("-> " +rst.toString());
-	return !rst.toString().equals("[]");
-	} */
 	@Override
 	public Response<?> descargarAdendaRenovacionAnual(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
@@ -276,10 +263,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		Map<String, Object> envioDatos = new RenovarBean().generarAdendaAnual(reporteDto);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DESCARGA CORRECTA ANEXO B ADENDA DE RENOVACION ANUAL", IMPRIMIR, authentication);
 		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
-				authentication);
-		
+				authentication);		
 	}
-
 
 	@Override
 	public Response<?> descargarConvenioPlanAnterior(DatosRequest request, Authentication authentication) throws IOException {
