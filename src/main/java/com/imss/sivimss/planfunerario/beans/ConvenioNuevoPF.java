@@ -421,6 +421,7 @@ public class ConvenioNuevoPF {
         datosPdf.put("idConvenio", pdfDto.getIdConvenio());// sacar datos de query
         datosPdf.put("ciudadExpedicion", pdfDto.getCiudadExpedicion());// sacar datos de query
         datosPdf.put("fechaExpedicion", pdfDto.getFechaExpedicion());// sacar datos de query
+        datosPdf.put("folioConvenio", infoReporte.getFolio());// sacar datos de query
         return datosPdf;
     }
 
@@ -429,7 +430,7 @@ public class ConvenioNuevoPF {
         Map<String, Object> parametro = new HashMap<>();
         SelectQueryUtil querySelect = new SelectQueryUtil();
         querySelect.select("SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss", "SP.NOM_PERSONA AS nombrePersona",
-                        "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido", "SP.NUM_INE AS numIne",
+                        "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido", "SP.NUM_INE AS numIne", "SCP.DES_FOLIO AS folio",
                         "CPF.ID_PAQUETE AS idPaquete", "PAQ.DES_NOM_PAQUETE AS nombrePaquete", "PAQ.DES_PAQUETE AS desPaquete", "PAQ.MON_PRECIO AS monPrecio")
                 .from("SVT_CONVENIO_PF SCP")
                 .leftJoin("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF", "SCP.ID_CONVENIO_PF = CPF.ID_CONVENIO_PF")

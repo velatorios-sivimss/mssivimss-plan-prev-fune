@@ -87,9 +87,8 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         mapa.put("idPersona", persona.getIdPersona());
         mapa.put("idContratante", persona.getIdContratante());
         mapa.put("idDomicilio", persona.getIdDomicilio());
-
-
-        return providerRestTemplate.consumirServicio(mapa, urlDominioConvenios + "/insertConvenios", authentication);
+        //MensajeResponseUtil.mensajeResponse(providerRestTemplate.consumirServicio(salas.registrarEntrada(registroEntrada, usuarioDto).getDatos(), urlDominioConsulta + "/crear", authentication), REGISTRO_CORRECTO);
+        return MensajeResponseUtil.mensajeResponse(providerRestTemplate.consumirServicio(mapa, urlDominioConvenios + "/insertConvenios", authentication),"30");
     }
 
     @Override
