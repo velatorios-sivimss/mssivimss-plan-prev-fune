@@ -398,7 +398,7 @@ public class ConvenioNuevoPF {
         Map<String, Object> parametro = new HashMap<>();
         final QueryHelper query = new QueryHelper("UPDATE SVT_CONVENIO_PF");
         query.agregarParametroValues("ID_ESTATUS_CONVENIO", idEstatusConvenio);
-        query.agregarParametroValues("ID_USUARIO_MODIFICA", user.getCveUsuario());
+        query.agregarParametroValues("ID_USUARIO_MODIFICA", "'" + user.getCveUsuario() + "'");
         query.agregarParametroValues("FEC_ACTUALIZACION", "NOW()");
         query.addWhere("DES_FOLIO = " + folioConvenio);
         String encoded = DatatypeConverter.printBase64Binary(query.obtenerQueryActualizar().getBytes());
