@@ -33,6 +33,7 @@ endpoints:
   ms-mod-catalogos: ${msit_CATALOGOS}
   ms-reportes: ${msit_REPORTES_GENERALES}
   ms-dominio-convenios: ${msit_MOD_CATALOGO_MULTIPLE}
+  renapo: ${msit_RENAPO}
   rutas:
     dominio-crear-convenio: ${endpoints.ms-dominio-convenios}/insertConvenios
     dominio-actualizar-convenio: ${endpoints.ms-dominio-convenios}/modificarConvenio
