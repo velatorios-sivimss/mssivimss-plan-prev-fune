@@ -100,7 +100,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    			response.setDatos(null);
 		    			return response;
 		    	  }
-		    	  if(getDia()>21 || mesActual()>mesVigencia){
+		    	  if(getDia()>20 || mesActual()>mesVigencia){
 		    		    	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 		    		    	providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar,authentication);
 		    		    	logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 CONVENIO INACTIVO ", CONSULTA, authentication);
@@ -128,12 +128,17 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}
 		filtros.setTipoPrevision(2);
-		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarConvenio(request, filtros, fecFormat).getDatos(), urlConsulta,
+		
+		 providerRestTemplate.consumirServicio(renovarBean.validarBeneficiarios(request, filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar,
+  				authentication);
+
+		 Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarConvenio(request, filtros, fecFormat).getDatos(), urlConsulta,
 				authentication);
 	      if(response.getDatos().toString().equals("[]")){
 	    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getNumeroConvenio(), CONSULTA, authentication);
 	    		response.setMensaje("45 " +filtros.getNumeroConvenio());
 	      }else {
+	    	        logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CAMBIO DE ESTATUS BENEFICIARIOS PLAN ANTERIOR " +filtros.getNumeroConvenio(), CONSULTA, authentication);
 			    	  if(!validarPeriodoCtoAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio() ,authentication)) {
 			    		  logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);
 			    		    response.setMensaje("36");
@@ -320,7 +325,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private Integer mesActual() {
 	    SimpleDateFormat sdfMes = new SimpleDateFormat("M");
 		String date = sdfMes.format(new Date());
-		//String date ="6";
+		//String date ="7";
 		return Integer.parseInt(date);
 	}
 	

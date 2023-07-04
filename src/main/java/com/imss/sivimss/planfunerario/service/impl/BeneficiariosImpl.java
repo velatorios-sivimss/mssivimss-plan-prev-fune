@@ -82,14 +82,13 @@ public class BeneficiariosImpl implements BeneficiariosService{
 			String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		    PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-			log.info("-> " +benefRequest.getIndComprobanteEstudios());
 			benefBean = new BeneficiariosBean(benefRequest);
 			benefBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 			
 			if(benefRequest.getBeneficiario().getIdContratanteConvenioPf()==null || benefRequest.getBeneficiario().getIdParentesco()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
 			}
-			if(benefRequest.getTipoContratacion()==2) {
+			if(benefRequest.getTipoPrevision()==2) {
 				response = providerRestTemplate.consumirServicio(benefBean.insertarPersonaPlanAnterior().getDatos(), urlCrear,
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
@@ -139,7 +138,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getIndActa(), benefRequest.getBeneficiario().getIndIne()).getDatos(), urlActualizar,
 						authentication);
 			}
-			if(response.getCodigo()==200 && benefRequest.getTipoContratacion()==2) {
+			if(response.getCodigo()==200 && benefRequest.getTipoPrevision()==2) {
 				providerRestTemplate.consumirServicio(benefBean.editarDocPlanAnterior().getDatos(), urlActualizar,
 						authentication);	
 			}

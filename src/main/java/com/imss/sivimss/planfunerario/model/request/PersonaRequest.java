@@ -29,7 +29,7 @@ public class PersonaRequest {
 	private String correoE;
 	private String tel;
 	private BeneficiarioModel beneficiario;
-	private Integer tipoContratacion;
+	private Integer tipoPrevision;
 	private Integer indComprobanteEstudios;
 	private Integer indActaMatrimonio;
 	private Integer indDeclaracionConcubinato;
