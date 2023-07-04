@@ -199,7 +199,6 @@ public class ConsultaConvenios {
         // los siniestros tendrian que estar pagados o facturados para poder mostrarlos aca
         // si las facturas son globales, tendria que aparecer repetida en varios registros?
         SelectQueryUtil querySiniestros = new SelectQueryUtil();
-        // por persona
         final String[] columnas = {
                 "velatorio.DES_VELATORIO as nombreVelatorio",
                 "ods.FEC_ALTA as fechaSiniestro",
@@ -210,12 +209,14 @@ public class ConsultaConvenios {
                 "presupuesto.CAN_PRESUPUESTO as importe"
         };
 
+        // todo - falta agregar la condicion del pago
         querySiniestros.select(columnas)
                 .from("SVC_ORDEN_SERVICIO ods")
                 .join("SVC_VELATORIO velatorio",
                         "velatorio.ID_VELATORIO = ods.ID_VELATORIO")
                 .join("SVC_FINADO finado",
-                        "finado.ID_ORDEN_SERVICIO = ods.ID_ORDEN_SERVICIO")
+                        "finado.ID_ORDEN_SERVICIO = ods.ID_ORDEN_SERVICIO",
+                        "finado.ID_TIPO_ORDEN = 2") // sacar a una constante
                 .join("SVT_CONVENIO_PF convenio",
                         "convenio.ID_CONVENIO_PF = finado.ID_CONTRATO_PREVISION")
                 .join("SVC_VELATORIO velatorioOrigen",
@@ -224,11 +225,6 @@ public class ConsultaConvenios {
                         "personaFinado.ID_PERSONA = finado.ID_PERSONA")
                 .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-//                .join("SVC_CONTRATANTE contratante",
-//                        "contratante.ID_CONTRATANTE = ods.ID_CONTRATANTE",
-//                        "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
-//                .join("SVC_PERSONA personaContratante",
-//                        "personaContratante.ID_PERSONA = contratante.ID_PERSONA")
                 .join("SVT_CONTRATANTE_BENEFICIARIOS beneficiario",
                         "beneficiario.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = contratanteConvenio.ID_CONTRATANTE_PAQUETE_CONVENIO_PF",
                         "beneficiario.IND_ACTIVO = true",
@@ -237,17 +233,19 @@ public class ConsultaConvenios {
                         "parentesco.ID_PARENTESCO = beneficiario.ID_PARENTESCO")
                 .join("SVC_CARACTERISTICAS_PRESUPUESTO presupuesto",
                         "presupuesto.ID_ORDEN_SERVICIO = ods.ID_ORDEN_SERVICIO")
-                .where("convenio.DES_FOLIO = :folioConvenio");
+//                .join("SVT_PAGO_BITACORA pago",
+//                        "pago.CVE_FOLIO = ods.CVE_FOLIO",
+//                        "pago.CVE_ESTATUS_PAGO = 2")
+                .where("convenio.DES_FOLIO = :folioConvenio",
+                        "ods.ID_ESTATUS_ORDEN_SERVICIO in (4, 5)") // sacar a una constante
+                .setParameter("folioConvenio", filtros.getFolioConvenio());
+        if (filtros.getFolioSiniestro() != null) {
+            querySiniestros.where("ods.cve_folio = :folioSiniestro")
+                    .setParameter("folioSiniestro", filtros.getFolioSiniestro());
+        }
 
-        // todo - hacer un union para juntar los registros de la empresa y los de las personas
-//                .join("SVT_EMPRESA_CONVENIO_PF empresaContratante");
-
-
-        crearWhereConFiltros(querySiniestros, filtros, true);
-        // query para los convenios de las empresas
-        SelectQueryUtil querySiniestrosEmpresa = new SelectQueryUtil();
-        // agregar las columnas que estamos buscando arriba
-        querySiniestrosEmpresa.select(
+        SelectQueryUtil querySiniestrosContratante = new SelectQueryUtil();
+        querySiniestrosContratante.select(
                         "velatorio.DES_VELATORIO as nombreVelatorio",
                         "ods.FEC_ALTA as fechaSiniestro",
                         "ods.CVE_FOLIO as folioSiniestro",
@@ -260,7 +258,8 @@ public class ConsultaConvenios {
                 .join("SVC_VELATORIO velatorio",
                         "velatorio.ID_VELATORIO = ods.ID_VELATORIO")
                 .join("SVC_FINADO finado",
-                        "finado.ID_ORDEN_SERVICIO = ods.ID_ORDEN_SERVICIO")
+                        "finado.ID_ORDEN_SERVICIO = ods.ID_ORDEN_SERVICIO",
+                        "finado.ID_TIPO_ORDEN = 2") // sacar a una constante
                 .join("SVT_CONVENIO_PF convenio",
                         "convenio.ID_CONVENIO_PF = finado.ID_CONTRATO_PREVISION")
                 .join("SVC_VELATORIO velatorioOrigen",
@@ -269,47 +268,30 @@ public class ConsultaConvenios {
                         "personaFinado.ID_PERSONA = finado.ID_PERSONA")
                 .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-                // cambiar el contratante
-                // ver si van a ser los datos del afiliado
-                .join("SVT_EMPRESA_CONVENIO_PF empresaContratante",
-                        "empresaContratante.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-//                .join("SVC_CONTRATANTE contratante",
-//                        "contratante.ID_CONTRATANTE = ods.ID_CONTRATANTE",
-//                        "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
-//                .join("SVC_PERSONA personaContratante",
-//                        "personaContratante.ID_PERSONA = contratante.ID_PERSONA")
-                .join("SVT_CONTRATANTE_BENEFICIARIOS beneficiario",
-                        "beneficiario.IND_ACTIVO = true",
-                        "beneficiario.ID_PERSONA = finado.ID_PERSONA",
-                        "beneficiario.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = contratanteConvenio.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
+                // hacer otro escenario para cuando el finado sea el contratante
+                .join("SVC_CONTRATANTE contratante",
+                        "contratante.ID_CONTRATANTE = ods.ID_CONTRATANTE",
+                        "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
+                .join("SVC_PERSONA personaContratante",
+                        "personaContratante.ID_PERSONA = contratante.ID_PERSONA",
+                        "personaContratante.id_persona = personaFinado.id_persona")
                 .join("SVC_PARENTESCO parentesco",
-                        "parentesco.ID_PARENTESCO = beneficiario.ID_PARENTESCO")
+                        "parentesco.ID_PARENTESCO = ods.ID_PARENTESCO")
                 .join("SVC_CARACTERISTICAS_PRESUPUESTO presupuesto",
-                        "presupuesto.ID_ORDEN_SERVICIO = ods.ID_ORDEN_SERVICIO");
-        crearWhereConFiltros(querySiniestrosEmpresa, filtros, false);
+                        "presupuesto.ID_ORDEN_SERVICIO = ods.ID_ORDEN_SERVICIO")
+                .join("SVT_PAGO_BITACORA pago",
+                        "pago.CVE_FOLIO = ods.CVE_FOLIO",
+                        "pago.CVE_ESTATUS_PAGO = 2") // sacar a una constante
+                .where("convenio.DES_FOLIO = :folioConvenio",
+                        "ods.ID_ESTATUS_ORDEN_SERVICIO in (4, 5)")// sacar a una constante
+                .setParameter("folioConvenio", filtros.getFolioConvenio());
+        if (filtros.getFolioSiniestro() != null) {
+            querySiniestrosContratante.where("ods.CVE_FOLIO = :folioSiniestro")
+                    .setParameter("folioSiniestro", filtros.getFolioSiniestro());
+        }
 
-        // todo hay que filtrar los datos porque son opcionales
-//        if (filtros.getEstatusConvenio() != null) {
-//            querySiniestros.where("convenio.ID_ESTATUS_CONVENIO = :estatusConvenio")
-//                    .setParameter("estatusConvenio", 1);
-//        }
-//        if (filtros.getFolioConvenio() != null) {
-//            querySiniestros.where("convenio.DES_FOLIO = :folioConvenio")
-//                    .setParameter("folioConvenio", "123321");
-//        }
-//        if (filtros.getRfc() != null) {
-//            final String condicion = "personaContratante.CVE_RFC = " +
-//                    filtros.getRfc() +
-//                    " or empresa.DES_RFC = " +
-//                    filtros.getRfc();
-//            querySiniestros.where("(" + condicion + ")");
-//        }
-//        if (filtros.get)
-
-        final String query = querySiniestros.unionAll(querySiniestrosEmpresa);
+        final String query = querySiniestros.unionAll(querySiniestrosContratante);
         String encoded = querySiniestros.encrypt(query);
-//        request.getDatos().put(AppConstantes.QUERY, encoded);
-//        request.getDatos().remove(AppConstantes.DATOS);
         return recuperarDatos(request, encoded);
     }
 
@@ -354,7 +336,8 @@ public class ConsultaConvenios {
                         "contratante.ID_CONTRATANTE = contratantePaquete.ID_CONTRATANTE")
                 .join("SVC_PERSONA personaAfiliada",
                         "personaAfiliada.ID_PERSONA = contratante.ID_PERSONA")
-                .where("convenio.DES_FOLIO = :folioConvenio")
+                .where("convenio.IND_TIPO_CONTRATACION = false",
+                        "convenio.DES_FOLIO = :folioConvenio")
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
         if (filtros.getRfc() != null) {
             queryAfiliados.where("personaAfiliada.CVE_RFC = :rfc")
@@ -389,14 +372,15 @@ public class ConsultaConvenios {
                 .leftJoin("SVT_RENOVACION_CONVENIO_PF renovacionConvenio",
                         "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 // joins para la consulta por filtros
-                .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
-                        "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-                .join("SVC_CONTRATANTE contratante",
-                        "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
-                .join("SVC_PERSONA personaContratante",
-                        "personaContratante.id_persona = contratante.id_persona")
-                .where("convenio.IND_TIPO_CONTRATACION = true"); // persona -> true
-        crearWhereConFiltros(queryVigencias, filtros, true);
+//                .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
+//                        "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
+//                .join("SVC_CONTRATANTE contratante",
+//                        "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
+//                .join("SVC_PERSONA personaContratante",
+//                        "personaContratante.id_persona = contratante.id_persona")
+                .where("convenio.DES_FOLIO = :folioConvenio") // persona -> true
+                .setParameter("folioConvenio", filtros.getFolioConvenio());
+//        crearWhereConFiltros(queryVigencias, filtros, true);
 
         SelectQueryUtil queryVigenciasEmpresa = new SelectQueryUtil();
         queryVigenciasEmpresa.select(
@@ -412,10 +396,12 @@ public class ConsultaConvenios {
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVT_EMPRESA_CONVENIO_PF empresaContratante",
                         "empresaContratante.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-                .where("convenio.IND_TIPO_CONTRATACION = false"); // empresa -> false
-        crearWhereConFiltros(queryVigenciasEmpresa, filtros, false);
+                .where("convenio.IND_TIPO_CONTRATACION = false",
+                        "convenio.des_folio = :folioConvenio") // empresa -> false
+                .setParameter("folioConvenio", filtros.getFolioConvenio());
 
-        final String query = queryVigencias.unionAll(queryVigenciasEmpresa);
+//        final String query = queryVigencias.unionAll(queryVigenciasEmpresa);
+        final String query = queryVigencias.build();
         String encoded = queryVigencias.encrypt(query);
 
         return recuperarDatos(request, encoded);
@@ -434,56 +420,62 @@ public class ConsultaConvenios {
         // ver como relaciono los filtros para que se pueda implementar en esta parte
         SelectQueryUtil queryFacturas = new SelectQueryUtil();
 
+        final String CONVENIO_ALIAS = SVT_CONVENIO + " convenio";
         queryFacturas.select(
-                        "factura.CVE_FOLIO as numeroFactura",
-                        "factura.UUID as UUID", // cambiar por el nombre que va a tener en la base de datos
-                        "factura.FEC_ALTA as fecha", // cambiar por la fecha que se estaria registrando
-                        "personaContratante.DES_RFC as rfc",
-                        recuperarNombrePersona("personaContratante", "cliente"),
-                        "factura.CAN_TOTAL as total",
+                        "factura.CVE_FOLIO_FISCAL as numeroFactura",
+                        "factura.NUM_UUID as UUID", // cambiar por el nombre que va a tener en la base de datos
+                        "factura.FEC_FACTURACION as fecha", // cambiar por la fecha que se estaria registrando
+                        "factura.CVE_RFC_CONTRATANTE as rfc",
+//                        recuperarNombrePersona("personaContratante", "cliente"),
+                        "factura.DES_RAZON_SOCIAL as cliente",
+                        "factura.IMP_TOTAL as total",
                         "factura.ID_ESTATUS_FACTURA as estatusFactura"
                 )
+                .from("SVC_FACTURA factura")
+                .join("SVT_PAGO_BITACORA pago",
+                        "pago.ID_PAGO_BITACORA = factura.ID_PAGO")
+                .join(CONVENIO_ALIAS,
+                        "convenio.DES_FOLIO = pago.CVE_FOLIO")
+//                .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
+//                        "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
+//                .join("SVC_CONTRATANTE contratante",
+//                        "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
+//                .join("SVC_PERSONA personaContratante",
+//                        "personaContratante.id_persona = contratante.id_persona")
 
-                .from("SVT_FACTURA factura")
-                .join("SVT_BITACORA_PAGO pago",
-                        "pago.ID_PAGO_BITACORA = factura.ID_PAGO_BITACORA")
-                .join(SVT_CONVENIO,
-                        SVT_CONVENIO + ".CVE_FOLIO = factura.CVE_FOLIO")
-                .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
-                        "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
+                .where("convenio.DES_FOLIO = :folioConvenio")
+                .setParameter("folioConvenio", filtros.getFolioConvenio()); // empresa -> false
 
-                .join("SVC_CONTRATANTE contratante",
-                        "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
-                .join("SVC_PERSONA personaContratante",
-                        "personaContratante.id_persona = contratante.id_persona")
+        if (filtros.getNumeroFactura() != null) {
+            queryFacturas.where("factura.CVE_FOLIO_FISCAL = :numeroFactura")
+                    .setParameter("numeroFactura", filtros.getNumeroFactura());
+        }
+//        crearWhereConFiltros(queryFacturas, filtros, true);
 
-                .where("convenio.IND_TIPO_CONTRATACION = true"); // empresa -> false
+//        SelectQueryUtil queryFacturasEmpresa = new SelectQueryUtil();
+//        queryFacturasEmpresa.select(
+//                        "factura.CVE_FOLIO as numeroFactura",
+//                        "factura.UUID as UUID", // que significa este campo - va a estar en la tabla factura
+//                        "factura.FEC_ALTA as fecha", // ver que fecha es la que se va a regresar
+//                        "empresaContratante.DES_RFC as rfc",
+//                        "empresaContratante.DES_NOM as cliente",
+//                        "factura.CAN_TOTAL as total",
+//                        "factura.ID_ESTATUS_FACTURA as estatusFactura"
+//                )
+//                .from("SVT_FACTURA factura")
+//                .join("SVT_BITACORA_PAGO pago",
+//                        "pago.ID_PAGO_BITACORA = factura.ID_PAGO_BITACORA")
+//                .join(SVT_CONVENIO,
+//                        SVT_CONVENIO + ".CVE_FOLIO = factura.CVE_FOLIO")
+//
+//                // todo - esto se puede mover a crearWhere...
+//                .join("SVT_EMPRESA_CONVENIO_PF empresaContratante",
+//                        "empresaContratante.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
+//                .where("convenio.IND_TIPO_CONTRATACION = false"); // empresa -> false
+//        crearWhereConFiltros(queryFacturasEmpresa, filtros, true);
 
-        crearWhereConFiltros(queryFacturas, filtros, true);
-
-        SelectQueryUtil queryFacturasEmpresa = new SelectQueryUtil();
-        queryFacturasEmpresa.select(
-                        "factura.CVE_FOLIO as numeroFactura",
-                        "factura.UUID as UUID", // que significa este campo - va a estar en la tabla factura
-                        "factura.FEC_ALTA as fecha", // ver que fecha es la que se va a regresar
-                        "empresaContratante.DES_RFC as rfc",
-                        "empresaContratante.DES_NOM as cliente",
-                        "factura.CAN_TOTAL as total",
-                        "factura.ID_ESTATUS_FACTURA as estatusFactura"
-                )
-                .from("SVT_FACTURA factura")
-                .join("SVT_BITACORA_PAGO pago",
-                        "pago.ID_PAGO_BITACORA = factura.ID_PAGO_BITACORA")
-                .join(SVT_CONVENIO,
-                        SVT_CONVENIO + ".CVE_FOLIO = factura.CVE_FOLIO")
-
-                // todo - esto se puede mover a crearWhere...
-                .join("SVT_EMPRESA_CONVENIO_PF empresaContratante",
-                        "empresaContratante.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-                .where("convenio.IND_TIPO_CONTRATACION = false"); // empresa -> false
-        crearWhereConFiltros(queryFacturasEmpresa, filtros, true);
-
-        final String query = queryFacturas.unionAll(queryFacturasEmpresa);
+//        final String query = queryFacturas.unionAll(queryFacturasEmpresa);
+        final String query = queryFacturas.build();
         String encoded = queryFacturas.encrypt(query);
 
         return recuperarDatos(request, encoded);

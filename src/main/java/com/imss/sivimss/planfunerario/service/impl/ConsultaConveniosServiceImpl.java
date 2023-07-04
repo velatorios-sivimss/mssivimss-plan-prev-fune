@@ -77,7 +77,7 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
             consultas.put("vigencias", consultaConvenios.consultarVigencias(request, filtros));
             // armar la consulta para las facturas
             // hay que armar la tabla con lo que vimos que puede ser de utilidad
-//            consultas.put("facturas", consultaConvenios.consultarFacturas(request, filtros));
+            consultas.put("facturas", consultaConvenios.consultarFacturas(request, filtros));
 
 //            procesarConsultas(consultas, authentication);
 //            for (Map.Entry<String, DatosRequest> consulta : consultas.entrySet()) {
