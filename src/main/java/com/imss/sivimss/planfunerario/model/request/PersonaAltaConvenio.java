@@ -6,6 +6,8 @@ import lombok.Data;
 @Data
 public class PersonaAltaConvenio {
     @JsonProperty
+    private String idPersona;
+    @JsonProperty
     private String matricula;
     @JsonProperty
     private String rfc;

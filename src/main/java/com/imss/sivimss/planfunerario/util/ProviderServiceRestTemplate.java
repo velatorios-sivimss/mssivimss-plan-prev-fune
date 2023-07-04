@@ -41,6 +41,7 @@ public class ProviderServiceRestTemplate {
 		}
 	}
 
+
 	public Response<?> consumirServicioReportes(Map<String, Object> dato,
 			String url, Authentication authentication) throws IOException {
 		try {
@@ -67,6 +68,15 @@ public class ProviderServiceRestTemplate {
 
 		}
 		return respuestaGenerado;
+	}
+	public Response<Object> consumirServicioExternoGet(String url)
+			throws IOException {
+		try {
+			return restTemplateUtil.sendGetRequest(url);
+		} catch (IOException exception) {
+			log.error("Ha ocurrido un error al recuperar la informacion");
+			throw exception;
+		}
 	}
 
 	public Response<?> respuestaProvider(String e) {
