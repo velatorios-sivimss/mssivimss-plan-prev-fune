@@ -10,4 +10,5 @@ public class ConsultaGeneralRequest extends FiltrosGeneralesDto {
     private String numeroFactura;
     private String folioSiniestro;
     private String nombreBeneficiario;
+    private Integer idVelatorio;
 }

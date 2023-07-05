@@ -48,8 +48,11 @@ public class ConsultaConvenios {
         // revisar que id_flujo corresponde a los convenios
         SelectQueryUtil queryFacturas = new SelectQueryUtil();
         queryFacturas.select()
-                .from("SVT_FACTURA factura")
-                .where("factura.CVE_FOLIO = convenio.DES_FOLIO");
+                .from("SVC_FACTURA factura")
+                .join("SVT_PAGO_BITACORA pago",
+                        "pago.ID_PAGO_BITACORA = factura.ID_PAGO",
+                        "pago.CVE_ESTATUS_PAGO = 5")
+                .where("pago.CVE_FOLIO = convenio.DES_FOLIO");
 
         queryConveniosPersona.select("convenio.ID_CONVENIO_PF as idConvenio",
                         "convenio.DES_FOLIO as folioConvenio",
@@ -59,10 +62,12 @@ public class ConsultaConvenios {
                         "if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA) as fechaVigenciaFin",
                         "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
                         "if(convenio.IND_RENOVACION = false, 'No Renovado', 'Renovado') as situacion",
-//                        "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
+                        "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
                         "paquete.MON_PRECIO as importeConvenio",
-                        "convenio.ID_ESTATUS_CONVENIO as estatusConvenio")
+                        "estatus.DES_ESTATUS as estatusConvenio")
                 .from(SVT_CONVENIO + " convenio")
+                .join("SVC_ESTATUS_CONVENIO_PF estatus",
+                        "estatus.ID_ESTATUS_CONVENIO_PF = convenio.ID_ESTATUS_CONVENIO")
                 .leftJoin("SVT_RENOVACION_CONVENIO_PF renovacionConvenio",
                         "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
@@ -91,10 +96,12 @@ public class ConsultaConvenios {
                         "if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA) as fechaVigenciaFin",
                         "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
                         "if(convenio.IND_RENOVACION = false, 'No Renovado', 'Renovado') as situacion",
-//                        "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
+                        "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
                         "paquete.MON_PRECIO as importeConvenio",
-                        "convenio.ID_ESTATUS_CONVENIO as estatusConvenio")
+                        "estatus.DES_ESTATUS as estatusConvenio")
                 .from(SVT_CONVENIO + " convenio")
+                .join("SVC_ESTATUS_CONVENIO_PF estatus",
+                        "estatus.ID_ESTATUS_CONVENIO_PF = convenio.ID_ESTATUS_CONVENIO")
                 .leftJoin("SVT_RENOVACION_CONVENIO_PF renovacionConvenio",
                         "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
@@ -587,6 +594,10 @@ public class ConsultaConvenios {
             selectQuery.where("convenio.ID_ESTATUS_CONVENIO = :estatusConvenio")
                     .setParameter("estatusConvenio", filtros.getEstatusConvenio());
         }
+        if (filtros.getIdVelatorio() != null) {
+            selectQuery.where("convenio.ID_VELATORIO = :idVelatorio")
+                    .setParameter("idVelatorio", filtros.getIdVelatorio());
+        }
     }
 
     /**
@@ -626,10 +637,10 @@ public class ConsultaConvenios {
     public Map<String, Object> recuperarDatosFormatoTabla(DatosReporteRequest filtros) {
         Map<String, Object> parametros = new HashMap<>();
 
-        parametros.put("folioConvenio", filtros.getFolioConvenio());
-        parametros.put("nombre", filtros.getNombre());
-        parametros.put("curp", filtros.getCurp());
-        parametros.put("rfc", filtros.getRfc());
+        parametros.put("folioConvenio", filtros.getFolioConvenio() != null ? "'" + filtros.getFolioConvenio() + "'" : null);
+        parametros.put("nombre", filtros.getNombre() != null ? "'" + filtros.getNombre() + "'" : null);
+        parametros.put("curp", filtros.getCurp() != null ? "'" + filtros.getCurp() + "'" : null);
+        parametros.put("rfc", filtros.getRfc() != null ? "'" + filtros.getRfc() + "'" : null);
         parametros.put("estatusConvenio", filtros.getEstatusConvenio());
 
         parametros.put("rutaNombreReporte", filtros.getRuta());
