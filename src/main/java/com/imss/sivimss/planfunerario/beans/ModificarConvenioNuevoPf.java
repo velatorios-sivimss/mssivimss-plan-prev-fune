@@ -19,6 +19,7 @@ public class ModificarConvenioNuevoPf {
         //queryPersona.agregarParametroValues("NUM_SEXO", "'" + persona.getSexo() + "'");
         queryPersona.agregarParametroValues("DES_OTRO_SEXO", "'" + persona.getOtroSexo() + "'");
        // queryPersona.agregarParametroValues("FEC_NAC", "'" + persona.getFechaNacimiento() + "'");
+        log.info("id pais persona");
         queryPersona.agregarParametroValues("ID_PAIS", "'" + persona.getPais() + "'");
         //queryPersona.agregarParametroValues("ID_ESTADO", "'" + persona.getEstado() + "'");
         queryPersona.agregarParametroValues("DES_TELEFONO", "'" + persona.getTelefono() + "'");
@@ -43,6 +44,7 @@ public class ModificarConvenioNuevoPf {
         queryPersona.agregarParametroValues("DES_OTRO_SEXO", "'" + persona.getOtroSexo() + "'");
         queryPersona.agregarParametroValues("FEC_NAC", "'" + persona.getFechaNacimiento() + "'");
         queryPersona.agregarParametroValues("ID_PAIS", "'" + persona.getPais() + "'");
+        log.info("id pais bene");
         //queryPersona.agregarParametroValues("ID_ESTADO", "'" + persona.getEstado() + "'");
         queryPersona.agregarParametroValues("DES_TELEFONO", "'" + persona.getTelefono() + "'");
         queryPersona.agregarParametroValues("DES_CORREO", "'" + persona.getCorreoElectronico() + "'");
@@ -66,6 +68,7 @@ public class ModificarConvenioNuevoPf {
         queryDomicilio.agregarParametroValues("ID_USUARIO_MODIFICA", usuario);
         queryDomicilio.agregarParametroValues("FEC_ACTUALIZACION", "NOW()");
         queryDomicilio.addWhere("ID_DOMICILIO = idDomicilio" );
+        log.info(queryDomicilio.obtenerQueryActualizar());
         return queryDomicilio.obtenerQueryActualizar();
     }
 
@@ -81,6 +84,7 @@ public class ModificarConvenioNuevoPf {
         queryEmpresaConvenio.agregarParametroValues("ID_USUARIO_MODIFICA", usuario);
         queryEmpresaConvenio.agregarParametroValues("FEC_ACTUALIZACION", "NOW()");
         queryEmpresaConvenio.addWhere("ID_EMPRESA_CONVENIO_PF = idEmpresaConvenio");
+        log.info(queryEmpresaConvenio.obtenerQueryActualizar());
        return queryEmpresaConvenio.obtenerQueryActualizar();
     }
 }
