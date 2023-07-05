@@ -16,7 +16,7 @@ public class ModificarConvenioNuevoPf {
         queryPersona.agregarParametroValues("NOM_PERSONA", "'" + persona.getNombre() + "'");
         queryPersona.agregarParametroValues("NOM_PRIMER_APELLIDO", "'" + persona.getPrimerApellido() + "'");
         queryPersona.agregarParametroValues("NOM_SEGUNDO_APELLIDO", "'" + persona.getSegundoApellido() + "'");
-        queryPersona.agregarParametroValues("NUM_SEXO", "'" + persona.getSexo() + "'");
+        //queryPersona.agregarParametroValues("NUM_SEXO", "'" + persona.getSexo() + "'");
         queryPersona.agregarParametroValues("DES_OTRO_SEXO", "'" + persona.getOtroSexo() + "'");
         queryPersona.agregarParametroValues("FEC_NAC", "'" + persona.getFechaNacimiento() + "'");
         queryPersona.agregarParametroValues("ID_PAIS", "'" + persona.getPais() + "'");
