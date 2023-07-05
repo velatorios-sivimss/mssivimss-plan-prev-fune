@@ -18,4 +18,10 @@ private String idPersona;
 private String rfc;
 private String curp;
 private String nss;
+private String edad;
+private String validaIneBeneficiario;
+private String validaActaNacimientoBeneficiario;
+private String idParentesco;
+private String idVelatorio;
+private String nomVelatorio;
 }
