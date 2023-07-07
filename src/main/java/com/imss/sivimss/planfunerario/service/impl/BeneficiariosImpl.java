@@ -97,14 +97,12 @@ public class BeneficiariosImpl implements BeneficiariosService{
 					providerRestTemplate.consumirServicio(benefBean.insertarBeneficiarioPlanAnterior(id).getDatos(), urlCrearMultiple,
 							authentication);
 				}
-				
-				return response;
 			}else {
 				response = providerRestTemplate.consumirServicio(benefBean.insertarPersona().getDatos(), urlCrearMultiple,
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
-			      return response;
 			}
+			  return response;
 						
 		}catch (Exception e) {
 			String consulta = benefBean.insertarPersona().getDatos().get(""+AppConstantes.QUERY+"").toString();

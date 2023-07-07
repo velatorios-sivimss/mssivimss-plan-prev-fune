@@ -113,12 +113,12 @@ public class BeneficiariosBean {
 				"SP.NOM_SEGUNDO_APELLIDO) AS nombre",
 				SP_ID_PERSONA+" AS idPersona",
 				"SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF AS idContratanteConvenioPf")
-		.from(SVT_CONTRATANTE_BENEFICIARIOS)
-		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF)
-		.join(SVC_PERSONA, " SB.ID_PERSONA = SP.ID_PERSONA")
-		.join(SVT_CONVENIO_PF, SCPC_ID_CONVENIO_PF_PF_ID_CONVENIO_PF);
-      	queryUtil.where("PF.ID_TIPO_PREVISION= 1");
-		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio").and("SB.IND_SINIESTROS=0")
+		.from(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF)
+		.join(SVT_CONVENIO_PF, SCPC_ID_CONVENIO_PF_PF_ID_CONVENIO_PF)
+		.leftJoin(SVT_CONTRATANTE_BENEFICIARIOS, "SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
+		.leftJoin(SVC_PERSONA, "SB.ID_PERSONA=SP.ID_PERSONA");
+      	//queryUtil.where("PF.ID_TIPO_PREVISION= 1");
+		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio").and("(SB.IND_SINIESTROS=0 OR SB.IND_SINIESTROS IS NULL)")
 		.setParameter("idConvenio", Integer.parseInt(palabra));
 		String query = obtieneQuery(queryUtil);
 		log.info("-> " +query);
@@ -221,14 +221,14 @@ public class BeneficiariosBean {
 		 DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
         final QueryHelper q = new QueryHelper("INSERT INTO SVT_BENEFICIARIOS_DOCUMENTACION_PLAN_ANTERIOR");
-        q.agregarParametroValues("ID_CONTRATANTE_BENEFICIARIO", ID_TABLA);
+        q.agregarParametroValues("ID_CONTRATANTE_BENEFICIARIOS", ID_TABLA);
         q.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS", ""+this.indComprobanteEstudios+"");
         q.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+this.indActaMatrimonio+"");
         q.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+this.indDeclaracionConcubinato+"");	
-        q.agregarParametroValues("IND_CARTA_PODER", ""+this.indCartaPoder+"");  
+      /*  q.agregarParametroValues("IND_CARTA_PODER", ""+this.indCartaPoder+"");  
         q.agregarParametroValues("IND_INE_TESTIGO", ""+this.indIneTestigo+""); 
         q.agregarParametroValues("IND_INE_TESTIGO_DOS", ""+this.indIneTestigoDos+""); 
-       // q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
+        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1"); */
         q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, ""+usuarioAlta+"" );
 		q.agregarParametroValues(AppConstantes.FEC_ALTA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
         String query = q.obtenerQueryInsertar();
@@ -400,7 +400,7 @@ public class BeneficiariosBean {
 	        q.agregarParametroValues("IND_SINIESTROS", "0");
 	        q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"" );
 			q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
-	        String query = q.obtenerQueryInsertar()+"$$" +insertarDocPlanAnterior();
+	        String query = q.obtenerQueryInsertar();
 	        String encoded = encodedQuery(query);
 	        parametro.put(AppConstantes.QUERY, encoded);
 	        request.setDatos(parametro);
