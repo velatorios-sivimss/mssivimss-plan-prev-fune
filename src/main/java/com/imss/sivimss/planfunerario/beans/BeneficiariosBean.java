@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
-
-import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
@@ -96,6 +94,8 @@ public class BeneficiariosBean {
 	public static final String DES_CORREO = "DES_CORREO";
 	public static final String DES_TELEFONO = "DES_TELEFONO";
 	public static final String ID_TABLA = "idTabla";
+	public static final String IND_ACTA_NACIMIENTO = "IND_ACTA_NACIMIENTO";
+	public static final String IND_INE_BENEFICIARIO = "IND_INE_BENEFICIARIO";
 	
 	//JOIN
 	public static final String SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF = "SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF";
@@ -197,10 +197,10 @@ public class BeneficiariosBean {
 	        q.agregarParametroValues("ID_PERSONA", ""+id+"");
 	        q.agregarParametroValues(ID_PARENTESCO, ""+this.idParentesco+"");
 	        if(indActa!=null) {
-	        	q.agregarParametroValues("IND_ACTA_NACIMIENTO", ""+this.indActa+"");	
+	        	q.agregarParametroValues(IND_ACTA_NACIMIENTO, ""+this.indActa+"");	
 	        }
 	        if(indIne!=null) {
-	        	   q.agregarParametroValues("IND_INE_BENEFICIARIO", ""+this.indIne+"");   	
+	        	   q.agregarParametroValues(IND_INE_BENEFICIARIO, ""+this.indIne+"");   	
 	        }
 	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 	        q.agregarParametroValues("IND_SINIESTROS", "0");
@@ -225,10 +225,6 @@ public class BeneficiariosBean {
         q.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS", ""+this.indComprobanteEstudios+"");
         q.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+this.indActaMatrimonio+"");
         q.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+this.indDeclaracionConcubinato+"");	
-      /*  q.agregarParametroValues("IND_CARTA_PODER", ""+this.indCartaPoder+"");  
-        q.agregarParametroValues("IND_INE_TESTIGO", ""+this.indIneTestigo+""); 
-        q.agregarParametroValues("IND_INE_TESTIGO_DOS", ""+this.indIneTestigoDos+""); 
-        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1"); */
         q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, ""+usuarioAlta+"" );
 		q.agregarParametroValues(AppConstantes.FEC_ALTA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
         String query = q.obtenerQueryInsertar();
@@ -270,10 +266,10 @@ public class BeneficiariosBean {
 	        q.agregarParametroValues(ID_PARENTESCO, ""+parentesco+"");
 	       // q.agregarParametroValues("CVE_ACTA", "'"+acta+"'");
 	        if(indActa!=null) {
-	        	 q.agregarParametroValues("IND_ACTA_NACIMIENTO", ""+indActa+""); 	
+	        	 q.agregarParametroValues(IND_ACTA_NACIMIENTO, ""+indActa+""); 	
 	        }
 	       if(indIne!=null) {
-	    	   q.agregarParametroValues("IND_INE_BENEFICIARIO", ""+indIne+"");   
+	    	   q.agregarParametroValues(IND_INE_BENEFICIARIO, ""+indIne+"");   
 	       }
 	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 	        q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"" );
@@ -391,10 +387,10 @@ public class BeneficiariosBean {
 	        q.agregarParametroValues("ID_PERSONA", ID_TABLA);
 	        q.agregarParametroValues(ID_PARENTESCO, ""+this.idParentesco+"");
 	        if(this.indActa!=null) {
-	        	q.agregarParametroValues("IND_ACTA_NACIMIENTO", ""+this.indActa+"");	
+	        	q.agregarParametroValues(IND_ACTA_NACIMIENTO, ""+this.indActa+"");	
 	        }
 	        if(this.indIne!=null) {
-	        	   q.agregarParametroValues("IND_INE_BENEFICIARIO", ""+this.indIne+"");   	
+	        	   q.agregarParametroValues(IND_INE_BENEFICIARIO, ""+this.indIne+"");   	
 	        }
 	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 	        q.agregarParametroValues("IND_SINIESTROS", "0");

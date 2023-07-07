@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.xml.bind.DatatypeConverter;
 
 import com.ibm.icu.text.RuleBasedNumberFormat;
-import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.RenovarDocumentacionModel;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
 import com.imss.sivimss.planfunerario.model.request.RenovarPlanPFRequest;
@@ -106,7 +105,6 @@ public class RenovarBean {
 		.join("SVT_DOMICILIO SD", "SC.ID_DOMICILIO = SD.ID_DOMICILIO ")
 		.leftJoin("SVC_CP CP", "SD.DES_CP = CP.CVE_CODIGO_POSTAL")
 		.join(SVC_PERSONA, "SC.ID_PERSONA = SP.ID_PERSONA");
-		//.leftJoin("SVC_PERSONA SP2", "SCB.ID_PERSONA = SP2.ID_PERSONA");
 		queryUtil.where("SCP.ID_ESTATUS_CONVENIO = 2");
 		queryUtil.where("SCP.ID_TIPO_PREVISION = :tipoPrevision")
 		.setParameter("tipoPrevision", filtros.getTipoPrevision());
@@ -159,7 +157,7 @@ public class RenovarBean {
 			request.setDatos(parametro);
 			return request;
 	}
-
+	
 	public DatosRequest validarFallecido(FiltrosConvenioPFRequest filtros) {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
@@ -170,13 +168,13 @@ public class RenovarBean {
 		.join(SVC_PERSONA, "SF.ID_PERSONA = SP.ID_PERSONA")
 		.join(SVC_CONTRATANTE, "SP.ID_PERSONA = SC.ID_PERSONA")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SC.ID_CONTRATANTE = SCPC.ID_CONTRATANTE")
-		.join("SVT_CONVENIO_PF PF", "SCPC.ID_CONVENIO_PF = PF.ID_CONVENIO_PF");
+		.join(SVT_CONVENIO_PF, "SCPC.ID_CONVENIO_PF = SPF.ID_CONVENIO_PF");
 		if(filtros.getNumIne()!= null) {
 			queryUtil.where("SP.NUM_INE= '"+filtros.getNumIne()+"'");
 		}else if(filtros.getRfc()!=null) {
 			queryUtil.where("SP.CVE_RFC= '"+filtros.getRfc()+"'");
 		}else if(filtros.getFolio()!=null && filtros.getRfc()==null || filtros.getNumIne()==null) {
-			queryUtil.where("PF.DES_FOLIO= '"+filtros.getFolio()+"'");
+			queryUtil.where("SPF.DES_FOLIO= '"+filtros.getFolio()+"'");
 		}
 			String query = obtieneQuery(queryUtil);
 			log.info("validar fallecido ->"+query);
@@ -279,8 +277,8 @@ public class RenovarBean {
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("UPDATE SVT_RENOVACION_CONVENIO_PF");
 		q.agregarParametroValues("IND_ESTATUS", "0");
-		q.agregarParametroValues("ID_USUARIO_BAJA", ""+usuarioAlta+"");
-		q.agregarParametroValues("FEC_BAJA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		q.agregarParametroValues(AppConstantes.ID_USUARIO_BAJA, ""+usuarioAlta+"");
+		q.agregarParametroValues(AppConstantes.FEC_BAJA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		q.addWhere("ID_CONVENIO_PF=" + idConvenioPf +" AND FEC_VIGENCIA = '"+ vigencia +"'");
 		String query = q.obtenerQueryActualizar();
 		log.info("estatus convenio ->"+query);
@@ -488,8 +486,8 @@ public class RenovarBean {
 		        qh.agregarParametroValues("IND_CARTA_PODER", ""+renovarDoc.getCartaPoder()+"");
 		        qh.agregarParametroValues("IND_INE_TESTIGO", ""+renovarDoc.getIneTestigo()+"");
 		        qh.agregarParametroValues("IND_INE_TESTIGO_DOS", ""+renovarDoc.getIneTestigoDos()+"");
-		        qh.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"");
-		        qh.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		        qh.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, ""+usuarioAlta+"");
+		        qh.agregarParametroValues(AppConstantes.FEC_ALTA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		        String query = qh.obtenerQueryInsertar(); 
 	        queries.append(query+ "ON DUPLICATE KEY ");
 	        final QueryHelper q = new QueryHelper("UPDATE");
@@ -518,8 +516,8 @@ public class RenovarBean {
 		String query;
 			final QueryHelper q = new QueryHelper("UPDATE SVC_VALIDACION_DOCUMENTOS_CONVENIO_PF");
 			q.agregarParametroValues("IND_ACTIVO", "0");
-			q.agregarParametroValues("ID_USUARIO_BAJA", ""+usuarioAlta+"");
-			q.agregarParametroValues("FEC_BAJA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+			q.agregarParametroValues(AppConstantes.ID_USUARIO_BAJA, ""+usuarioAlta+"");
+			q.agregarParametroValues(AppConstantes.FEC_BAJA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
 			q.addWhere("ID_CONVENIO_PF = "+idConvenio+" AND IND_ACTIVO= 1 ");
 			query = q.obtenerQueryActualizar();
 		log.info("renovar -> "+query);
