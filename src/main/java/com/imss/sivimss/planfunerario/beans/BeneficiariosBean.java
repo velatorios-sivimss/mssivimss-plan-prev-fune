@@ -42,8 +42,7 @@ public class BeneficiariosBean {
 	private String correoE;
 	private String tel;
 	private Integer usuarioAlta;
-	private Integer usuarioBaja;
-	
+	private Integer usuarioBaja;	
 	private Integer indComprobanteEstudios;
 	private Integer indActaMatrimonio;
 	private Integer indDeclaracionConcubinato;
@@ -67,12 +66,12 @@ public class BeneficiariosBean {
 		this.tel = beneficiarioRequest.getTel();
 		this.indActa = beneficiarioRequest.getBeneficiario().getIndActa();
 		this.indIne = beneficiarioRequest.getBeneficiario().getIndIne();
-		this.indComprobanteEstudios = beneficiarioRequest.getIndComprobanteEstudios();
-		this.indActaMatrimonio = beneficiarioRequest.getIndActaMatrimonio();
-		this.indDeclaracionConcubinato = beneficiarioRequest.getIndDeclaracionConcubinato();
+		/*this.indComprobanteEstudios = beneficiarioRequest.getDocPlanAnterior().getIndComprobanteEstudios();
+		this.indActaMatrimonio = beneficiarioRequest.getDocPlanAnterior().getIndActaMatrimonio();
+		this.indDeclaracionConcubinato = beneficiarioRequest.getDocPlanAnterior().getIndDeclaracionConcubinato();
 		this.indCartaPoder = beneficiarioRequest.getIndCartaPoder();
 		this.indIneTestigo = beneficiarioRequest.getIndIneTestigo();
-		this.indIneTestigoDos = beneficiarioRequest.getIndIneTestigoDos();
+		this.indIneTestigoDos = beneficiarioRequest.getIndIneTestigoDos();*/
 	}
 
 	//TABLAS

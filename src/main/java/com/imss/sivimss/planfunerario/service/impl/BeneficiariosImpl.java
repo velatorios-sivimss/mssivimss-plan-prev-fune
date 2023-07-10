@@ -88,7 +88,10 @@ public class BeneficiariosImpl implements BeneficiariosService{
 			if(benefRequest.getBeneficiario().getIdContratanteConvenioPf()==null || benefRequest.getBeneficiario().getIdParentesco()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
 			}
-			if(benefRequest.getTipoPrevision()==2) {
+			if(benefRequest.getDocPlanAnterior()!=null) {
+				benefBean.setIndComprobanteEstudios(benefRequest.getDocPlanAnterior().getIndComprobanteEstudios());
+				benefBean.setIndActaMatrimonio(benefRequest.getDocPlanAnterior().getIndActaMatrimonio());
+				benefBean.setIndDeclaracionConcubinato(benefRequest.getDocPlanAnterior().getIndDeclaracionConcubinato());
 				response = providerRestTemplate.consumirServicio(benefBean.insertarPersonaPlanAnterior().getDatos(), urlCrear,
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
@@ -107,7 +110,6 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		}catch (Exception e) {
 			String consulta = benefBean.insertarPersona().getDatos().get(""+AppConstantes.QUERY+"").toString();
 			String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
-			log.error("Error al ejecutar la query " +encoded);
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),ERROR, CONSULTA, authentication);
 			throw new IOException("5", e.getCause()) ;
 		}
@@ -136,7 +138,10 @@ public class BeneficiariosImpl implements BeneficiariosService{
 						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getIndActa(), benefRequest.getBeneficiario().getIndIne()).getDatos(), urlActualizar,
 						authentication);
 			}
-			if(response.getCodigo()==200 && benefRequest.getTipoPrevision()==2) {
+			benefBean.setIndComprobanteEstudios(benefRequest.getDocPlanAnterior().getIndComprobanteEstudios());
+			benefBean.setIndActaMatrimonio(benefRequest.getDocPlanAnterior().getIndActaMatrimonio());
+			benefBean.setIndDeclaracionConcubinato(benefRequest.getDocPlanAnterior().getIndDeclaracionConcubinato());
+			if(response.getCodigo()==200 && benefRequest.getDocPlanAnterior()!=null) {
 				providerRestTemplate.consumirServicio(benefBean.editarDocPlanAnterior().getDatos(), urlActualizar,
 						authentication);	
 			}
@@ -145,7 +150,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	}catch (Exception e) {
 		String consulta = benefBean.editarPersona().getDatos().get("query").toString();
 		String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
-		log.error("Error al ejecutar la query" +encoded);
+		log.error("Error al ejecutar la query" +e.getCause());
 		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),ERROR, MODIFICACION, authentication);
 		throw new IOException("5", e.getCause()) ;
 	}
