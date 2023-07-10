@@ -16,11 +16,36 @@ public class ModificarConvenioNuevoPf {
         queryPersona.agregarParametroValues("NOM_PERSONA", "'" + persona.getNombre() + "'");
         queryPersona.agregarParametroValues("NOM_PRIMER_APELLIDO", "'" + persona.getPrimerApellido() + "'");
         queryPersona.agregarParametroValues("NOM_SEGUNDO_APELLIDO", "'" + persona.getSegundoApellido() + "'");
-        queryPersona.agregarParametroValues("NUM_SEXO", "'" + persona.getSexo() + "'");
+        //queryPersona.agregarParametroValues("NUM_SEXO", "'" + persona.getSexo() + "'");
+        queryPersona.agregarParametroValues("DES_OTRO_SEXO", "'" + persona.getOtroSexo() + "'");
+       // queryPersona.agregarParametroValues("FEC_NAC", "'" + persona.getFechaNacimiento() + "'");
+        log.info("id pais persona");
+        queryPersona.agregarParametroValues("ID_PAIS", "'" + persona.getPais() + "'");
+        //queryPersona.agregarParametroValues("ID_ESTADO", "'" + persona.getEstado() + "'");
+        queryPersona.agregarParametroValues("DES_TELEFONO", "'" + persona.getTelefono() + "'");
+        queryPersona.agregarParametroValues("DES_CORREO", "'" + persona.getCorreoElectronico() + "'");
+        queryPersona.agregarParametroValues("TIPO_PERSONA", "'" + persona.getTipoPersona() + "'");
+        queryPersona.agregarParametroValues("NUM_INE", "'" + persona.getNumIne() + "'");
+        queryPersona.agregarParametroValues("ID_USUARIO_MODIFICA", usuario);
+        queryPersona.agregarParametroValues("FEC_ACTUALIZACION", "NOW()");
+        queryPersona.addWhere("ID_PERSONA = " + idPersona);
+        return queryPersona.obtenerQueryActualizar();
+    }
+
+    public String generaQueryActualizaPersonaBeneficiario(PersonaAltaConvenio persona, String usuario, String idPersona){
+        final QueryHelper queryPersona = new QueryHelper("UPDATE SVC_PERSONA");
+        queryPersona.agregarParametroValues("CVE_RFC", "'" + persona.getRfc() + "'");
+        queryPersona.agregarParametroValues("CVE_CURP", "'" + persona.getCurp() + "'");
+        queryPersona.agregarParametroValues("CVE_NSS", "'" + persona.getNss() + "'");
+        queryPersona.agregarParametroValues("NOM_PERSONA", "'" + persona.getNombre() + "'");
+        queryPersona.agregarParametroValues("NOM_PRIMER_APELLIDO", "'" + persona.getPrimerApellido() + "'");
+        queryPersona.agregarParametroValues("NOM_SEGUNDO_APELLIDO", "'" + persona.getSegundoApellido() + "'");
+        //queryPersona.agregarParametroValues("NUM_SEXO", "'" + persona.getSexo() + "'");
         queryPersona.agregarParametroValues("DES_OTRO_SEXO", "'" + persona.getOtroSexo() + "'");
         queryPersona.agregarParametroValues("FEC_NAC", "'" + persona.getFechaNacimiento() + "'");
         queryPersona.agregarParametroValues("ID_PAIS", "'" + persona.getPais() + "'");
-        queryPersona.agregarParametroValues("ID_ESTADO", "'" + persona.getEstado() + "'");
+        log.info("id pais bene");
+        //queryPersona.agregarParametroValues("ID_ESTADO", "'" + persona.getEstado() + "'");
         queryPersona.agregarParametroValues("DES_TELEFONO", "'" + persona.getTelefono() + "'");
         queryPersona.agregarParametroValues("DES_CORREO", "'" + persona.getCorreoElectronico() + "'");
         queryPersona.agregarParametroValues("TIPO_PERSONA", "'" + persona.getTipoPersona() + "'");
@@ -43,6 +68,7 @@ public class ModificarConvenioNuevoPf {
         queryDomicilio.agregarParametroValues("ID_USUARIO_MODIFICA", usuario);
         queryDomicilio.agregarParametroValues("FEC_ACTUALIZACION", "NOW()");
         queryDomicilio.addWhere("ID_DOMICILIO = idDomicilio" );
+        log.info(queryDomicilio.obtenerQueryActualizar());
         return queryDomicilio.obtenerQueryActualizar();
     }
 
@@ -58,6 +84,7 @@ public class ModificarConvenioNuevoPf {
         queryEmpresaConvenio.agregarParametroValues("ID_USUARIO_MODIFICA", usuario);
         queryEmpresaConvenio.agregarParametroValues("FEC_ACTUALIZACION", "NOW()");
         queryEmpresaConvenio.addWhere("ID_EMPRESA_CONVENIO_PF = idEmpresaConvenio");
+        log.info(queryEmpresaConvenio.obtenerQueryActualizar());
        return queryEmpresaConvenio.obtenerQueryActualizar();
     }
 }

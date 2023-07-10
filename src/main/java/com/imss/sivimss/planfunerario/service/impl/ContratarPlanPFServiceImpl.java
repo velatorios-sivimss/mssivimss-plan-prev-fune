@@ -87,7 +87,8 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         mapa.put("idPersona", persona.getIdPersona());
         mapa.put("idContratante", persona.getIdContratante());
         mapa.put("idDomicilio", persona.getIdDomicilio());
-        return providerRestTemplate.consumirServicio(mapa, urlDominioConvenios + "/insertConvenios", authentication);
+        //MensajeResponseUtil.mensajeResponse(providerRestTemplate.consumirServicio(salas.registrarEntrada(registroEntrada, usuarioDto).getDatos(), urlDominioConsulta + "/crear", authentication), REGISTRO_CORRECTO);
+        return MensajeResponseUtil.mensajeResponse(providerRestTemplate.consumirServicio(mapa, urlDominioConvenios + "/insertConvenios", authentication),"30");
     }
 
     @Override
@@ -175,7 +176,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
     public Response<?> generarPDF(DatosRequest request, Authentication authentication) throws IOException {
         String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
         PdfDto pdfDto = json.fromJson(datosJson, PdfDto.class);
-        Map<String, Object> envioDatos = new ConvenioNuevoPF().generarReporte(pdfDto, buscarInformacionReporte(pdfDto.getFolioConvenio(), authentication));
+        Map<String, Object> envioDatos = new ConvenioNuevoPF().generarReporte(pdfDto, buscarInformacionReporte(pdfDto.getIdConvenio(), authentication));
         return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes,
                 authentication);
     }
