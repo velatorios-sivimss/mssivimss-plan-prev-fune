@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.xml.bind.DatatypeConverter;
 
 import com.ibm.icu.text.RuleBasedNumberFormat;
+import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.RenovarDocumentacionModel;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
 import com.imss.sivimss.planfunerario.model.request.RenovarPlanPFRequest;
@@ -95,7 +96,7 @@ public class RenovarBean {
 		 + " FROM SVT_CONTRATANTE_BENEFICIARIOS SCB "
 		 + " JOIN SVT_CONTRATANTE_PAQUETE_CONVENIO_PF BENEF ON SCB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF=BENEF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF "
 		 + " JOIN SVC_PERSONA PC ON SCB.ID_PERSONA = PC.ID_PERSONA "
-		 + " WHERE BENEF.ID_CONVENIO_PF=SCP.ID_CONVENIO_PF AND SCB.IND_ACTIVO=1 AND SCB.IND_SINIESTROS=0) AS beneficiario ")
+		 + " WHERE BENEF.ID_CONVENIO_PF=SCP.ID_CONVENIO_PF AND SCB.IND_ACTIVO=1 AND SCB.IND_SINIESTROS=0) AS benef ")
 		.from("SVT_CONVENIO_PF SCP")
 		.leftJoin(SVT_RENOVACION_CONVENIO_PF, "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS=1")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
@@ -560,5 +561,28 @@ public class RenovarBean {
 		parametro.put(AppConstantes.QUERY, encoded);
 		request.setDatos(parametro);
 		return request;
+	}
+
+	public DatosRequest buscarBeneficiarios(String folio) {
+		DatosRequest request= new DatosRequest();
+		Map<String, Object> parametros = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("CONCAT(PC.NOM_PERSONA, ' ', "
+				+ "PC.NOM_PRIMER_APELLIDO, ' ', "
+				+ "PC.NOM_SEGUNDO_APELLIDO ) AS nombreBeneficiario",
+				" SCB.ID_CONTRATANTE_BENEFICIARIOS AS id")
+		.from("SVT_CONTRATANTE_BENEFICIARIOS SCB")
+		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF BENEF", "SCB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF=BENEF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
+		.join("SVT_CONVENIO_PF PF", "BENEF.ID_CONVENIO_PF = PF.ID_CONVENIO_PF")
+		.join("SVC_PERSONA PC", "SCB.ID_PERSONA = PC.ID_PERSONA");
+		queryUtil.where("SCB.IND_ACTIVO=1 AND SCB.IND_SINIESTROS=0");
+		queryUtil.where("PF.DES_FOLIO= :folio")
+		.setParameter("folio", folio);
+		String query = obtieneQuery(queryUtil);
+		log.info("beneficiarios -> " +query);
+		String encoded = encodedQuery(query);
+	    parametros.put(AppConstantes.QUERY, encoded );
+	    request.setDatos(parametros);
+	    return request;
 	}
 }

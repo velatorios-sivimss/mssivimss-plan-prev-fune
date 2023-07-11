@@ -3,7 +3,9 @@ package com.imss.sivimss.planfunerario.service.impl;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
@@ -25,10 +27,14 @@ import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
 import com.imss.sivimss.planfunerario.model.request.RenovarPlanPFRequest;
 import com.imss.sivimss.planfunerario.model.request.ReporteDto;
+import com.imss.sivimss.planfunerario.model.response.BeneficiarioResponse;
+import com.imss.sivimss.planfunerario.model.response.DatosConvenioResponse;
+import com.imss.sivimss.planfunerario.model.response.BenefResponse;
 import com.imss.sivimss.planfunerario.model.request.UsuarioDto;
 import com.imss.sivimss.planfunerario.model.request.VerificarDocumentacionRequest;
 import com.imss.sivimss.planfunerario.service.RenovarPlanService;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
+import com.imss.sivimss.planfunerario.util.ConvertirGenerico;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.LogUtil;
 import com.imss.sivimss.planfunerario.util.ProviderServiceRestTemplate;
@@ -78,8 +84,14 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	
 	Integer mesVigencia = 0;
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public Response<?> buscarConvenioNuevo(DatosRequest request, Authentication authentication) throws IOException {		 
+		Response<?> response = new Response<>();
+	try {
+		List<DatosConvenioResponse> convenioResponse;
+		List<BenefResponse> benefResponse;
+		DatosConvenioResponse datosConvenio = new DatosConvenioResponse();
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
@@ -87,9 +99,9 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}
 		filtros.setTipoPrevision(1);
-			Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarConvenio(request, filtros, fecFormat).getDatos(), urlConsulta,
+		Response<?>	responseDatosConvenio = providerRestTemplate.consumirServicio(renovarBean.buscarConvenio(request, filtros, fecFormat).getDatos(), urlConsulta,
 					authentication);
-			Object rst = response.getDatos();
+			Object rst = responseDatosConvenio.getDatos();
 		      if(rst.toString().equals("[]")){
 		    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getFolio(), CONSULTA, authentication);
 		    		response.setMensaje("45 folio: " +filtros.getFolio());
@@ -117,7 +129,20 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			  			return response;
 		    		  }
 				}
-			return response;    		
+		        convenioResponse = Arrays.asList(modelMapper.map(responseDatosConvenio.getDatos(), DatosConvenioResponse[].class));
+		        benefResponse = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(renovarBean.buscarBeneficiarios(filtros.getFolio()).getDatos(), urlConsulta, authentication).getDatos(), BenefResponse[].class));
+		        datosConvenio = convenioResponse.get(0);
+		        datosConvenio.setBeneficiarios(benefResponse);
+		        response.setCodigo(200);
+	            response.setError(false);
+	            response.setMensaje("OK");
+		      response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));
+	}catch(Exception e) {
+		log.info("estoy aqui" +e.getCause());
+		e.getCause();
+	}
+		      return response;   
+	
 	}
 
 	public Response<?> buscarConvenioAnterior(DatosRequest request, Authentication authentication) throws IOException {
