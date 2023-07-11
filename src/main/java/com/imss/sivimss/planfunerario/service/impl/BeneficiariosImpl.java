@@ -77,7 +77,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 
 	@Override
 	public Response<?> crearBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
-		Response<?> response;
+		Response<?> response = new Response<>();
 		try {
 			String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		    PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
@@ -110,6 +110,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		}catch (Exception e) {
 			String consulta = benefBean.insertarPersona().getDatos().get(""+AppConstantes.QUERY+"").toString();
 			String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
+			log.error("Error al ejecutar la query" +encoded);
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),ERROR, CONSULTA, authentication);
 			throw new IOException("5", e.getCause()) ;
 		}
@@ -119,7 +120,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 
 	@Override
 	public Response<?> editarBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
-		Response<?> response;
+		Response<?> response = new Response<>();
 		try {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 	    PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
@@ -150,7 +151,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	}catch (Exception e) {
 		String consulta = benefBean.editarPersona().getDatos().get("query").toString();
 		String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
-		log.error("Error al ejecutar la query" +e.getCause());
+		log.error("Error al ejecutar la query" +encoded);
 		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),ERROR, MODIFICACION, authentication);
 		throw new IOException("5", e.getCause()) ;
 	}
