@@ -516,7 +516,7 @@ public class RenovarBean {
 			queryUtil.where("PF.ID_CONVENIO_PF= :id")
 			.setParameter("id", id);	
 		}
-		
+		queryUtil.limit(3);
 		String query = obtieneQuery(queryUtil);
 		log.info("beneficiarios -> " +query);
 		String encoded = encodedQuery(query);
