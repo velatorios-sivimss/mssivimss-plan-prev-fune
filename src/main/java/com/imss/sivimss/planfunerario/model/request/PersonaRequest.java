@@ -32,4 +32,5 @@ public class PersonaRequest {
 	private BeneficiarioModel beneficiario;
 	private DocBeneficiariosPlanAnteriorModel docPlanAnterior;
 //	private Integer tipoPrevision;	
+
 }
