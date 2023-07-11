@@ -87,7 +87,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 			String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		    PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-			log.info("-> " +benefRequest.getIndComprobanteEstudios());
+	
 			benefBean = new BeneficiariosBean(benefRequest);
 			benefBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 			
@@ -130,10 +130,8 @@ public class BeneficiariosImpl implements BeneficiariosService{
 
 	@Override
 	public Response<?> editarBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
-		Response<?> response = new Response<>();
-		try {
-		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
-	    PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
+		R
+
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		benefBean = new BeneficiariosBean(benefRequest);
 		benefBean.setUsuarioAlta(usuarioDto.getIdUsuario());
@@ -187,12 +185,10 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	}
 
 	@Override
-	public Response<?> buscarCatalogos(DatosRequest request, Authentication authentication) throws IOException {
-		String datosJson = String.valueOf(request.getDatos().get("datos"));
-		CatalogosRequest filtros = gson.fromJson(datosJson, CatalogosRequest.class);
-		if(filtros.getIdCatalogo()==1 && filtros.getIdConvenio()!=null) {
-			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogosDocRequerida(request, filtros.getIdConvenio()).getDatos(), urlConsulta,
-					authentication);
+
+	CatalogosRequest filtros = gson.fromJson(datosson, CatalogosRequest.class);	if(filtros.getI
+
+				authentication);
 		}
 		if(filtros.getIdCatalogo()==2 && filtros.getIdConvenio()!=null) {
 			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogosInfoConvenioActual(request, filtros.getIdConvenio(), fecFormat).getDatos(), urlConsulta,
@@ -209,3 +205,9 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		
 
 }
+
+
+	
+
+	
+	
