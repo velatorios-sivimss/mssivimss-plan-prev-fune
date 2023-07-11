@@ -87,7 +87,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 			String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		    PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-	
+			log.info("-> " +benefRequest.getIndComprobanteEstudios());
 			benefBean = new BeneficiariosBean(benefRequest);
 			benefBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 			
@@ -130,8 +130,10 @@ public class BeneficiariosImpl implements BeneficiariosService{
 
 	@Override
 	public Response<?> editarBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
-		R
-
+		Response<?> response = new Response<>();
+		try {
+		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
+	    PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		benefBean = new BeneficiariosBean(benefRequest);
 		benefBean.setUsuarioAlta(usuarioDto.getIdUsuario());
@@ -167,13 +169,16 @@ public class BeneficiariosImpl implements BeneficiariosService{
 
 	@Override
 	public Response<?> estatusBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
-		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+		UsuarioDto usuari
+
+	Dto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		benefBean.setUsuarioBaja(usuarioDto.getIdUsuario());
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 	  PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
 	  Response<?> response = providerRestTemplate.consumirServicio(benefBean.cambiarEstatus(benefRequest.getIdBeneficiario(), benefRequest.getEstatusBenefic()).getDatos(), urlActualizar,
 				authentication);
-		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", BAJA, authentication);
+		
+
 	return response;
 	}
 
@@ -185,10 +190,12 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	}
 
 	@Override
-
-	CatalogosRequest filtros = gson.fromJson(datosson, CatalogosRequest.class);	if(filtros.getI
-
-				authentication);
+	public Response<?> buscarCatalogos(DatosRequest request, Authentication authentication) throws IOException {
+		String datosJson = String.valueOf(request.getDatos().get("datos"));
+		CatalogosRequest filtros = gson.fromJson(datosJson, CatalogosRequest.class);
+		if(filtros.getIdCatalogo()==1 && filtros.getIdConvenio()!=null) {
+			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogosDocRequerida(request, filtros.getIdConvenio()).getDatos(), urlConsulta,
+					authentication);
 		}
 		if(filtros.getIdCatalogo()==2 && filtros.getIdConvenio()!=null) {
 			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogosInfoConvenioActual(request, filtros.getIdConvenio(), fecFormat).getDatos(), urlConsulta,
@@ -202,12 +209,4 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		}
 			
 	}
-		
 
-}
-
-
-	
-
-	
-	
