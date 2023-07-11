@@ -35,7 +35,8 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	private static final String BAJA = "baja";
 	private static final String MODIFICACION = "modificacion";
 	private static final String CONSULTA = "consulta";
-	private static final String ERROR = "Fallo al ejecutar la query ";
+	private static final String ERROR = "Fallo al ejecutar la query";
+	private static final String INFORMACION_INCOMPLETA = "Informacion Incompleta";
 	
 	@Autowired
 	private LogUtil logUtil;
@@ -71,13 +72,17 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	public Response<?> detalleBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 	FiltrosBeneficiariosRequest filtros = gson.fromJson(datosJson, FiltrosBeneficiariosRequest.class);
-		return providerRestTemplate.consumirServicio(benefBean.detalleBeneficiarios(request, filtros.getIdBeneficiario(), filtros.getIdConvenioPF()).getDatos(), urlConsulta,
+	if(filtros.getIdBeneficiario()==null) {
+		throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
+		}	
+	return providerRestTemplate.consumirServicio(benefBean.detalleBeneficiarios(request, filtros.getIdBeneficiario()).getDatos(), urlConsulta,
+
 				authentication);
 	}
 
 	@Override
 	public Response<?> crearBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
-		Response<?> response;
+		Response<?> response = new Response<>();
 		try {
 			String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		    PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
@@ -87,9 +92,13 @@ public class BeneficiariosImpl implements BeneficiariosService{
 			benefBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 			
 			if(benefRequest.getBeneficiario().getIdContratanteConvenioPf()==null || benefRequest.getBeneficiario().getIdParentesco()==null) {
-			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
+			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 			}
-			if(benefRequest.getTipoContratacion()==2) {
+			if(benefRequest.getDocPlanAnterior()!=null) {
+				benefBean.setIndComprobanteEstudios(benefRequest.getDocPlanAnterior().getIndComprobanteEstudios());
+				benefBean.setIndActaMatrimonio(benefRequest.getDocPlanAnterior().getIndActaMatrimonio());
+				benefBean.setIndDeclaracionConcubinato(benefRequest.getDocPlanAnterior().getIndDeclaracionConcubinato());
+
 				response = providerRestTemplate.consumirServicio(benefBean.insertarPersonaPlanAnterior().getDatos(), urlCrear,
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
@@ -98,19 +107,20 @@ public class BeneficiariosImpl implements BeneficiariosService{
 					providerRestTemplate.consumirServicio(benefBean.insertarBeneficiarioPlanAnterior(id).getDatos(), urlCrearMultiple,
 							authentication);
 				}
-				
-				return response;
+ 
 			}else {
 				response = providerRestTemplate.consumirServicio(benefBean.insertarPersona().getDatos(), urlCrearMultiple,
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
-			      return response;
+
 			}
+			  return response;
+
 						
 		}catch (Exception e) {
 			String consulta = benefBean.insertarPersona().getDatos().get(""+AppConstantes.QUERY+"").toString();
 			String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
-			log.error("Error al ejecutar la query " +encoded);
+			log.error("Error al ejecutar la query" +encoded);
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),ERROR, CONSULTA, authentication);
 			throw new IOException("5", e.getCause()) ;
 		}
@@ -120,7 +130,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 
 	@Override
 	public Response<?> editarBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
-		Response<?> response;
+		Response<?> response = new Response<>();
 		try {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 	    PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
@@ -139,7 +149,10 @@ public class BeneficiariosImpl implements BeneficiariosService{
 						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getIndActa(), benefRequest.getBeneficiario().getIndIne()).getDatos(), urlActualizar,
 						authentication);
 			}
-			if(response.getCodigo()==200 && benefRequest.getTipoContratacion()==2) {
+			benefBean.setIndComprobanteEstudios(benefRequest.getDocPlanAnterior().getIndComprobanteEstudios());
+			benefBean.setIndActaMatrimonio(benefRequest.getDocPlanAnterior().getIndActaMatrimonio());
+			benefBean.setIndDeclaracionConcubinato(benefRequest.getDocPlanAnterior().getIndDeclaracionConcubinato());
+			if(response.getCodigo()==200 && benefRequest.getDocPlanAnterior()!=null) {
 				providerRestTemplate.consumirServicio(benefBean.editarDocPlanAnterior().getDatos(), urlActualizar,
 						authentication);	
 			}

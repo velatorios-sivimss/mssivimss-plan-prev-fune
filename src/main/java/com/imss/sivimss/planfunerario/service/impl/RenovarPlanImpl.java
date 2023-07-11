@@ -3,7 +3,9 @@ package com.imss.sivimss.planfunerario.service.impl;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
@@ -25,10 +27,13 @@ import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
 import com.imss.sivimss.planfunerario.model.request.RenovarPlanPFRequest;
 import com.imss.sivimss.planfunerario.model.request.ReporteDto;
+import com.imss.sivimss.planfunerario.model.response.DatosConvenioResponse;
+import com.imss.sivimss.planfunerario.model.response.BenefResponse;
 import com.imss.sivimss.planfunerario.model.request.UsuarioDto;
 import com.imss.sivimss.planfunerario.model.request.VerificarDocumentacionRequest;
 import com.imss.sivimss.planfunerario.service.RenovarPlanService;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
+import com.imss.sivimss.planfunerario.util.ConvertirGenerico;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.LogUtil;
 import com.imss.sivimss.planfunerario.util.ProviderServiceRestTemplate;
@@ -80,6 +85,9 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	
 	@Override
 	public Response<?> buscarConvenioNuevo(DatosRequest request, Authentication authentication) throws IOException {		 
+		Response<?> response = new Response<>();
+		List<DatosConvenioResponse> convenioResponse;
+		List<BenefResponse> benefResponse;
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
@@ -87,40 +95,61 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}
 		filtros.setTipoPrevision(1);
-			Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarConvenio(request, filtros, fecFormat).getDatos(), urlConsulta,
+		DatosConvenioResponse datosConvenio = new DatosConvenioResponse();
+		try {
+		Response<?>	responseDatosConvenio = providerRestTemplate.consumirServicio(renovarBean.buscarConvenio(request, filtros, fecFormat).getDatos(), urlConsulta,
 					authentication);
-			Object rst = response.getDatos();
+			Object rst = responseDatosConvenio.getDatos();
 		      if(rst.toString().equals("[]")){
 		    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getFolio(), CONSULTA, authentication);
 		    		response.setMensaje("45 folio: " +filtros.getFolio());
 		      }else {
 		    	  if(!validarPeriodoRenovacion(filtros, authentication)) {
 		    		  logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);
+		    		  response.setCodigo(200);
+			          response.setError(false);
 		    		  response.setMensaje("36");
-		    			response.setDatos(null);
 		    			return response;
 		    	  }
-		    	  if(getDia()>21 || mesActual()>mesVigencia){
+		    	  if(getDia()>20 || mesActual()>mesVigencia){
 		    		    	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 		    		    	providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar,authentication);
 		    		    	logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 CONVENIO INACTIVO ", CONSULTA, authentication);
-		    		    	response.setMensaje("36 CONVENIO INACTIVO");
-				  			response.setDatos(null);
+		    		    	 response.setCodigo(200);
+					          response.setError(false);
+					          response.setMensaje("36 CONVENIO INACTIVO");
 				  			return response;
 		    		    } 
 		    		if(validarFallecido(filtros, authentication)) {
 		    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A CERRADO", MODIFICACION, authentication);
 		    			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusACerrado(filtros.getFolio(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
 		    			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
-		    			response.setMensaje("39");
+		    			 response.setCodigo(200);
+				          response.setError(false);
 			  			response.setDatos(null);
 			  			return response;
 		    		  }
 				}
-			return response;    		
+		        convenioResponse = Arrays.asList(modelMapper.map(responseDatosConvenio.getDatos(), DatosConvenioResponse[].class));
+		        benefResponse = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(renovarBean.buscarBeneficiarios(filtros.getFolio(), filtros.getNumeroConvenio()).getDatos(), urlConsulta, authentication).getDatos(), BenefResponse[].class));
+		        datosConvenio = convenioResponse.get(0);
+		        datosConvenio.setBeneficiarios(benefResponse);
+		        response.setCodigo(200);
+	            response.setError(false);
+	            response.setMensaje("Exito");
+		      response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));
+	}catch(Exception e) {
+		log.info("estoy aqui" +e.getCause());
+		e.getCause();
+	}
+		      return response;   
+	
 	}
 
 	public Response<?> buscarConvenioAnterior(DatosRequest request, Authentication authentication) throws IOException {
+		Response<?> response = new Response<>();
+		List<DatosConvenioResponse> convenioResponse;
+		List<BenefResponse> benefResponse;
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
@@ -128,35 +157,57 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}
 		filtros.setTipoPrevision(2);
-		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.buscarConvenio(request, filtros, fecFormat).getDatos(), urlConsulta,
+		DatosConvenioResponse datosConvenio = new DatosConvenioResponse();
+	try {
+		 providerRestTemplate.consumirServicio(renovarBean.validarBeneficiarios(request, filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar,
+  				authentication);
+
+		 Response<?> responseDatosConvenio = providerRestTemplate.consumirServicio(renovarBean.buscarConvenio(request, filtros, fecFormat).getDatos(), urlConsulta,
+
 				authentication);
-	      if(response.getDatos().toString().equals("[]")){
+	      if(responseDatosConvenio.getDatos().toString().equals("[]")){
 	    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getNumeroConvenio(), CONSULTA, authentication);
 	    		response.setMensaje("45 " +filtros.getNumeroConvenio());
 	      }else {
+	    	        logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CAMBIO DE ESTATUS BENEFICIARIOS PLAN ANTERIOR " +filtros.getNumeroConvenio(), CONSULTA, authentication);
 			    	  if(!validarPeriodoCtoAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio() ,authentication)) {
 			    		  logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);
-			    		    response.setMensaje("36");
-			    			response.setDatos(null);
+			    		  response.setCodigo(200);
+				          response.setError(false);
+			    		  response.setMensaje("36");
 			    			return response;
 			    	  }
 			    		 if(getDia()>20 || mesActual()>mesVigencia) {
 			    	         logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 			    			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlanAnterior(filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
 			    			 logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO SE ENCUENTRA INACTIVO", CONSULTA, authentication);
-			    			    response.setMensaje("36 CONVENIO INACTIVO");
-			    				response.setDatos(null);
-			    				return response;
+			    			    response.setCodigo(200);
+						        response.setError(false);
+						        response.setMensaje("36 CONVENIO INACTIVO");
+					    	     return response;
 			    		}
 			    		  if(validarFallecidoCtoAnterior(filtros.getNumeroContratante(),filtros.getNumeroConvenio(), authentication)) {
 			    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A CERRADO", MODIFICACION, authentication);
 			    			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusACerrado(filtros.getFolio(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
 			    			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
+			    			response.setCodigo(200);
+					        response.setError(false);
 			    			response.setMensaje("39");
-			    			response.setDatos(null);
 			    			return response;
 			    		}
+			    		  convenioResponse = Arrays.asList(modelMapper.map(responseDatosConvenio.getDatos(), DatosConvenioResponse[].class));
+			    		   benefResponse = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(renovarBean.buscarBeneficiarios(filtros.getFolio(),filtros.getNumeroConvenio()).getDatos(), urlConsulta, authentication).getDatos(), BenefResponse[].class));
+			    		   datosConvenio = convenioResponse.get(0);
+			    		   datosConvenio.setBeneficiarios(benefResponse);
+			    		   response.setCodigo(200);
+			    		   response.setError(false);
+			    		   response.setMensaje("Exito");
+			    		 response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));
 		}
+   }catch(Exception e) {
+	   e.getCause();
+   }
+  
 		return response;
 	}
 	
@@ -320,7 +371,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private Integer mesActual() {
 	    SimpleDateFormat sdfMes = new SimpleDateFormat("M");
 		String date = sdfMes.format(new Date());
-		//String date ="6";
+		//String date ="7";
 		return Integer.parseInt(date);
 	}
 	
