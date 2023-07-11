@@ -76,7 +76,6 @@ public class BeneficiariosImpl implements BeneficiariosService{
 		throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}	
 	return providerRestTemplate.consumirServicio(benefBean.detalleBeneficiarios(request, filtros.getIdBeneficiario()).getDatos(), urlConsulta,
-
 				authentication);
 	}
 
@@ -87,18 +86,19 @@ public class BeneficiariosImpl implements BeneficiariosService{
 			String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		    PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-			log.info("-> " +benefRequest.getIndComprobanteEstudios());
 			benefBean = new BeneficiariosBean(benefRequest);
-			benefBean.setUsuarioAlta(usuarioDto.getIdUsuario());
-			
+			benefBean.setUsuarioAlta(usuarioDto.getIdUsuario
+
+	
 			if(benefRequest.getBeneficiario().getIdContratanteConvenioPf()==null || benefRequest.getBeneficiario().getIdParentesco()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 			}
-			if(benefRequest.getDocPlanAnterior()!=null) {
-				benefBean.setIndComprobanteEstudios(benefRequest.getDocPlanAnterior().getIndComprobanteEstudios());
-				benefBean.setIndActaMatrimonio(benefRequest.getDocPlanAnterior().getIndActaMatrimonio());
-				benefBean.setIndDeclaracionConcubinato(benefRequest.getDocPlanAnterior().getIndDeclaracionConcubinato());
+			i
 
+	benefBean.setIndActaMatrimonio(benefRequest
+
+	getDocPlanAnterior().getIndActaMatrimonio());
+				benefBean.setIndDeclaracionConcubinato(benefRequest.getDocPlanAnterior().getIndDeclaracionConcubinato());
 				response = providerRestTemplate.consumirServicio(benefBean.insertarPersonaPlanAnterior().getDatos(), urlCrear,
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
@@ -107,51 +107,41 @@ public class BeneficiariosImpl implements BeneficiariosService{
 					providerRestTemplate.consumirServicio(benefBean.insertarBeneficiarioPlanAnterior(id).getDatos(), urlCrearMultiple,
 							authentication);
 				}
- 
 			}else {
 				response = providerRestTemplate.consumirServicio(benefBean.insertarPersona().getDatos(), urlCrearMultiple,
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
-
 			}
-			  return response;
-
+			  ret
+	rn response;
 						
 		}catch (Exception e) {
 			String consulta = benefBean.insertarPersona().getDatos().get(""+AppConstantes.QUERY+"").toString();
 			String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
-			log.error("Error al ejecutar la query" +encoded);
-			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),ERROR, CONSULTA, authentication);
-			throw new IOException("5", e.getCause()) ;
-		}
-		
+			lgUtil.crearArchi
+
+	
+	
+	
 			
 		}
 
 	@Override
 	public Response<?> editarBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
-		Response<?> response = new Response<>();
-		try {
-		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
-	    PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);	
-		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-		benefBean = new BeneficiariosBean(benefRequest);
-		benefBean.setUsuarioAlta(usuarioDto.getIdUsuario());
-		
+		R
+
+	 
+
+		benefBea 	
 		if(benefRequest.getIdPersona()==null && benefRequest.getIdBeneficiario()==null) {
-		throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
-		}
-			response = providerRestTemplate.consumirServicio(benefBean.editarPersona().getDatos(), urlActualizar,
-					authentication);
-			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", MODIFICACION, authentication);
-			if(response.getCodigo()==200) {
-				providerRestTemplate.consumirServicio(benefBean.editarBeneficiario(benefRequest.getIdPersona(), usuarioDto.getIdUsuario(),
-						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getIndActa(), benefRequest.getBeneficiario().getIndIne()).getDatos(), urlActualizar,
-						authentication);
-			}
-			benefBean.setIndComprobanteEstudios(benefRequest.getDocPlanAnterior().getIndComprobanteEstudios());
-			benefBean.setIndActaMatrimonio(benefRequest.getDocPlanAnterior().getIndActaMatrimonio());
-			benefBean.setIndDeclaracionConcubinato(benefRequest.getDocPlanAnterior().getIndDeclaracionConcubinato());
+		throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta 
+	
+		response = providerRestTemplate.consumirServicio(benefBean.editarPersona().getDatos(), urlActua			autheniation);	logUtil.crearArchivoLog(Level.INFO.toString(), this
+
+		providerRestTemplate.consumirServico(enefBean.editarBeneficiario(benefReques			benefRequest.getBeneficiario().getIdParentesco(, benefRequest.getBenefici
+		 efBean.setIndCom
+
+	enefBean.setIndDeclaracionConcubinato(benefRequest.getDocPlanAnterior().getIndDeclaracionConcubinato());
 			if(response.getCodigo()==200 && benefRequest.getDocPlanAnterior()!=null) {
 				providerRestTemplate.consumirServicio(benefBean.editarDocPlanAnterior().getDatos(), urlActualizar,
 						authentication);	
@@ -176,11 +166,11 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	  Response<?> response = providerRestTemplate.consumirServicio(benefBean.cambiarEstatus(benefRequest.getIdBeneficiario(), benefRequest.getEstatusBenefic()).getDatos(), urlActualizar,
 				authentication);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Todo correcto", BAJA, authentication);
-	return response;
-	}
+	re
 
-	@Override
-	public Response<?> buscarBeneficiariosPlanAnterior(DatosRequest request, Authentication authentication)
+	verride blic 
+
+	esponse<?> buscarBeneficiariosPlanAnterior(DatosRequest request, Authentication authentication)
 			throws IOException {
 		return providerRestTemplate.consumirServicio(benefBean.beneficiariosPlanAnterior(request).getDatos(), urlConsulta,
 				authentication);
@@ -190,22 +180,39 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	public Response<?> buscarCatalogos(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		CatalogosRequest filtros = gson.fromJson(datosJson, CatalogosRequest.class);
-		if(filtros.getIdCatalogo()==1 && filtros.getIdConvenio()!=null) {
-			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogosDocRequerida(request, filtros.getIdConvenio()).getDatos(), urlConsulta,
-					authentication);
-		}
-		if(filtros.getIdCatalogo()==2 && filtros.getIdConvenio()!=null) {
+		
+
+				auth
+
 			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogosInfoConvenioActual(request, filtros.getIdConvenio(), fecFormat).getDatos(), urlConsulta,
 					authentication);
-		}
-		if(filtros.getIdCatalogo()==3) {
+
+		f(filtros.getIdCatalogo()==3) {
+				
 			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogosParentescos(request).getDatos(), urlConsulta,
 					authentication);
 		}else {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, "INFORMACION INCOMPLETA");			
 		}
 			
-	}
+
+		
+     
+}
+					     
+					
+					
+					
 		
 
-}
+		   
+					
+					
+		 
+
+			
+		
+
+	
+
+
