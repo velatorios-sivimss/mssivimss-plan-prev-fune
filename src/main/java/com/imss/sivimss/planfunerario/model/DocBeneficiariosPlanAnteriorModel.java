@@ -1,6 +1,7 @@
-package com.imss.sivimss.planfunerario.model.request;
+package com.imss.sivimss.planfunerario.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
+import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,13 +15,10 @@ import lombok.Setter;
 @Setter
 @Getter
 @JsonIgnoreType(value = true)
-public class FiltrosConvenioPFRequest {
-
-	private Integer tipoPrevision;
-	private Integer numeroConvenio;
-	private Integer numeroContratante;
-	private String folio;
-	private String rfc;
-	private String numIne;
+public class DocBeneficiariosPlanAnteriorModel {
 	
+	private Integer indComprobanteEstudios;
+	private Integer indActaMatrimonio;
+	private Integer indDeclaracionConcubinato;
+
 }

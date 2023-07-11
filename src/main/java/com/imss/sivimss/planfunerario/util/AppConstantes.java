@@ -30,6 +30,10 @@ public class AppConstantes {
 	public static final String CURRENT_TIMESTAMP="CURRENT_TIMESTAMP()";
 	public static final String IND_ACTIVO="IND_ACTIVO";
 	public static final String ID_ESTATUS_CONVENIO="ID_ESTATUS_CONVENIO";
+	public static final String ID_USUARIO_ALTA="ID_USUARIO_ALTA";
+	public static final String FEC_ALTA="FEC_ALTA";
+	public static final String ID_USUARIO_BAJA="ID_USUARIO_BAJA";
+	public static final String FEC_BAJA="FEC_BAJA";
 	public static final String ID_USUARIO_MODIFICA="ID_USUARIO_MODIFICA";
 	public static final String FEC_ACTUALIZACION="FEC_ACTUALIZACION";
 	public static final String RUTA="rutaNombreReporte";
