@@ -35,7 +35,8 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	private static final String BAJA = "baja";
 	private static final String MODIFICACION = "modificacion";
 	private static final String CONSULTA = "consulta";
-	private static final String ERROR = "Fallo al ejecutar la query ";
+	private static final String ERROR = "Fallo al ejecutar la query";
+	private static final String INFORMACION_INCOMPLETA = "Informacion Incompleta";
 	
 	@Autowired
 	private LogUtil logUtil;
@@ -71,7 +72,10 @@ public class BeneficiariosImpl implements BeneficiariosService{
 	public Response<?> detalleBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 	FiltrosBeneficiariosRequest filtros = gson.fromJson(datosJson, FiltrosBeneficiariosRequest.class);
-		return providerRestTemplate.consumirServicio(benefBean.detalleBeneficiarios(request, filtros.getIdBeneficiario(), filtros.getIdConvenioPF()).getDatos(), urlConsulta,
+	if(filtros.getIdBeneficiario()==null) {
+		throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
+		}	
+	return providerRestTemplate.consumirServicio(benefBean.detalleBeneficiarios(request, filtros.getIdBeneficiario()).getDatos(), urlConsulta,
 				authentication);
 	}
 
@@ -86,7 +90,7 @@ public class BeneficiariosImpl implements BeneficiariosService{
 			benefBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 			
 			if(benefRequest.getBeneficiario().getIdContratanteConvenioPf()==null || benefRequest.getBeneficiario().getIdParentesco()==null) {
-			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Informacion incompleta ");	
+			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 			}
 			if(benefRequest.getDocPlanAnterior()!=null) {
 				benefBean.setIndComprobanteEstudios(benefRequest.getDocPlanAnterior().getIndComprobanteEstudios());

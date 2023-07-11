@@ -127,7 +127,7 @@ public class BeneficiariosBean {
 	    return request;
 	}
 		
-	public DatosRequest detalleBeneficiarios(DatosRequest request, Integer idBeneficiario, Integer idConvenio) {
+	public DatosRequest detalleBeneficiarios(DatosRequest request, Integer idBeneficiario) {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF AS idConvenio", 
 				SB_ID_CONTRATANTE_BENEFICIARIOS +" AS idBenef",
@@ -152,8 +152,8 @@ public class BeneficiariosBean {
 		.leftJoin("SVT_BENEFICIARIOS_DOCUMENTACION_PLAN_ANTERIOR SBD", "SB.ID_CONTRATANTE_BENEFICIARIOS = SBD.ID_CONTRATANTE_BENEFICIARIOS")
 		.join(SVC_PERSONA, " SB.ID_PERSONA = SP.ID_PERSONA")
 		.join("SVC_PARENTESCO PAR", "PAR.ID_PARENTESCO = SB.ID_PARENTESCO");
-		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio").and("SB.ID_CONTRATANTE_BENEFICIARIOS = :idBeneficiario")
-		.setParameter("idConvenio", idConvenio)
+		queryUtil.where("SB.ID_CONTRATANTE_BENEFICIARIOS = :idBeneficiario")
+		//.setParameter("idConvenio", idConvenio)
 		.setParameter("idBeneficiario", idBeneficiario);
 		String query = obtieneQuery(queryUtil);
 		log.info("estoy en: " +query);
@@ -429,8 +429,13 @@ public class BeneficiariosBean {
 				 "SV.DES_VELATORIO AS velatorio",
 				 "IND_INE_AFILIADO AS ineAfiliado",
 				 "IND_CURP AS curpAfiliado",
-				 "IND_RFC AS rfcAfiliado")
+				 "IND_RFC AS rfcAfiliado",
+				 "SVDR.IND_CONVENIO_ANTERIOR AS convenioAnterior",
+				 "SVDR.IND_CARTA_PODER AS cartaPoder",
+				 "SVDR.IND_INE_TESTIGO AS ineTestigo",
+				 "SVDR.IND_INE_TESTIGO_DOS AS ineTestigoDos")
 		.from("SVC_VALIDACION_DOCUMENTOS_CONVENIO_PF SVD")
+		.leftJoin("SVC_VALIDACION_DOCUMENTOS_RENOVACION_CONVENIO_PF SVDR", "SVD.ID_VALIDACION_DOCUMENTO = SVDR.ID_VALIDACION_DOCUMENTO")
 		.join(SVT_CONVENIO_PF, "SVD.ID_CONVENIO_PF=PF.ID_CONVENIO_PF")
         .join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "PF.ID_CONVENIO_PF =SCPC.ID_CONVENIO_PF")
         .join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
