@@ -102,7 +102,10 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			Object rst = responseDatosConvenio.getDatos();
 		      if(rst.toString().equals("[]")){
 		    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getFolio(), CONSULTA, authentication);
-		    		response.setMensaje("45 folio: " +filtros.getFolio());
+		    		  response.setCodigo(200);
+			          response.setError(false);
+			          response.setMensaje("45");
+		    			return response;
 		      }else {
 		    	  if(!validarPeriodoRenovacion(filtros, authentication)) {
 		    		  logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);
@@ -168,6 +171,10 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	      if(responseDatosConvenio.getDatos().toString().equals("[]")){
 	    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getNumeroConvenio(), CONSULTA, authentication);
 	    		response.setMensaje("45 " +filtros.getNumeroConvenio());
+	    		  response.setCodigo(200);
+		          response.setError(false);
+		          response.setMensaje("45");
+	    		return response;
 	      }else {
 	    	        logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CAMBIO DE ESTATUS BENEFICIARIOS PLAN ANTERIOR " +filtros.getNumeroConvenio(), CONSULTA, authentication);
 			    	  if(!validarPeriodoCtoAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio() ,authentication)) {
