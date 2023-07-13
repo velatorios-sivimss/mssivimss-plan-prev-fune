@@ -128,7 +128,7 @@ public class RenovarBean {
 	    return request;
 	}
 	
-	public DatosRequest validarFallecidoCtoAnterior(Integer idContratante, Integer idConvenio) {
+/*	public DatosRequest validarFallecidoCtoAnterior(Integer idContratante, Integer idConvenio) {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
@@ -147,7 +147,7 @@ public class RenovarBean {
 			parametro.put(AppConstantes.QUERY, encoded);
 			request.setDatos(parametro);
 			return request;
-	}
+	} */
 	
 	public DatosRequest validarFallecido(FiltrosConvenioPFRequest filtros) {
 		DatosRequest request= new DatosRequest();
@@ -160,11 +160,10 @@ public class RenovarBean {
 		.join(SVC_CONTRATANTE, "SP.ID_PERSONA = SC.ID_PERSONA")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SC.ID_CONTRATANTE = SCPC.ID_CONTRATANTE")
 		.join(SVT_CONVENIO_PF, "SCPC.ID_CONVENIO_PF = SPF.ID_CONVENIO_PF");
-		if(filtros.getNumIne()!= null) {
-			queryUtil.where("SP.NUM_INE= '"+filtros.getNumIne()+"'");
-		}else if(filtros.getRfc()!=null) {
-			queryUtil.where("SP.CVE_RFC= '"+filtros.getRfc()+"'");
-		}else if(filtros.getFolio()!=null && filtros.getRfc()==null || filtros.getNumIne()==null) {
+		if(filtros.getNumeroConvenio()!= null) {
+			queryUtil.where("SCPC.ID_CONVENIO_PF =" +filtros.getNumeroConvenio()+"");
+		}
+		if(filtros.getFolio()!=null) {
 			queryUtil.where("SPF.DES_FOLIO= '"+filtros.getFolio()+"'");
 		}
 			String query = obtieneQuery(queryUtil);
