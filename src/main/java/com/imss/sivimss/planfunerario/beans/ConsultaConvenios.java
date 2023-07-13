@@ -5,6 +5,7 @@ import com.imss.sivimss.planfunerario.model.request.DatosReporteRequest;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.SelectQueryUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
@@ -13,6 +14,8 @@ import java.util.Map;
 
 @Component
 public class ConsultaConvenios {
+    @Value("${formato_fecha}")
+    private String formatoFecha;
     // todo - revisar si los estatus son correctos
     private final static int ESTATUS_VIGENTE = 1;
     private final static int ESTATUS_RENOVACION = 2;
@@ -57,13 +60,15 @@ public class ConsultaConvenios {
         queryConveniosPersona.select("convenio.ID_CONVENIO_PF as idConvenio",
                         "convenio.DES_FOLIO as folioConvenio",
                         recuperarNombrePersona("personaContratante", "nombreContratante"),
-                        "convenio.FEC_INICIO as fechaContratacion", // La fecha de inicio sera la fecha de contratacion o sera la fecha de alta
-                        "if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO) as fechaVigenciaInicio", // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
-                        "if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA) as fechaVigenciaFin",
+                        formatearFecha("convenio.FEC_INICIO") + " as fechaContratacion", // La fecha de inicio sera la fecha de contratacion o sera la fecha de alta
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO)")
+                                + " as fechaVigenciaInicio", // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA)")
+                                + " as fechaVigenciaFin",
                         "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
                         "if(convenio.IND_RENOVACION = false, 'No Renovado', 'Renovado') as situacion",
                         "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
-                        "paquete.MON_PRECIO as importeConvenio",
+                        formatearImporte("paquete.MON_PRECIO") + " as importeConvenio",
                         "estatus.DES_ESTATUS as estatusConvenio")
                 .from(SVT_CONVENIO + " convenio")
                 .join("SVC_ESTATUS_CONVENIO_PF estatus",
@@ -91,13 +96,15 @@ public class ConsultaConvenios {
                         "convenio.ID_CONVENIO_PF as idConvenio",
                         "convenio.DES_FOLIO as folioConvenio",
                         "empresaContratante.DES_NOMBRE as nombreContratante",
-                        "convenio.FEC_INICIO as fechaContratacion",
-                        "if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO) as fechaVigenciaInicio",
-                        "if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA) as fechaVigenciaFin",
+                        formatearFecha("convenio.FEC_INICIO") + " as fechaContratacion",
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO)")
+                                + " as fechaVigenciaInicio",
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA)")
+                                + " as fechaVigenciaFin",
                         "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
                         "if(convenio.IND_RENOVACION = false, 'No Renovado', 'Renovado') as situacion",
                         "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
-                        "paquete.MON_PRECIO as importeConvenio",
+                        formatearImporte("paquete.MON_PRECIO") + " as importeConvenio",
                         "estatus.DES_ESTATUS as estatusConvenio")
                 .from(SVT_CONVENIO + " convenio")
                 .join("SVC_ESTATUS_CONVENIO_PF estatus",
@@ -121,6 +128,26 @@ public class ConsultaConvenios {
         return recuperarDatos(request, encoded);
     }
 
+    /**
+     * Formatea el importe.
+     *
+     * @param campo
+     * @return
+     */
+    private String formatearImporte(String campo) {
+        return "CONCAT('$', FORMAT(" + campo + ", 2))";
+    }
+
+    /**
+     * Regresa la cadena con la fecha con formato.
+     *
+     * @param campo
+     * @return
+     */
+    private String formatearFecha(String campo) {
+        return "DATE_FORMAT(" + campo + ", '" + formatoFecha + "')";
+    }
+
 
     /**
      * Consulta los beneficiarios relacionados a un <b>Convenio PF</b>
@@ -135,7 +162,7 @@ public class ConsultaConvenios {
 
         final String[] columnas = {
                 recuperarNombrePersona("personaBeneficiario", ALIAS_NOMBRE_BENEFICIARIO),
-                "personaBeneficiario.FEC_NAC as " + ALIAS_FECHA_NACIMIENTO,
+                formatearFecha("personaBeneficiario.FEC_NAC") + " as " + ALIAS_FECHA_NACIMIENTO,
                 recuperarEdad("personaBeneficiario"),
                 "parentesco.DES_PARENTESCO as " + ALIAS_PARENTESCO
         };
@@ -208,12 +235,12 @@ public class ConsultaConvenios {
         SelectQueryUtil querySiniestros = new SelectQueryUtil();
         final String[] columnas = {
                 "velatorio.DES_VELATORIO as nombreVelatorio",
-                "ods.FEC_ALTA as fechaSiniestro",
+                formatearFecha("ods.FEC_ALTA") + " as fechaSiniestro",
                 "ods.CVE_FOLIO as folioSiniestro",
                 recuperarNombrePersona("personaFinado", "nombreFinado"),
                 "parentesco.DES_PARENTESCO as descripcionParentesco",
                 "velatorioOrigen.DES_VELATORIO as velatorioOrigen",
-                "presupuesto.CAN_PRESUPUESTO as importe"
+                formatearImporte("presupuesto.CAN_PRESUPUESTO") + " as importe"
         };
 
         // todo - falta agregar la condicion del pago
@@ -254,12 +281,12 @@ public class ConsultaConvenios {
         SelectQueryUtil querySiniestrosContratante = new SelectQueryUtil();
         querySiniestrosContratante.select(
                         "velatorio.DES_VELATORIO as nombreVelatorio",
-                        "ods.FEC_ALTA as fechaSiniestro",
+                        formatearFecha("ods.FEC_ALTA") + " as fechaSiniestro",
                         "ods.CVE_FOLIO as folioSiniestro",
                         recuperarNombrePersona("personaFinado", "nombreFinado"),
                         "parentesco.DES_PARENTESCO as descripcionParentesco",
                         "velatorioOrigen.DES_VELATORIO as velatorioOrigen",
-                        "presupuesto.CAN_PRESUPUESTO as importe"
+                        formatearImporte("presupuesto.CAN_PRESUPUESTO") + " as importe"
                 )
                 .from("SVC_ORDEN_SERVICIO ods")
                 .join("SVC_VELATORIO velatorio",
@@ -324,7 +351,7 @@ public class ConsultaConvenios {
                         "velatorio.DES_VELATORIO as nombreVelatorio",
                         recuperarNombrePersona("personaAfiliada", "nombreAfiliado"),
                         "empresaContratante.DES_RFC as rfcTitular",
-                        "personaAfiliada.FEC_NAC as " + ALIAS_FECHA_NACIMIENTO,
+                        formatearFecha("personaAfiliada.FEC_NAC") + " as " + ALIAS_FECHA_NACIMIENTO,
                         recuperarEdad("personaAfiliada"),
                         "personaAfiliada.NUM_SEXO as genero",
                         "personaAfiliada.DES_CORREO as correo"
@@ -370,9 +397,11 @@ public class ConsultaConvenios {
         SelectQueryUtil queryVigencias = new SelectQueryUtil();
         queryVigencias.select(
                         "convenio.DES_FOLIO as folioConvenio",
-                        "convenio.FEC_INICIO as fechaInicio",
-                        "if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO) as fechaFin", // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
-                        "if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA) as fechaRenovacion" // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
+                        formatearFecha("convenio.FEC_INICIO") + " as fechaInicio",
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA)")
+                                + " as fechaFin", // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO)")
+                                + " as fechaRenovacion" // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
 //                        "as fechaRenovacion"
                 )
                 .from("SVT_CONVENIO_PF convenio")
@@ -392,9 +421,11 @@ public class ConsultaConvenios {
         SelectQueryUtil queryVigenciasEmpresa = new SelectQueryUtil();
         queryVigenciasEmpresa.select(
                         "convenio.DES_FOLIO as folioConvenio",
-                        "convenio.FEC_INICIO as fechaInicio",
-                        "if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO) as fechaFin",
-                        "if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA) as fechaRenovacion"
+                        formatearFecha("convenio.FEC_INICIO") + " as fechaInicio",
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA)")
+                                + " as fechaFin",
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO)")
+                                + " as fechaRenovacion"
                 )
                 .from("SVT_CONVENIO_PF convenio")
                 .leftJoin("SVT_RENOVACION_CONVENIO_PF renovacionConvenio",
@@ -431,7 +462,7 @@ public class ConsultaConvenios {
         queryFacturas.select(
                         "factura.CVE_FOLIO_FISCAL as numeroFactura",
                         "factura.NUM_UUID as UUID", // cambiar por el nombre que va a tener en la base de datos
-                        "factura.FEC_FACTURACION as fecha", // cambiar por la fecha que se estaria registrando
+                        formatearFecha("factura.FEC_FACTURACION") + " as fecha", // cambiar por la fecha que se estaria registrando
                         "factura.CVE_RFC_CONTRATANTE as rfc",
 //                        recuperarNombrePersona("personaContratante", "cliente"),
                         "factura.DES_RAZON_SOCIAL as cliente",
@@ -535,6 +566,8 @@ public class ConsultaConvenios {
 
             }
             queryUtil.where("convenio.ID_TIPO_PREVISION = 2");
+        } else {
+            queryUtil.where("convenio.ID_TIPO_PREVISION = 1");
         }
 
         queryUtil.where("convenio.DES_FOLIO = :folioConvenio",
@@ -542,11 +575,14 @@ public class ConsultaConvenios {
                         "beneficiario.IND_SINIESTROS = 0")
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
         if (filtros.getNombreBeneficiario() != null) {
-            queryUtil.where("personaBeneficiario.NOM_PERSONA = :nombreBeneficiario")
-                    .setParameter("nombreBeneficiario", filtros.getNombreBeneficiario());
+            String condicionNombre = recuperarNombrePersona("personaBeneficiario") + "like '%" + filtros.getNombreBeneficiario() + "%'";
+//            queryUtil.where("personaBeneficiario.NOM_PERSONA = :nombreBeneficiario")
+            queryUtil.where(condicionNombre);
+//                    .setParameter("nombreBeneficiario", filtros.getNombreBeneficiario());
         }
     }
 
+    // todo - remove
     private void crearWhereSiniestros(SelectQueryUtil queryUtil, ConsultaGeneralRequest filtros, boolean isPersona) {
         if (isPersona) {
 
