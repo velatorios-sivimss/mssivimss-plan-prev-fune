@@ -143,10 +143,10 @@ public class BeneficiariosImpl implements BeneficiariosService{
 						benefRequest.getBeneficiario().getIdParentesco(), benefRequest.getBeneficiario().getIndActa(), benefRequest.getBeneficiario().getIndIne()).getDatos(), urlActualizar,
 						authentication);
 			}
-			benefBean.setIndComprobanteEstudios(benefRequest.getDocPlanAnterior().getIndComprobanteEstudios());
-			benefBean.setIndActaMatrimonio(benefRequest.getDocPlanAnterior().getIndActaMatrimonio());
-			benefBean.setIndDeclaracionConcubinato(benefRequest.getDocPlanAnterior().getIndDeclaracionConcubinato());
 			if(response.getCodigo()==200 && benefRequest.getDocPlanAnterior()!=null) {
+				benefBean.setIndComprobanteEstudios(benefRequest.getDocPlanAnterior().getIndComprobanteEstudios());
+				benefBean.setIndActaMatrimonio(benefRequest.getDocPlanAnterior().getIndActaMatrimonio());
+				benefBean.setIndDeclaracionConcubinato(benefRequest.getDocPlanAnterior().getIndDeclaracionConcubinato());
 				providerRestTemplate.consumirServicio(benefBean.editarDocPlanAnterior().getDatos(), urlActualizar,
 						authentication);	
 			}
