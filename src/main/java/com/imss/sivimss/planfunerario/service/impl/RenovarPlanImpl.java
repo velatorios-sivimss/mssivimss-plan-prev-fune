@@ -2,6 +2,7 @@ package com.imss.sivimss.planfunerario.service.impl;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -81,7 +82,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	
 	RenovarBean renovarBean = new RenovarBean();
 	
-	Integer mesVigencia = 0;
+	Integer anioMesVigencia = 0;
 	
 	@Override
 	public Response<?> buscarConvenioNuevo(DatosRequest request, Authentication authentication) throws IOException {		 
@@ -91,9 +92,9 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-		if(filtros.getFolio()==null) {
+		if(filtros.getFolio()==null && filtros.getRfc()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
-		}
+		}  
 		filtros.setTipoPrevision(1);
 		DatosConvenioResponse datosConvenio = new DatosConvenioResponse();
 		try {
@@ -105,8 +106,15 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    		  response.setCodigo(200);
 			          response.setError(false);
 			          response.setMensaje("45");
-		    			return response;
-		      }else {
+			          return response;
+		      }
+		    	  convenioResponse = Arrays.asList(modelMapper.map(responseDatosConvenio.getDatos(), DatosConvenioResponse[].class));
+			        benefResponse = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(renovarBean.buscarBeneficiarios(filtros.getFolio(), filtros.getNumeroConvenio()).getDatos(), urlConsulta, authentication).getDatos(), BenefResponse[].class));
+			        datosConvenio = convenioResponse.get(0);
+			        datosConvenio.setBeneficiarios(benefResponse);
+			        if(filtros.getFolio()==null) {
+			        	filtros.setFolio(datosConvenio.getFolio());
+			        }
 		    	  if(!validarPeriodoRenovacion(filtros, authentication)) {
 		    		  logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);
 		    		  response.setCodigo(200);
@@ -114,8 +122,10 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    		  response.setMensaje("36");
 		    			return response;
 		    	  }
-		    	  if(getDia()>20 || mesActual()>mesVigencia){
-		    		    	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
+		    	  Integer vig = obtieneVigencia(datosConvenio.getFecVigencia());
+		    
+		    	  if(getDia()>20 && getDia()>vig || anioMesActual()>anioMesVigencia) {		  
+		    			  logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 		    		    	providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar,authentication);
 		    		    	logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 CONVENIO INACTIVO ", CONSULTA, authentication);
 		    		    	 response.setCodigo(200);
@@ -132,15 +142,10 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			  			response.setDatos(null);
 			  			return response;
 		    		  }
-				}
-		        convenioResponse = Arrays.asList(modelMapper.map(responseDatosConvenio.getDatos(), DatosConvenioResponse[].class));
-		        benefResponse = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(renovarBean.buscarBeneficiarios(filtros.getFolio(), filtros.getNumeroConvenio()).getDatos(), urlConsulta, authentication).getDatos(), BenefResponse[].class));
-		        datosConvenio = convenioResponse.get(0);
-		        datosConvenio.setBeneficiarios(benefResponse);
-		        response.setCodigo(200);
-	            response.setError(false);
-	            response.setMensaje("Exito");
-		      response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));
+		    		response.setCodigo(200);
+		            response.setError(false);
+		            response.setMensaje("Exito");
+			      response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));
 	}catch(Exception e) {
 		log.info("estoy aqui" +e.getCause());
 		e.getCause();
@@ -156,7 +161,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioPFRequest filtros = gson.fromJson(datosJson, FiltrosConvenioPFRequest .class);
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-		if(filtros.getNumeroConvenio()==null) {
+		if(filtros.getNumeroConvenio()==null && filtros.getNumeroContratante()==null) {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);	
 		}
 		filtros.setTipoPrevision(2);
@@ -174,17 +179,26 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	    		  response.setCodigo(200);
 		          response.setError(false);
 		          response.setMensaje("45");
-	    		return response;
-	      }else {
+		          return response;
+	      }
+	    	  
+	      convenioResponse = Arrays.asList(modelMapper.map(responseDatosConvenio.getDatos(), DatosConvenioResponse[].class));
+   		   benefResponse = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(renovarBean.buscarBeneficiarios(filtros.getFolio(),filtros.getNumeroConvenio()).getDatos(), urlConsulta, authentication).getDatos(), BenefResponse[].class));
+   		   datosConvenio = convenioResponse.get(0);
+   		   datosConvenio.setBeneficiarios(benefResponse);
+   		  if(filtros.getNumeroConvenio()==null) {
+	        	filtros.setNumeroConvenio(datosConvenio.getIdConvenio());
+	        }
 	    	        logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CAMBIO DE ESTATUS BENEFICIARIOS PLAN ANTERIOR " +filtros.getNumeroConvenio(), CONSULTA, authentication);
-			    	  if(!validarPeriodoCtoAnterior(filtros.getNumeroContratante(), filtros.getNumeroConvenio() ,authentication)) {
+			    	  if(!validarPeriodoRenovacion(filtros ,authentication)) {
 			    		  logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);
 			    		  response.setCodigo(200);
 				          response.setError(false);
 			    		  response.setMensaje("36");
 			    			return response;
 			    	  }
-			    		 if(getDia()>20 || mesActual()>mesVigencia) {
+			    	  Integer vig = obtieneVigencia(datosConvenio.getFecVigencia());
+			    		 if(getDia()>20 && getDia()>vig || anioMesActual()>anioMesVigencia) {
 			    	         logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 			    			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlanAnterior(filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
 			    			 logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO SE ENCUENTRA INACTIVO", CONSULTA, authentication);
@@ -202,15 +216,10 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			    			response.setMensaje("39");
 			    			return response;
 			    		}
-			    		  convenioResponse = Arrays.asList(modelMapper.map(responseDatosConvenio.getDatos(), DatosConvenioResponse[].class));
-			    		   benefResponse = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(renovarBean.buscarBeneficiarios(filtros.getFolio(),filtros.getNumeroConvenio()).getDatos(), urlConsulta, authentication).getDatos(), BenefResponse[].class));
-			    		   datosConvenio = convenioResponse.get(0);
-			    		   datosConvenio.setBeneficiarios(benefResponse);
 			    		   response.setCodigo(200);
 			    		   response.setError(false);
 			    		   response.setMensaje("Exito");
 			    		 response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));
-		}
    }catch(Exception e) {
 	   e.getCause();
    }
@@ -288,29 +297,10 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	return !rst.toString().equals("[]");
 	}
 
-	private boolean validarPeriodoCtoAnterior(Integer numContratante, Integer numConvenio, Authentication authentication) throws IOException {
-		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validaPeriodoCtoAnterior(numContratante, numConvenio).getDatos(), urlConsulta,
-				authentication);
-	Object rst=response.getDatos();
-	String fec = rst.toString();
-	obtieneMesVigencia(fec);
-	log.info("-> " +rst.toString());
-	return !rst.toString().equals("[]");
-	}
-
 	private boolean validarFallecido(FiltrosConvenioPFRequest filtros, Authentication authentication) throws IOException {	
 		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarFallecido(filtros).getDatos(), urlConsulta,
 				authentication);
 	Object rst=response.getDatos();
-	return !rst.toString().equals("[]");
-	}
-	
-	private boolean validarPeriodoRenovacion(FiltrosConvenioPFRequest filtros, Authentication authentication) throws IOException {
-		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarPeriodo(filtros).getDatos(), urlConsulta,
-				authentication);
-	Object rst=response.getDatos();
-	String fec = rst.toString();
-	obtieneMesVigencia(fec);
 	return !rst.toString().equals("[]");
 	}
 	
@@ -375,11 +365,20 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		return Integer.parseInt(date);
 	}
 	
-	private Integer mesActual() {
-	    SimpleDateFormat sdfMes = new SimpleDateFormat("M");
+	private Integer anioMesActual() {
+	    SimpleDateFormat sdfMes = new SimpleDateFormat("yyyyMM");
 		String date = sdfMes.format(new Date());
 		//String date ="7";
 		return Integer.parseInt(date);
+	}
+	
+	private boolean validarPeriodoRenovacion(FiltrosConvenioPFRequest filtros, Authentication authentication) throws IOException {
+		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarPeriodo(filtros).getDatos(), urlConsulta,
+				authentication);
+	Object rst=response.getDatos();
+	String fec = rst.toString();
+	obtieneMesVigencia(fec);
+	return !rst.toString().equals("[]");
 	}
 	
 
@@ -391,7 +390,14 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    vigencia = Integer.parseInt(matcher.group(1));
 		}
 		log.info("-> " +vigencia);
-		mesVigencia = vigencia;
+		anioMesVigencia = vigencia;
+	}
+	
+	private Integer obtieneVigencia(String fecVigencia) throws ParseException {
+		Date sdf = new SimpleDateFormat("dd/MM/yyyy").parse(fecVigencia);
+		  DateFormat fechaFormateada = new SimpleDateFormat("dd");
+		  String fechaVig = fechaFormateada.format(sdf);
+		return  Integer.parseInt(fechaVig);
 	}
 
 }

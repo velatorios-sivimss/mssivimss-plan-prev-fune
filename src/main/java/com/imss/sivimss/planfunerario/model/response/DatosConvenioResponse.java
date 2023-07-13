@@ -19,15 +19,15 @@ public class DatosConvenioResponse {
 	private Integer indRenovacion;
 	private String segundoApellido;
 	private Integer estatusConvenio;
-	private String nomContratante; //
+	private String nomContratante; 
 	private String tipoPrevision;
-	private String numInterior;   //
-	private String fecInicio;     //
+	private String numInterior;   
+	private String fecInicio;     
 	private String correo;
-	private Integer idTipoPrevision;//
-	private String tel;   //
-	private String fecVigencia;    //
-	private String numExterior;     //
+	private Integer idTipoPrevision;
+	private String tel;   
+	private String fecVigencia;    
+	private String numExterior;     
 	private String primerApellido;
 	private String municipio;
 	private String calle;
