@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -35,11 +36,11 @@ public class ConvenioNuevoPF {
             queryPersona.agregarParametroValues("NOM_PERSONA", "'" + persona.getNombre() + "'");
             queryPersona.agregarParametroValues("NOM_PRIMER_APELLIDO", "'" + persona.getPrimerApellido() + "'");
             queryPersona.agregarParametroValues("NOM_SEGUNDO_APELLIDO", "'" + persona.getSegundoApellido() + "'");
-            queryPersona.agregarParametroValues("NUM_SEXO", "'" + persona.getSexo() + "'");
+            //queryPersona.agregarParametroValues("NUM_SEXO", "'" + persona.getSexo() + "'");
             queryPersona.agregarParametroValues("DES_OTRO_SEXO", "'" + persona.getOtroSexo() + "'");
-            queryPersona.agregarParametroValues("FEC_NAC", "'" + persona.getFechaNacimiento() + "'");
+            //queryPersona.agregarParametroValues("FEC_NAC", "'" + persona.getFechaNacimiento() + "'");
             queryPersona.agregarParametroValues("ID_PAIS", "'" + persona.getPais() + "'");
-            queryPersona.agregarParametroValues("ID_ESTADO", "'" + persona.getEstado() + "'");
+           // queryPersona.agregarParametroValues("ID_ESTADO", "'" + persona.getEstado() + "'");
             queryPersona.agregarParametroValues("DES_TELEFONO", "'" + persona.getTelefono() + "'");
             queryPersona.agregarParametroValues("DES_CORREO", "'" + persona.getCorreoElectronico() + "'");
             queryPersona.agregarParametroValues("TIPO_PERSONA", "'" + persona.getTipoPersona() + "'");
@@ -57,11 +58,11 @@ public class ConvenioNuevoPF {
         queryPersona.agregarParametroValues("NOM_PERSONA", "'" + personaBeneficiario.getNombre() + "'");
         queryPersona.agregarParametroValues("NOM_PRIMER_APELLIDO", "'" + personaBeneficiario.getPrimerApellido() + "'");
         queryPersona.agregarParametroValues("NOM_SEGUNDO_APELLIDO", "'" + personaBeneficiario.getSegundoApellido() + "'");
-        queryPersona.agregarParametroValues("NUM_SEXO", "'" + personaBeneficiario.getSexo() + "'");
+       // queryPersona.agregarParametroValues("NUM_SEXO", "'" + personaBeneficiario.getSexo() + "'");
         queryPersona.agregarParametroValues("DES_OTRO_SEXO", "'" + personaBeneficiario.getOtroSexo() + "'");
         queryPersona.agregarParametroValues("FEC_NAC", "'" + personaBeneficiario.getFechaNacimiento() + "'");
         queryPersona.agregarParametroValues("ID_PAIS", "'" + personaBeneficiario.getPais() + "'");
-        queryPersona.agregarParametroValues("ID_ESTADO", "'" + personaBeneficiario.getEstado() + "'");
+        //queryPersona.agregarParametroValues("ID_ESTADO", "'" + personaBeneficiario.getEstado() + "'");
         queryPersona.agregarParametroValues("DES_TELEFONO", "'" + personaBeneficiario.getTelefono() + "'");
         queryPersona.agregarParametroValues("DES_CORREO", "'" + personaBeneficiario.getCorreoElectronico() + "'");
         queryPersona.agregarParametroValues("TIPO_PERSONA", "'" + personaBeneficiario.getTipoPersona() + "'");
@@ -127,18 +128,6 @@ public class ConvenioNuevoPF {
         return queryContratantePaquete.obtenerQueryInsertar();
     }
 
-    public String generarQueryContratantePaqueteEmpresa(PersonaAltaConvenio persona, String usuario , Authentication authentication) throws IOException {
-            final QueryHelper queryContratantePaquete = new QueryHelper("INSERT INTO SVT_CONTRATANTE_PAQUETE_CONVENIO_PF");
-            queryContratantePaquete.agregarParametroValues("ID_CONTRATANTE", "idContratante");
-            queryContratantePaquete.agregarParametroValues("ID_CONVENIO_PF", "idConvenioPf");
-            queryContratantePaquete.agregarParametroValues("ID_ENFERMEDAD_PREXISTENTE", "'" + persona.getEnfermedadPreexistente() + "'");
-            queryContratantePaquete.agregarParametroValues("DES_OTRA_ENFERMEDAD", "'" + persona.getOtraEnfermedad() + "'");
-            queryContratantePaquete.agregarParametroValues("ID_PAQUETE", persona.getPaquete());
-            queryContratantePaquete.agregarParametroValues("ID_USUARIO_ALTA", usuario);
-            log.info("Query insert contratante paquete: " + queryContratantePaquete.obtenerQueryInsertar());
-            return queryContratantePaquete.obtenerQueryInsertar();
-    }
-
 
 
     public String generarQueryContratanteBeneficiarios(String parentesco, String claveActa, String usuario, PersonaAltaConvenio persona,Authentication authentication) throws IOException {
@@ -146,10 +135,13 @@ public class ConvenioNuevoPF {
             queryContratanteBeneficiarios.agregarParametroValues("ID_CONTRATANTE_PAQUETE_CONVENIO_PF", "idContratantePaqueteConvenio");
             queryContratanteBeneficiarios.agregarParametroValues("ID_PARENTESCO", parentesco);
             queryContratanteBeneficiarios.agregarParametroValues("ID_PERSONA", "idPersona");
-            queryContratanteBeneficiarios.agregarParametroValues("ID_CONVENIO_PF", "idConvenioPf");
+            //queryContratanteBeneficiarios.agregarParametroValues("ID_CONVENIO_PF", "idConvenioPf");
             queryContratanteBeneficiarios.agregarParametroValues("CVE_ACTA", "'" + claveActa + "'");
             queryContratanteBeneficiarios.agregarParametroValues("ID_USUARIO_ALTA", usuario);
             queryContratanteBeneficiarios.agregarParametroValues("IND_ACTIVO", "1");
+            String bool = "";
+            queryContratanteBeneficiarios.agregarParametroValues("IND_INE_BENEFICIARIO",  persona.getDocumentacion().getValidaIneBeneficiario() == true ? "1" : "0");
+            queryContratanteBeneficiarios.agregarParametroValues("IND_ACTA_NACIMIENTO", persona.getDocumentacion().getValidaActaNacimientoBeneficiario() == true ? "1" : "0");
             log.info("Query insert contratante beneficiarios: " + queryContratanteBeneficiarios.obtenerQueryInsertar());
             return queryContratanteBeneficiarios.obtenerQueryInsertar();
     }
@@ -183,15 +175,6 @@ public class ConvenioNuevoPF {
         return consulta;
     }
 
-    public String generarContratanteConvenioEmpresa(PorEmpresaRequest empresa, String usuario) {
-        final QueryHelper queryEmpresaConvenio = new QueryHelper("SVC_CONTRATANTE_CONVENIO_PF_EMPRESA");
-        queryEmpresaConvenio.agregarParametroValues("ID_EMPRESA_CONVENIO_PF", "idEmpresaConvenioPf");
-        queryEmpresaConvenio.agregarParametroValues("DES_RAZON_SOCIAL", empresa.getRazonSocial());
-        queryEmpresaConvenio.agregarParametroValues("ID_USUARIO_ALTA", usuario);
-        String consulta = queryEmpresaConvenio.obtenerQueryInsertar();
-        log.info("Query insert empresa convenio pf: " + consulta);
-        return consulta;
-    }
 
     public DatosRequest consultarPromotores() {
         DatosRequest dr = new DatosRequest();
@@ -207,24 +190,68 @@ public class ConvenioNuevoPF {
         return dr;
     }
 
-    public DatosRequest consultaPaquetes(){
-        DatosRequest dr = new DatosRequest();
-        Map<String, Object> parametro = new HashMap<>();
-        SelectQueryUtil query = new SelectQueryUtil();
-        query.select("SP.ID_PAQUETE AS idPaquete", "SP.DES_NOM_PAQUETE AS nomPaquete", "SP.DES_PAQUETE AS descPaquete")
-                .from("SVT_PAQUETE SP").where("SP.IND_ACTIVO = 1");
-        String consulta = query.build();
-        String encoded = DatatypeConverter.printBase64Binary(consulta.getBytes());
-        parametro.put(AppConstantes.QUERY, encoded);
-        dr.setDatos(parametro);
-        return dr;
+
+    public DatosRequest obtenerPaquetes(Integer idVelatorio) {
+        DatosRequest datosRequest = new DatosRequest();
+        Map<String, Object>parametros= new HashMap<>();
+        SelectQueryUtil selectQueryUtilPaquete= new SelectQueryUtil();
+        SelectQueryUtil selectQueryUtilUnionPaqueteRegion= new SelectQueryUtil();
+        SelectQueryUtil selectQueryUtilUnionPaqueteVelatorio= new SelectQueryUtil();
+        SelectQueryUtil selectQueryUtilUnionPaqueteServicio= new SelectQueryUtil();
+        SelectQueryUtil selectQueryUtilUnionPaqueteArticulo= new SelectQueryUtil();
+
+        selectQueryUtilUnionPaqueteVelatorio.select("SP.ID_PAQUETE","SP.DES_NOM_PAQUETE","SP.DES_PAQUETE")
+                .from("SVT_PAQUETE SP")
+                .innerJoin("SVT_PAQUETE_VELATORIO SPV", "SP.ID_PAQUETE=SPV.ID_PAQUETE")
+                .where("SP.IND_ACTIVO = 1")
+                .and("SPV.ID_VELATORIO = "+idVelatorio);
+
+        selectQueryUtilUnionPaqueteRegion.select("SP.ID_PAQUETE","SP.DES_NOM_PAQUETE","SP.DES_PAQUETE")
+                .from("SVT_PAQUETE SP")
+                .where("SP.IND_ACTIVO =1 ")
+                .and("SP.IND_REGION =1");
+
+        selectQueryUtilUnionPaqueteServicio.select("SPS.ID_PAQUETE")
+                .from("SVT_PROVEEDOR SP")
+                .innerJoin("SVT_CONTRATO SC", "SC.ID_PROVEEDOR = SP.ID_PROVEEDOR")
+                .innerJoin("SVT_CONTRATO_SERVICIO SCS", "SCS.ID_CONTRATO = SC.ID_CONTRATO")
+                .innerJoin("SVT_SERVICIO SS", "SS.ID_SERVICIO = SCS.ID_SERVICIO")
+                .innerJoin("SVT_PAQUETE_SERVICIO SPS", "SPS.ID_SERVICIO = SS.ID_SERVICIO")
+                .where("SP.IND_ACTIVO =1 ")
+                .and("SPS.IND_ACTIVO = 1")
+                .and("SP.ID_TIPO_PROVEEDOR =1")
+                .and("SC.FEC_FIN_VIG >= CURRENT_DATE()")
+                .and("SP.FEC_VIGENCIA >= CURRENT_DATE()")
+                .and("SC.IND_ACTIVO =1");
+
+        selectQueryUtilUnionPaqueteArticulo.select("DISTINCT SPA.ID_PAQUETE")
+                .from("SVT_INVENTARIO_ARTICULO STI")
+                .innerJoin("SVT_ARTICULO STA", "STA.ID_ARTICULO =STI.ID_ARTICULO")
+                .innerJoin("SVC_CATEGORIA_ARTICULO SCA", "SCA.ID_CATEGORIA_ARTICULO = STA.ID_CATEGORIA_ARTICULO")
+                .innerJoin("SVT_PAQUETE_ARTICULO SPA", "SPA.ID_CATEGORIA_ARTICULO = SCA.ID_CATEGORIA_ARTICULO")
+                .where("STI.IND_ESTATUS = 0")
+                .and("STI.ID_TIPO_ASIGNACION_ART IN (1,3)");
+
+        String queryPaqueteRegion=selectQueryUtilUnionPaqueteVelatorio.union(selectQueryUtilUnionPaqueteRegion);
+        String queryPaqueteServiciosArticulos=selectQueryUtilUnionPaqueteServicio.union(selectQueryUtilUnionPaqueteArticulo);
+
+        selectQueryUtilPaquete.select("PAQUETES.ID_PAQUETE AS idPaquete","PAQUETES.DES_NOM_PAQUETE AS nomPaquete", "PAQUETES.DES_PAQUETE AS descPaquete")
+                .from("("+queryPaqueteRegion+") PAQUETES")
+                .where("PAQUETES.ID_PAQUETE IN("+queryPaqueteServiciosArticulos+")");
+
+        String query=selectQueryUtilPaquete.build();
+        log.info(query);
+
+        String encoded=DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+        parametros.put(AppConstantes.QUERY, encoded);
+        datosRequest.setDatos(parametros);
+        return datosRequest;
     }
 
     public DatosRequest consultarCurpRfc(String curp, String rfc) {
         DatosRequest dr = new DatosRequest();
         Map<String, Object> parametro = new HashMap<>();
         if(rfc.equals("\"\"")){
-            log.info("dentro if");
             SelectQueryUtil query = new SelectQueryUtil();
             query.select("SP.ID_PERSONA as idPersona","SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss", "SP.NOM_PERSONA AS nomPersona",
                             "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
@@ -330,7 +357,9 @@ public class ConvenioNuevoPF {
         querySelect.select("SP2.ID_PERSONA AS idPersona", "SP2.NOM_PERSONA AS nombreBeneficiario", "SP2.NOM_PRIMER_APELLIDO AS primerApellido",
                         "SP2.NOM_SEGUNDO_APELLIDO AS segundoApellido", "DATE_FORMAT(SP2.FEC_NAC,'%Y-%m-%d') AS fechaNacimiento",
                         "SP2.CVE_RFC AS rfc", "SP2.CVE_CURP AS curp", "SP2.CVE_NSS  AS nss", "SP2.NUM_SEXO AS numSexo",
-                        "SP2.DES_TELEFONO AS telefono", "SP2.DES_CORREO AS correo", "SP2.TIPO_PERSONA AS tipoPersona", "SP2.NUM_INE AS numIne")
+                        "SP2.DES_TELEFONO AS telefono", "SP2.DES_CORREO AS correo", "SP2.TIPO_PERSONA AS tipoPersona", "SP2.NUM_INE AS numIne", "TIMESTAMPDIFF(YEAR, SP2.FEC_NAC , NOW()) AS edad",
+                        "SCB.IND_INE_BENEFICIARIO AS validaIneBeneficiario" , "SCB.IND_ACTA_NACIMIENTO AS validaActaNacimientoBeneficiario", "SCB.ID_PARENTESCO  AS idParentesco",
+                        "SV.ID_VELATORIO AS idVelatorio","SV.DES_VELATORIO AS nomVelatorio")
                 .from("SVT_CONVENIO_PF SCP")
                 .leftJoin("SVC_VELATORIO SV", "SCP.ID_VELATORIO = SV.ID_VELATORIO")
                 .leftJoin("SVT_PROMOTOR PROM", "SCP.ID_PROMOTOR = PROM.ID_PROMOTOR")
@@ -342,6 +371,7 @@ public class ConvenioNuevoPF {
                 .leftJoin("SVC_PERSONA SP2", "SCB.ID_PERSONA = SP2.ID_PERSONA")
                 .where("SCP.DES_FOLIO = " + folioConvenio);
         String consulta = querySelect.build();
+        log.info(consulta);
         String encoded = DatatypeConverter.printBase64Binary(consulta.getBytes());
         parametro.put(AppConstantes.QUERY, encoded);
         dr.setDatos(parametro);
@@ -372,7 +402,7 @@ public class ConvenioNuevoPF {
         Map<String, Object> parametro = new HashMap<>();
         final QueryHelper query = new QueryHelper("UPDATE SVT_CONVENIO_PF");
         query.agregarParametroValues("ID_ESTATUS_CONVENIO", idEstatusConvenio);
-        query.agregarParametroValues("ID_USUARIO_MODIFICA", user.getCveUsuario());
+        query.agregarParametroValues("ID_USUARIO_MODIFICA", String.valueOf(user.getIdUsuario()));
         query.agregarParametroValues("FEC_ACTUALIZACION", "NOW()");
         query.addWhere("DES_FOLIO = " + folioConvenio);
         String encoded = DatatypeConverter.printBase64Binary(query.obtenerQueryActualizar().getBytes());
@@ -392,25 +422,26 @@ public class ConvenioNuevoPF {
         datosPdf.put("costoPaquete", infoReporte.getMonPrecio());// sacar datos de query
         datosPdf.put("nombreTitular", infoReporte.getNombrePersona() + " " + infoReporte.getPrimerApellido() + " " + infoReporte.getSegundoApellido());// sacar datos de query
         datosPdf.put("rfc", infoReporte.getRfc());// sacar datos de query
-        datosPdf.put("folioConvenio", pdfDto.getFolioConvenio());// sacar datos de query
+        datosPdf.put("idConvenio", pdfDto.getIdConvenio());// sacar datos de query
         datosPdf.put("ciudadExpedicion", pdfDto.getCiudadExpedicion());// sacar datos de query
         datosPdf.put("fechaExpedicion", pdfDto.getFechaExpedicion());// sacar datos de query
+        datosPdf.put("folioConvenio", infoReporte.getFolio());// sacar datos de query
         return datosPdf;
     }
 
-    public DatosRequest busquedaFolioParaReporte(String folioConvenio) {
+    public DatosRequest busquedaFolioParaReporte(String idConvenio) {
         DatosRequest dr = new DatosRequest();
         Map<String, Object> parametro = new HashMap<>();
         SelectQueryUtil querySelect = new SelectQueryUtil();
         querySelect.select("SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss", "SP.NOM_PERSONA AS nombrePersona",
-                        "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido", "SP.NUM_INE AS numIne",
+                        "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido", "SP.NUM_INE AS numIne", "SCP.DES_FOLIO AS folio",
                         "CPF.ID_PAQUETE AS idPaquete", "PAQ.DES_NOM_PAQUETE AS nombrePaquete", "PAQ.DES_PAQUETE AS desPaquete", "PAQ.MON_PRECIO AS monPrecio")
                 .from("SVT_CONVENIO_PF SCP")
                 .leftJoin("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF", "SCP.ID_CONVENIO_PF = CPF.ID_CONVENIO_PF")
                 .leftJoin("SVT_PAQUETE PAQ", "CPF.ID_PAQUETE = PAQ.ID_PAQUETE")
                 .leftJoin("SVC_CONTRATANTE SC", "CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE")
                 .leftJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
-                .where("SCP.DES_FOLIO = '" + folioConvenio + "'")
+                .where("SCP.ID_CONVENIO_PF = '" + idConvenio + "'")
                 .groupBy("SCP.DES_FOLIO");
         String consulta = querySelect.build();
         String encoded = DatatypeConverter.printBase64Binary(consulta.getBytes());

@@ -6,10 +6,7 @@ import com.google.gson.JsonParser;
 import com.imss.sivimss.planfunerario.beans.ConvenioNuevoPF;
 import com.imss.sivimss.planfunerario.beans.ModificarConvenioNuevoPf;
 import com.imss.sivimss.planfunerario.model.request.*;
-import com.imss.sivimss.planfunerario.model.response.BeneficiarioResponse;
-import com.imss.sivimss.planfunerario.model.response.BusquedaInformacionReporteResponse;
-import com.imss.sivimss.planfunerario.model.response.BusquedaPersonaFolioResponse;
-import com.imss.sivimss.planfunerario.model.response.ContratanteResponse;
+import com.imss.sivimss.planfunerario.model.response.*;
 import com.imss.sivimss.planfunerario.service.ContratarPlanPFService;
 import com.imss.sivimss.planfunerario.util.*;
 import org.modelmapper.ModelMapper;
@@ -35,6 +32,8 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
     private String urlReportes;
     @Value("${endpoints.ms-dominio-convenios}")
     private String urlDominioConvenios;
+    @Value("${endpoints.renapo}")
+    private String urlRenapo;
     @Autowired
     private ProviderServiceRestTemplate providerRestTemplate;
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ContratarPlanPFServiceImpl.class);
@@ -72,8 +71,9 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         String[] queryBeneficiario = new String[persona.getPersona().getBeneficiarios().length];
         String[] queryContratanteBeneficiarios = new String[persona.getPersona().getBeneficiarios().length];
         for (int i = 0; i < persona.getPersona().getBeneficiarios().length; i++) {
+            persona.getPersona().getBeneficiarios()[i].setPais(persona.getPersona().getPais());
             queryBeneficiario[i] = DatatypeConverter.printBase64Binary(convenioBean.generarQueryPersonaBeneficiaria(persona.getPersona().getBeneficiarios()[i], usuarioDto.getIdUsuario().toString()).getBytes("UTF-8"));
-            queryContratanteBeneficiarios[i] = DatatypeConverter.printBase64Binary(convenioBean.generarQueryContratanteBeneficiarios(persona.getPersona().getBeneficiarios()[i].getParentesco(), persona.getPersona().getClaveActa(), usuarioDto.getIdUsuario().toString(),persona.getPersona(),authentication).getBytes("UTF-8"));
+            queryContratanteBeneficiarios[i] = DatatypeConverter.printBase64Binary(convenioBean.generarQueryContratanteBeneficiarios(persona.getPersona().getBeneficiarios()[i].getParentesco(), persona.getPersona().getClaveActa(), usuarioDto.getIdUsuario().toString(), persona.getPersona(), authentication).getBytes("UTF-8"));
         }
         HashMap mapa = new HashMap();
         mapa.put("datosPersonaContratante", DatatypeConverter.printBase64Binary(queryPersona.getBytes("UTF-8")));
@@ -87,7 +87,8 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         mapa.put("idPersona", persona.getIdPersona());
         mapa.put("idContratante", persona.getIdContratante());
         mapa.put("idDomicilio", persona.getIdDomicilio());
-        return providerRestTemplate.consumirServicio(mapa, urlDominioConvenios + "/insertConvenios", authentication);
+        //MensajeResponseUtil.mensajeResponse(providerRestTemplate.consumirServicio(salas.registrarEntrada(registroEntrada, usuarioDto).getDatos(), urlDominioConsulta + "/crear", authentication), REGISTRO_CORRECTO);
+        return MensajeResponseUtil.mensajeResponse(providerRestTemplate.consumirServicio(mapa, urlDominioConvenios + "/insertConvenios", authentication),"30");
     }
 
     @Override
@@ -120,15 +121,48 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
 
     @Override
     public Response<?> consultaPaquetes(DatosRequest request, Authentication authentication) throws IOException {
-        return providerRestTemplate.consumirServicio(convenioBean.consultaPaquetes().getDatos(), urlDominioConsulta, authentication);
+        JsonObject objeto = (JsonObject) jsonParser.parse((String) request.getDatos().get(AppConstantes.DATOS));
+        Integer idVelatorio = objeto.get("idVelatorio").getAsInt();
+        return providerRestTemplate.consumirServicio(convenioBean.obtenerPaquetes(idVelatorio).getDatos(), urlDominioConsulta, authentication);
     }
 
     @Override
     public Response<?> validaCurpRfc(DatosRequest request, Authentication authentication) throws IOException {
-        JsonObject objeto = (JsonObject) jsonParser.parse((String) request.getDatos().get(AppConstantes.DATOS));
-        String curp = String.valueOf(objeto.get("curp"));
-        String rfc = String.valueOf(objeto.get("rfc"));
-        return providerRestTemplate.consumirServicio(convenioBean.consultarCurpRfc(curp, rfc).getDatos(), urlDominioConsulta, authentication);
+        try {
+            JsonObject objeto = (JsonObject) jsonParser.parse((String) request.getDatos().get(AppConstantes.DATOS));
+            RenapoResponse rp = new RenapoResponse();
+            String curp = String.valueOf(objeto.get("curp"));
+            String rfc = String.valueOf(objeto.get("rfc"));
+            Response response = providerRestTemplate.consumirServicio(convenioBean.consultarCurpRfc(curp, rfc).getDatos(), urlDominioConsulta, authentication);
+            if (response.getDatos().toString().equals("[]")) {
+                Response respuestaRenapo = providerRestTemplate.consumirServicioExternoGet(urlRenapo + "/" + curp.replace("\"", ""));
+                JsonObject objRenapo = (JsonObject) jsonParser.parse(respuestaRenapo.getDatos().toString());
+                rp.setCurp(objRenapo.get("curp").getAsString());
+                rp.setCorreo("");
+                rp.setRfc("");
+                rp.setNss("");
+                rp.setIdEstado("");
+                rp.setFechaNacimiento(objRenapo.get("fechNac").getAsString());
+                rp.setIdPais("");
+                Integer sexo = objRenapo.get("sexo").equals("HOMBRE") ? 2 : 1;
+                rp.setSexo(String.valueOf(sexo));
+                rp.setNomPersona(objRenapo.get("nombre").getAsString());
+                rp.setPrimerApellido(objRenapo.get("apellido1").getAsString());
+                rp.setSegundoApellido(objRenapo.get("apellido2").getAsString());
+                rp.setCorreo("");
+                Response respuesta = new Response();
+                respuesta.setCodigo(200);
+                respuesta.setError(false);
+                respuesta.setMensaje("");
+                respuesta.setDatos(rp);
+                return respuesta;
+            }
+            return response;
+        } catch (Exception ex) {
+            ex.getMessage();
+            ex.printStackTrace();
+        }
+        return new Response();
     }
 
     @Override
@@ -142,7 +176,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
     public Response<?> generarPDF(DatosRequest request, Authentication authentication) throws IOException {
         String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
         PdfDto pdfDto = json.fromJson(datosJson, PdfDto.class);
-        Map<String, Object> envioDatos = new ConvenioNuevoPF().generarReporte(pdfDto, buscarInformacionReporte(pdfDto.getFolioConvenio(), authentication));
+        Map<String, Object> envioDatos = new ConvenioNuevoPF().generarReporte(pdfDto, buscarInformacionReporte(pdfDto.getIdConvenio(), authentication));
         return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes,
                 authentication);
     }
@@ -207,7 +241,6 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         }
         return new Response<>();
     }
-
 
 
     public BusquedaInformacionReporteResponse buscarInformacionReporte(String folioConvenio, Authentication authentication) throws IOException {
