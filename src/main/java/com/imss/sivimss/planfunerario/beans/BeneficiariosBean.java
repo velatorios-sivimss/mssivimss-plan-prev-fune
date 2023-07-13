@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
+ 
 import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
@@ -42,7 +43,9 @@ public class BeneficiariosBean {
 	private String correoE;
 	private String tel;
 	private Integer usuarioAlta;
-	private Integer usuarioBaja;	
+	private Integer usuarioBaja;
+	
+ 
 	private Integer indComprobanteEstudios;
 	private Integer indActaMatrimonio;
 	private Integer indDeclaracionConcubinato;
@@ -72,6 +75,7 @@ public class BeneficiariosBean {
 		this.indCartaPoder = beneficiarioRequest.getIndCartaPoder();
 		this.indIneTestigo = beneficiarioRequest.getIndIneTestigo();
 		this.indIneTestigoDos = beneficiarioRequest.getIndIneTestigoDos();*/
+ 
 	}
 
 	//TABLAS
@@ -93,8 +97,10 @@ public class BeneficiariosBean {
 	public static final String DES_CORREO = "DES_CORREO";
 	public static final String DES_TELEFONO = "DES_TELEFONO";
 	public static final String ID_TABLA = "idTabla";
+
 	public static final String IND_ACTA_NACIMIENTO = "IND_ACTA_NACIMIENTO";
 	public static final String IND_INE_BENEFICIARIO = "IND_INE_BENEFICIARIO";
+ 
 	
 	//JOIN
 	public static final String SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF = "SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF";
@@ -118,6 +124,7 @@ public class BeneficiariosBean {
 		.leftJoin(SVC_PERSONA, "SB.ID_PERSONA=SP.ID_PERSONA");
       	//queryUtil.where("PF.ID_TIPO_PREVISION= 1");
 		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio").and("(SB.IND_SINIESTROS=0 OR SB.IND_SINIESTROS IS NULL)")
+ 
 		.setParameter("idConvenio", Integer.parseInt(palabra));
 		String query = obtieneQuery(queryUtil);
 		log.info("-> " +query);
@@ -200,7 +207,7 @@ public class BeneficiariosBean {
 	        }
 	        if(indIne!=null) {
 	        	   q.agregarParametroValues(IND_INE_BENEFICIARIO, ""+this.indIne+"");   	
-	        }
+ 	        }
 	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 	        q.agregarParametroValues("IND_SINIESTROS", "0");
 	        q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, ""+usuarioAlta+"" );
@@ -396,6 +403,7 @@ public class BeneficiariosBean {
 	        q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"" );
 			q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 	        String query = q.obtenerQueryInsertar();
+
 	        String encoded = encodedQuery(query);
 	        parametro.put(AppConstantes.QUERY, encoded);
 	        request.setDatos(parametro);
@@ -436,6 +444,7 @@ public class BeneficiariosBean {
 				 "SVDR.IND_INE_TESTIGO_DOS AS ineTestigoDos")
 		.from("SVC_VALIDACION_DOCUMENTOS_CONVENIO_PF SVD")
 		.leftJoin("SVC_VALIDACION_DOCUMENTOS_RENOVACION_CONVENIO_PF SVDR", "SVD.ID_VALIDACION_DOCUMENTO = SVDR.ID_VALIDACION_DOCUMENTO")
+
 		.join(SVT_CONVENIO_PF, "SVD.ID_CONVENIO_PF=PF.ID_CONVENIO_PF")
         .join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "PF.ID_CONVENIO_PF =SCPC.ID_CONVENIO_PF")
         .join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")

@@ -3,6 +3,7 @@ package com.imss.sivimss.planfunerario.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.imss.sivimss.planfunerario.beans.ConsultaConvenios;
+import com.imss.sivimss.planfunerario.exception.NoDataException;
 import com.imss.sivimss.planfunerario.model.request.ConsultaGeneralRequest;
 import com.imss.sivimss.planfunerario.model.request.DatosReporteRequest;
 import com.imss.sivimss.planfunerario.service.ConsultaConveniosService;
@@ -15,7 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -33,6 +36,9 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
     private static final String MSG131_REGISTRO_SALIDA_OK = "131";
     //    MSG133	Se ha registrado correctamente el registro de entrada del equipo de velación.
     private static final String MSG133_REGISTRO_ENTRADA_OK = "133";
+    private static final String MSG045_SIN_RESULTADOS = "45";
+    // errores
+    private static final String MSG052_ERROR_CONSULTA = "52";
 
     // endpoints
     @Value("${endpoints.rutas.dominio-consulta}")
@@ -59,20 +65,19 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
     public Response<?> consultarTodo(DatosRequest request, Authentication authentication) {
         try {
             // recuperar los datos del request
-            ConsultaGeneralRequest filtros = gson.fromJson(
-                    String.valueOf(request.getDatos().get(AppConstantes.DATOS)),
-                    ConsultaGeneralRequest.class
-            );
-            // hacer una lista con los queries
+            ConsultaGeneralRequest filtros = recuperarFiltros(request);
             Map<String, DatosRequest> consultas = new HashMap<>();
-            consultas.put("convenios", consultaConvenios.consultarConvenios(request, filtros));
+//            final DatosRequest datosConvenio = consultaConvenios.consultarConvenios(request, filtros);
+
+            // hay que hacer la consulta por folio del convenio
+//            consultas.put("convenios", datosConvenio);
             consultas.put("afiliados", consultaConvenios.consultarAfiliados(request, filtros));
             consultas.put("beneficiarios", consultaConvenios.consultarBeneficiarios(request, filtros));
             consultas.put("siniestros", consultaConvenios.consultarSiniestros(request, filtros));
             consultas.put("vigencias", consultaConvenios.consultarVigencias(request, filtros));
             // armar la consulta para las facturas
             // hay que armar la tabla con lo que vimos que puede ser de utilidad
-//            consultas.put("facturas", consultaConvenios.consultarFacturas(request, filtros));
+            consultas.put("facturas", consultaConvenios.consultarFacturas(request, filtros));
 
 //            procesarConsultas(consultas, authentication);
 //            for (Map.Entry<String, DatosRequest> consulta : consultas.entrySet()) {
@@ -98,10 +103,7 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
     public Response<?> consultarConvenios(DatosRequest request, Authentication authentication) {
         try {
             // recuperar los datos del request
-            ConsultaGeneralRequest filtros = gson.fromJson(
-                    String.valueOf(request.getDatos().get(AppConstantes.DATOS)),
-                    ConsultaGeneralRequest.class
-            );
+            ConsultaGeneralRequest filtros = recuperarFiltros(request);
             final DatosRequest datosRequest = consultaConvenios.consultarConvenios(request, filtros);
 
             return enviarPeticion(datosRequest, authentication);
@@ -112,6 +114,7 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
         } catch (Exception exception) {
             log.error("Ha ocurrido un error al consultar los registros");
             // todo mandar el mensajeResponse con el codigo correspondiente
+            return MensajeResponseUtil.mensajeResponse(crearResponse(), MSG_ERROR_REGISTRAR); // cambiar por el error correcto
         }
         return null;
     }
@@ -119,10 +122,7 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
     @Override
     public Response<?> consultarBeneficiarios(DatosRequest request, Authentication authentication) {
         try {
-            ConsultaGeneralRequest filtros = gson.fromJson(
-                    String.valueOf(request.getDatos().get(AppConstantes.DATOS)),
-                    ConsultaGeneralRequest.class
-            );
+            ConsultaGeneralRequest filtros = recuperarFiltros(request);
             final DatosRequest datosRequest = consultaConvenios.consultarBeneficiarios(request, filtros);
 
             return enviarPeticion(datosRequest, authentication);
@@ -140,10 +140,7 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
     @Override
     public Response<?> consultarAfiliados(DatosRequest request, Authentication authentication) {
         try {
-            ConsultaGeneralRequest filtros = gson.fromJson(
-                    String.valueOf(request.getDatos().get(AppConstantes.DATOS)),
-                    ConsultaGeneralRequest.class
-            );
+            ConsultaGeneralRequest filtros = recuperarFiltros(request);
             final DatosRequest datosRequest = consultaConvenios.consultarAfiliados(request, filtros);
 
             return enviarPeticion(datosRequest, authentication);
@@ -161,10 +158,7 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
     @Override
     public Response<?> consultarSiniestros(DatosRequest request, Authentication authentication) {
         try {
-            ConsultaGeneralRequest filtros = gson.fromJson(
-                    String.valueOf(request.getDatos().get(AppConstantes.DATOS)),
-                    ConsultaGeneralRequest.class
-            );
+            ConsultaGeneralRequest filtros = recuperarFiltros(request);
             final DatosRequest datosRequest = consultaConvenios.consultarSiniestros(request, filtros);
 
             return enviarPeticion(datosRequest, authentication);
@@ -182,10 +176,7 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
     @Override
     public Response<?> consultarVigencias(DatosRequest request, Authentication authentication) {
         try {
-            ConsultaGeneralRequest filtros = gson.fromJson(
-                    String.valueOf(request.getDatos().get(AppConstantes.DATOS)),
-                    ConsultaGeneralRequest.class
-            );
+            ConsultaGeneralRequest filtros = recuperarFiltros(request);
             final DatosRequest datosRequest = consultaConvenios.consultarVigencias(request, filtros);
 
             return enviarPeticion(datosRequest, authentication);
@@ -203,10 +194,7 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
     @Override
     public Response<?> consultarFacturas(DatosRequest request, Authentication authentication) {
         try {
-            ConsultaGeneralRequest filtros = gson.fromJson(
-                    String.valueOf(request.getDatos().get(AppConstantes.DATOS)),
-                    ConsultaGeneralRequest.class
-            );
+            ConsultaGeneralRequest filtros = recuperarFiltros(request);
             final DatosRequest datosRequest = consultaConvenios.consultarFacturas(request, filtros);
             // todo - validar la respuesta y eso
 
@@ -280,10 +268,9 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
                                 response = enviarPeticion(entry.getValue(), authentication);
                                 return response;
                             } catch (IOException e) {
-                                // todo - hacer un objeto con la respuesta correcta
-                                MensajeResponseUtil.mensajeResponse(new Response(), "Error");
+                                return MensajeResponseUtil.mensajeResponse(new Response(), "Error");
                             }
-                            return response;
+//                            return response;
                         }
                 ));
 
@@ -312,6 +299,14 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
 //        };
 //    }
 
+    /**
+     * Env&iacute;a la solicitud a la siguiente capa en el flujo.
+     *
+     * @param datos
+     * @param authentication
+     * @return
+     * @throws IOException
+     */
     private Response<?> enviarPeticion(DatosRequest datos, Authentication authentication) throws IOException {
 
         return restTemplate.consumirServicio(
@@ -322,7 +317,49 @@ public class ConsultaConveniosServiceImpl implements ConsultaConveniosService {
         );
     }
 
+    /**
+     * todo - quitar funcion no se usa
+     *
+     * @param respuestas
+     */
     private void validarRespuesta(HashMap<String, Response<?>> respuestas) {
         System.out.println(respuestas);
+    }
+
+    /**
+     * Recupera los filtros para poder pasarlos a las consultas.
+     *
+     * @param request
+     * @return
+     */
+    private ConsultaGeneralRequest recuperarFiltros(DatosRequest request) {
+        return gson.fromJson(
+                String.valueOf(request.getDatos().get(AppConstantes.DATOS)),
+                ConsultaGeneralRequest.class);
+    }
+
+    /**
+     * todo - add documentation
+     * @return
+     */
+    private Response<?> crearResponse() {
+        Response<?> response = new Response<>();
+        response.setMensaje("Ha ocurrido un error");
+        response.setError(true);
+        response.setCodigo(HttpStatus.OK.value());
+        return response;
+    }
+
+    /**
+     * todo - add documentation
+     * @param datosConsultaResponse
+     * @throws NoDataException
+     */
+    private void validarRespuesta(Response<?> datosConsultaResponse) throws NoDataException {
+        final List<?> listaResponse = (ArrayList<?>) datosConsultaResponse.getDatos();
+//        final List<ValeSalidaResponse> listaValeSalidaResponse = new ArrayList<>();
+        if (listaResponse.isEmpty()) {
+            throw new NoDataException("No se encontraron datos");
+        }
     }
 }
