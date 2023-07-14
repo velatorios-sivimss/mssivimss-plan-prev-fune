@@ -38,17 +38,12 @@ public class ConsultaConvenios {
      * @return
      */
     public DatosRequest consultarConvenios(DatosRequest request, ConsultaGeneralRequest filtros) throws UnsupportedEncodingException {
-        // todo - regresar los convenios de acuerdo al estatus que se seleccione
         SelectQueryUtil queryConveniosPersona = new SelectQueryUtil();
         SelectQueryUtil queryBeneficiarios = new SelectQueryUtil();
         queryBeneficiarios.select("count(*)")
                 .from("SVT_CONTRATANTE_BENEFICIARIOS beneficiarios")
                 .where("beneficiarios.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = contratanteConvenio.ID_CONTRATANTE_PAQUETE_CONVENIO_PF");
 
-        // todo - revisar la consulta para facturas
-        // consultar aquellas facturas que sean pagadas o ver que estatus se va a manejar
-        // estan descritos en el documento cu100 para las facturas
-        // revisar que id_flujo corresponde a los convenios
         SelectQueryUtil queryFacturas = new SelectQueryUtil();
         queryFacturas.select()
                 .from("SVC_FACTURA factura")
@@ -230,8 +225,6 @@ public class ConsultaConvenios {
      * @return Los par&aacute;metros para realizar la consulta de <b>Siniestros</b>.
      */
     public DatosRequest consultarSiniestros(DatosRequest request, ConsultaGeneralRequest filtros) {
-        // los siniestros tendrian que estar pagados o facturados para poder mostrarlos aca
-        // si las facturas son globales, tendria que aparecer repetida en varios registros?
         SelectQueryUtil querySiniestros = new SelectQueryUtil();
         final String[] columnas = {
                 "velatorio.DES_VELATORIO as nombreVelatorio",
@@ -267,9 +260,6 @@ public class ConsultaConvenios {
                         "parentesco.ID_PARENTESCO = beneficiario.ID_PARENTESCO")
                 .join("SVC_CARACTERISTICAS_PRESUPUESTO presupuesto",
                         "presupuesto.ID_ORDEN_SERVICIO = ods.ID_ORDEN_SERVICIO")
-//                .join("SVT_PAGO_BITACORA pago",
-//                        "pago.CVE_FOLIO = ods.CVE_FOLIO",
-//                        "pago.CVE_ESTATUS_PAGO = 2")
                 .where("convenio.DES_FOLIO = :folioConvenio",
                         "ods.ID_ESTATUS_ORDEN_SERVICIO in (4, 5)") // sacar a una constante
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
@@ -302,7 +292,6 @@ public class ConsultaConvenios {
                         "personaFinado.ID_PERSONA = finado.ID_PERSONA")
                 .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-                // hacer otro escenario para cuando el finado sea el contratante
                 .join("SVC_CONTRATANTE contratante",
                         "contratante.ID_CONTRATANTE = ods.ID_CONTRATANTE",
                         "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
@@ -337,13 +326,6 @@ public class ConsultaConvenios {
      * @return Los par&aacute;metros para realizar la consulta de <b>Afiliados</b>.
      */
     public DatosRequest consultarAfiliados(DatosRequest request, ConsultaGeneralRequest filtros) throws UnsupportedEncodingException {
-        // la consulta por nombre aplica para buscar solo en la empresa o para buscar un afiliado?
-
-        // los afiliados son aquellas personas que tengan un convenio de tipo empresa
-        // los beneficiarios bajo este aspecto, no entran en la jugada
-        // el rfc sera el de la empresa?
-
-        // el afiliado es el contratante_convenio_paquete_pf que esta relacionado con n convenio de itpo empresa
 
         SelectQueryUtil queryAfiliados = new SelectQueryUtil();
 
@@ -402,21 +384,12 @@ public class ConsultaConvenios {
                                 + " as fechaFin", // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
                         formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO)")
                                 + " as fechaRenovacion" // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
-//                        "as fechaRenovacion"
                 )
                 .from("SVT_CONVENIO_PF convenio")
                 .leftJoin("SVT_RENOVACION_CONVENIO_PF renovacionConvenio",
                         "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-                // joins para la consulta por filtros
-//                .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
-//                        "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-//                .join("SVC_CONTRATANTE contratante",
-//                        "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
-//                .join("SVC_PERSONA personaContratante",
-//                        "personaContratante.id_persona = contratante.id_persona")
                 .where("convenio.DES_FOLIO = :folioConvenio") // persona -> true
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
-//        crearWhereConFiltros(queryVigencias, filtros, true);
 
         SelectQueryUtil queryVigenciasEmpresa = new SelectQueryUtil();
         queryVigenciasEmpresa.select(
@@ -438,7 +411,6 @@ public class ConsultaConvenios {
                         "convenio.des_folio = :folioConvenio") // empresa -> false
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
 
-//        final String query = queryVigencias.unionAll(queryVigenciasEmpresa);
         final String query = queryVigencias.build();
         String encoded = queryVigencias.encrypt(query);
 
@@ -454,8 +426,6 @@ public class ConsultaConvenios {
      * @return Los par&aacute;metros para realizar la consulta de <b>Facturas</b>.
      */
     public DatosRequest consultarFacturas(DatosRequest request, ConsultaGeneralRequest filtros) {
-        // consultar los pagos
-        // ver como relaciono los filtros para que se pueda implementar en esta parte
         SelectQueryUtil queryFacturas = new SelectQueryUtil();
 
         final String CONVENIO_ALIAS = SVT_CONVENIO + " convenio";
@@ -464,7 +434,6 @@ public class ConsultaConvenios {
                         "factura.NUM_UUID as UUID", // cambiar por el nombre que va a tener en la base de datos
                         formatearFecha("factura.FEC_FACTURACION") + " as fecha", // cambiar por la fecha que se estaria registrando
                         "factura.CVE_RFC_CONTRATANTE as rfc",
-//                        recuperarNombrePersona("personaContratante", "cliente"),
                         "factura.DES_RAZON_SOCIAL as cliente",
                         "factura.IMP_TOTAL as total",
                         "factura.ID_ESTATUS_FACTURA as estatusFactura"
@@ -474,12 +443,6 @@ public class ConsultaConvenios {
                         "pago.ID_PAGO_BITACORA = factura.ID_PAGO")
                 .join(CONVENIO_ALIAS,
                         "convenio.DES_FOLIO = pago.CVE_FOLIO")
-//                .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
-//                        "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-//                .join("SVC_CONTRATANTE contratante",
-//                        "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
-//                .join("SVC_PERSONA personaContratante",
-//                        "personaContratante.id_persona = contratante.id_persona")
 
                 .where("convenio.DES_FOLIO = :folioConvenio")
                 .setParameter("folioConvenio", filtros.getFolioConvenio()); // empresa -> false
@@ -488,31 +451,7 @@ public class ConsultaConvenios {
             queryFacturas.where("factura.CVE_FOLIO_FISCAL = :numeroFactura")
                     .setParameter("numeroFactura", filtros.getNumeroFactura());
         }
-//        crearWhereConFiltros(queryFacturas, filtros, true);
 
-//        SelectQueryUtil queryFacturasEmpresa = new SelectQueryUtil();
-//        queryFacturasEmpresa.select(
-//                        "factura.CVE_FOLIO as numeroFactura",
-//                        "factura.UUID as UUID", // que significa este campo - va a estar en la tabla factura
-//                        "factura.FEC_ALTA as fecha", // ver que fecha es la que se va a regresar
-//                        "empresaContratante.DES_RFC as rfc",
-//                        "empresaContratante.DES_NOM as cliente",
-//                        "factura.CAN_TOTAL as total",
-//                        "factura.ID_ESTATUS_FACTURA as estatusFactura"
-//                )
-//                .from("SVT_FACTURA factura")
-//                .join("SVT_BITACORA_PAGO pago",
-//                        "pago.ID_PAGO_BITACORA = factura.ID_PAGO_BITACORA")
-//                .join(SVT_CONVENIO,
-//                        SVT_CONVENIO + ".CVE_FOLIO = factura.CVE_FOLIO")
-//
-//                // todo - esto se puede mover a crearWhere...
-//                .join("SVT_EMPRESA_CONVENIO_PF empresaContratante",
-//                        "empresaContratante.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-//                .where("convenio.IND_TIPO_CONTRATACION = false"); // empresa -> false
-//        crearWhereConFiltros(queryFacturasEmpresa, filtros, true);
-
-//        final String query = queryFacturas.unionAll(queryFacturasEmpresa);
         final String query = queryFacturas.build();
         String encoded = queryFacturas.encrypt(query);
 
@@ -576,21 +515,12 @@ public class ConsultaConvenios {
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
         if (filtros.getNombreBeneficiario() != null) {
             String condicionNombre = recuperarNombrePersona("personaBeneficiario") + "like '%" + filtros.getNombreBeneficiario() + "%'";
-//            queryUtil.where("personaBeneficiario.NOM_PERSONA = :nombreBeneficiario")
             queryUtil.where(condicionNombre);
-//                    .setParameter("nombreBeneficiario", filtros.getNombreBeneficiario());
-        }
-    }
-
-    // todo - remove
-    private void crearWhereSiniestros(SelectQueryUtil queryUtil, ConsultaGeneralRequest filtros, boolean isPersona) {
-        if (isPersona) {
-
         }
     }
 
     /**
-     * todo - add documentation
+     * Crea una sentencia <b>{@code WHERE}</b> con los filtros que no sean null.
      *
      * @param selectQuery
      * @param filtros
@@ -599,7 +529,6 @@ public class ConsultaConvenios {
     private void crearWhereConFiltros(SelectQueryUtil selectQuery, ConsultaGeneralRequest filtros, boolean isPersona) {
         if (isPersona) {
             if (filtros.getRfc() != null) {
-                // todo - aca se podrian agregar los joins para las consultas y dejarlas mas limpias
                 selectQuery.where("personaContratante.CVE_RFC = :rfc")
                         .setParameter("rfc", filtros.getRfc());
             }
@@ -608,9 +537,8 @@ public class ConsultaConvenios {
                         .setParameter("curp", filtros.getCurp());
             }
             if (filtros.getNombre() != null) {
-                // la consulta se hace sobre el nombre completo, ver si se necesitan coincidencias
-                selectQuery.where(recuperarNombrePersona("personaContratante") + " = :nombre")
-                        .setParameter("nombre", filtros.getNombre());
+                final String condicion = recuperarNombrePersona("personaContratante") + " like '%" + filtros.getNombre() + "%'";
+                selectQuery.where(condicion);
             }
         } else {
             if (filtros.getRfc() != null) {
@@ -618,8 +546,8 @@ public class ConsultaConvenios {
                         .setParameter("rfc", filtros.getRfc());
             }
             if (filtros.getNombre() != null) {
-                selectQuery.where("empresaContratante.DES_NOMBRE = :nombreEmpresa")
-                        .setParameter("nombreEmpresa", filtros.getNombre());
+                final String condicion = "empresaContratante.DES_NOMBRE like '%" + filtros.getNombre() + "%'";
+                selectQuery.where(condicion);
             }
         }
         if (filtros.getFolioConvenio() != null) {
@@ -637,7 +565,7 @@ public class ConsultaConvenios {
     }
 
     /**
-     * todo - add documentation
+     * Recuprea la edad de la persona con su fecha de nacimiento.
      *
      * @param aliasTabla
      * @return
@@ -665,7 +593,7 @@ public class ConsultaConvenios {
     }
 
     /**
-     * todo - add documentation
+     * Recupera los datos para el formato del reporte de la tabla de convenios.
      *
      * @param filtros
      * @return
@@ -685,17 +613,13 @@ public class ConsultaConvenios {
     }
 
     /**
-     * todo - add documentation
+     * Crea la sentencia select.
      *
      * @param queryUtil
      * @param columnas
      */
     private void crearSelect(SelectQueryUtil queryUtil, String... columnas) {
         queryUtil.select(columnas
-//                recuperarNombrePersona("personaBeneficiario", ALIAS_NOMBRE_BENEFICIARIO),
-//                "personaBeneficiario.FEC_NAC as " + ALIAS_FECHA_NACIMIENTO,
-//                recuperarEdad("personaBeneficiario"),
-//                "parentesco.DES_PARENTESCO as " + ALIAS_PARENTESCO
         );
     }
 }
