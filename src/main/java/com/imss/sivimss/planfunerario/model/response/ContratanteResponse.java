@@ -36,4 +36,11 @@ public class ContratanteResponse {
     private String idEstado;
     private String idPromotor;
     private String nombrePromotor;
+    private String calle;
+    private String numExterior;
+    private String numInterior;
+    private String cp;
+    private String colonia;
+    private String municipio;
+    private String estado;
 }

@@ -21,6 +21,7 @@ private String nss;
 private String edad;
 private String validaIneBeneficiario;
 private String validaActaNacimientoBeneficiario;
+private String cveActa;
 private String idParentesco;
 private String idVelatorio;
 private String nomVelatorio;

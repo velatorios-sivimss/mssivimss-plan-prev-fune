@@ -139,7 +139,6 @@ public class ConvenioNuevoPF {
             queryContratanteBeneficiarios.agregarParametroValues("CVE_ACTA", "'" + claveActa + "'");
             queryContratanteBeneficiarios.agregarParametroValues("ID_USUARIO_ALTA", usuario);
             queryContratanteBeneficiarios.agregarParametroValues("IND_ACTIVO", "1");
-            String bool = "";
             queryContratanteBeneficiarios.agregarParametroValues("IND_INE_BENEFICIARIO",  persona.getDocumentacion().getValidaIneBeneficiario() == true ? "1" : "0");
             queryContratanteBeneficiarios.agregarParametroValues("IND_ACTA_NACIMIENTO", persona.getDocumentacion().getValidaActaNacimientoBeneficiario() == true ? "1" : "0");
             log.info("Query insert contratante beneficiarios: " + queryContratanteBeneficiarios.obtenerQueryInsertar());
@@ -312,7 +311,9 @@ public class ConvenioNuevoPF {
                         "SC.CVE_MATRICULA AS cveMatricula", "SC.ID_PERSONA AS idPersona", "SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss", "SP.NOM_PERSONA AS nombrePersona",
                         "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido", "SP.NUM_SEXO AS numSexo", "SP.ID_PAIS AS idPais", "SP.ID_ESTADO AS idEstado",
                         "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIPO_PERSONA AS tipoPersona", "SP.NUM_INE AS numIne",
-                        "CPF.ID_PAQUETE AS idPaquete", "PAQ.DES_NOM_PAQUETE AS nombrePaquete", "DATE_FORMAT(SP.FEC_NAC,'%Y-%m-%d') AS fechaNacimiento")
+                        "CPF.ID_PAQUETE AS idPaquete", "PAQ.DES_NOM_PAQUETE AS nombrePaquete", "DATE_FORMAT(SP.FEC_NAC,'%Y-%m-%d') AS fechaNacimiento",
+                        "SD.DES_CALLE AS calle", "SD.NUM_EXTERIOR AS numExterior","SD.NUM_INTERIOR AS numInterior","SD.DES_CP AS cp","SD.DES_COLONIA AS colonia",
+                        "SD.DES_MUNICIPIO AS municipio","SD.DES_ESTADO AS estado")
                 .from("SVT_CONVENIO_PF SCP")
                 .leftJoin("SVC_VELATORIO SV", "SCP.ID_VELATORIO = SV.ID_VELATORIO")
                 .leftJoin("SVT_PROMOTOR PROM", "SCP.ID_PROMOTOR = PROM.ID_PROMOTOR")
@@ -320,6 +321,7 @@ public class ConvenioNuevoPF {
                 .leftJoin("SVT_PAQUETE PAQ", "CPF.ID_PAQUETE = PAQ.ID_PAQUETE")
                 .leftJoin("SVC_CONTRATANTE SC", "CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE")
                 .leftJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
+                .leftJoin("SVT_DOMICILIO SD"," SC.ID_DOMICILIO = SD.ID_DOMICILIO")
                 .leftJoin("SVT_CONTRATANTE_BENEFICIARIOS SCB", "CPF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
                 .where("SCP.DES_FOLIO = " + folioConvenio)
                 .groupBy("SCP.DES_FOLIO");
@@ -338,10 +340,11 @@ public class ConvenioNuevoPF {
                         "EMP.DES_NOMBRE AS nombreEmpresa", "EMP.DES_RAZON_SOCIAL AS razonSocial", "EMP.DES_RFC AS rfc", "EMP.ID_PAIS AS idPais",
                         "EMP.ID_DOMICILIO AS idDomicilio", "SD.DES_CALLE AS calle", "SD.NUM_EXTERIOR AS numExterior", "SD.NUM_INTERIOR AS numInterior",
                         "SD.DES_CP AS cp", "SD.DES_COLONIA AS desColonia", "SD.DES_MUNICIPIO AS desMunicipio", "SD.DES_ESTADO AS desEstado",
-                        "EMP.DES_TELEFONO AS telefono", "EMP.DES_CORREO AS correo")
+                        "EMP.DES_TELEFONO AS telefono", "EMP.DES_CORREO AS correo","SCP.ID_PROMOTOR AS idPromotor","CONCAT(PRO.NOM_PROMOTOR, ' ', PRO.NOM_PAPELLIDO, ' ', PRO.NOM_SAPELLIDO) AS nomPromotor")
                 .from("SVT_CONVENIO_PF SCP")
                 .leftJoin("SVT_EMPRESA_CONVENIO_PF EMP", "SCP.ID_CONVENIO_PF = EMP .ID_CONVENIO_PF")
                 .leftJoin("SVT_DOMICILIO SD", "EMP.ID_DOMICILIO = SD.ID_DOMICILIO")
+                .leftJoin("SVT_PROMOTOR PRO","SCP.ID_PROMOTOR = PRO.ID_PROMOTOR")
                 .where("SCP.DES_FOLIO = " + folioConvenio);
         String consulta = querySelect.build();
         String encoded = DatatypeConverter.printBase64Binary(consulta.getBytes());
@@ -358,7 +361,7 @@ public class ConvenioNuevoPF {
                         "SP2.NOM_SEGUNDO_APELLIDO AS segundoApellido", "DATE_FORMAT(SP2.FEC_NAC,'%Y-%m-%d') AS fechaNacimiento",
                         "SP2.CVE_RFC AS rfc", "SP2.CVE_CURP AS curp", "SP2.CVE_NSS  AS nss", "SP2.NUM_SEXO AS numSexo",
                         "SP2.DES_TELEFONO AS telefono", "SP2.DES_CORREO AS correo", "SP2.TIPO_PERSONA AS tipoPersona", "SP2.NUM_INE AS numIne", "TIMESTAMPDIFF(YEAR, SP2.FEC_NAC , NOW()) AS edad",
-                        "SCB.IND_INE_BENEFICIARIO AS validaIneBeneficiario" , "SCB.IND_ACTA_NACIMIENTO AS validaActaNacimientoBeneficiario", "SCB.ID_PARENTESCO  AS idParentesco",
+                        "SCB.IND_INE_BENEFICIARIO AS validaIneBeneficiario" , "SCB.IND_ACTA_NACIMIENTO AS validaActaNacimientoBeneficiario", "SCB.ID_PARENTESCO  AS idParentesco","SCB.CVE_ACTA as cveActa",
                         "SV.ID_VELATORIO AS idVelatorio","SV.DES_VELATORIO AS nomVelatorio")
                 .from("SVT_CONVENIO_PF SCP")
                 .leftJoin("SVC_VELATORIO SV", "SCP.ID_VELATORIO = SV.ID_VELATORIO")
