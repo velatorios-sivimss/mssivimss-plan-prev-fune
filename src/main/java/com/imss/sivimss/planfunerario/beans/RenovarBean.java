@@ -256,14 +256,19 @@ public class RenovarBean {
 		return request;
 	}
 
-	public DatosRequest cambiarEstatusPlan(String folio, Integer id) {
+	public DatosRequest cambiarEstatusPlan(String folio, Integer idConvenio, Integer id) {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper(UPDATE_SVT_CONVENIO_PF);
-		q.agregarParametroValues(""+AppConstantes.ID_ESTATUS_CONVENIO+"", "3");
+		q.agregarParametroValues(""+AppConstantes.ID_ESTATUS_CONVENIO+"", "4");
 		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+id+"");
 		q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
-		q.addWhere("DES_FOLIO = '"+folio+"'");
+		if(folio!=null) {
+			q.addWhere("DES_FOLIO = '"+folio+"'");
+		}
+		if(idConvenio!=null) {
+			q.addWhere(ID_CONVENIO_PF+"="+idConvenio+"");
+		}
 		String query = q.obtenerQueryActualizar();
 		log.info("cambiar estatus plan -> "+query);
 		String encoded = encodedQuery(query);
@@ -272,7 +277,7 @@ public class RenovarBean {
 		return request;
 	}
 
-	public DatosRequest  cambiarEstatusPlanAnterior(Integer idConvenio, Integer idUsuario) {
+/*	public DatosRequest  cambiarEstatusPlanAnterior(Integer idConvenio, Integer idUsuario) {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		String query;
@@ -287,7 +292,7 @@ public class RenovarBean {
 		parametro.put(AppConstantes.QUERY, encoded);
 		request.setDatos(parametro);
 		return request;
-	}
+	} 
 
 
 	public DatosRequest cambiarEstatusACerrado(String folio, Integer idConvenio,Integer idUsuario) {
@@ -308,7 +313,7 @@ public class RenovarBean {
 		parametro.put(AppConstantes.QUERY, encoded);
 		request.setDatos(parametro);
 		return request;
-	}
+	} */
 
 
 	public DatosRequest contador (Integer idConvenioPf) {
