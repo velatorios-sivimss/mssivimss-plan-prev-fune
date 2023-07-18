@@ -338,13 +338,16 @@ public class ConvenioNuevoPF {
         SelectQueryUtil querySelect = new SelectQueryUtil();
         querySelect.select("SCP.ID_CONVENIO_PF AS idConvenio", "SCP.DES_FOLIO AS desFolio", "EMP.ID_EMPRESA_CONVENIO_PF AS idEmpresa",
                         "EMP.DES_NOMBRE AS nombreEmpresa", "EMP.DES_RAZON_SOCIAL AS razonSocial", "EMP.DES_RFC AS rfc", "EMP.ID_PAIS AS idPais",
-                        "EMP.ID_DOMICILIO AS idDomicilio", "SD.DES_CALLE AS calle", "SD.NUM_EXTERIOR AS numExterior", "SD.NUM_INTERIOR AS numInterior",
+                        "EMP.ID_DOMICILIO AS idDomicilio", "SD.DES_CALLE AS calle", "SD.NUM_EXTERIOR AS numExterior",
+                        "IFNULL(SD.NUM_INTERIOR,'') AS numInterior",
                         "SD.DES_CP AS cp", "SD.DES_COLONIA AS desColonia", "SD.DES_MUNICIPIO AS desMunicipio", "SD.DES_ESTADO AS desEstado",
-                        "EMP.DES_TELEFONO AS telefono", "EMP.DES_CORREO AS correo","SCP.ID_PROMOTOR AS idPromotor","CONCAT(PRO.NOM_PROMOTOR, ' ', PRO.NOM_PAPELLIDO, ' ', PRO.NOM_SAPELLIDO) AS nomPromotor")
+                        "EMP.DES_TELEFONO AS telefono", "EMP.DES_CORREO AS correo","SCP.ID_PROMOTOR AS idPromotor","CONCAT(PRO.NOM_PROMOTOR, ' ', PRO.NOM_PAPELLIDO, ' ', PRO.NOM_SAPELLIDO) AS nomPromotor",
+                "SCP.ID_VELATORIO as idVelatorio","VEL.DES_VELATORIO AS desVelatorio")
                 .from("SVT_CONVENIO_PF SCP")
                 .leftJoin("SVT_EMPRESA_CONVENIO_PF EMP", "SCP.ID_CONVENIO_PF = EMP .ID_CONVENIO_PF")
                 .leftJoin("SVT_DOMICILIO SD", "EMP.ID_DOMICILIO = SD.ID_DOMICILIO")
                 .leftJoin("SVT_PROMOTOR PRO","SCP.ID_PROMOTOR = PRO.ID_PROMOTOR")
+                .leftJoin("SVC_VELATORIO VEL","SCP.ID_VELATORIO = VEL.ID_VELATORIO")
                 .where("SCP.DES_FOLIO = " + folioConvenio);
         String consulta = querySelect.build();
         String encoded = DatatypeConverter.printBase64Binary(consulta.getBytes());
