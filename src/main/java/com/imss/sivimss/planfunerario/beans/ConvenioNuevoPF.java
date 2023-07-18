@@ -135,7 +135,6 @@ public class ConvenioNuevoPF {
             queryContratanteBeneficiarios.agregarParametroValues("ID_CONTRATANTE_PAQUETE_CONVENIO_PF", "idContratantePaqueteConvenio");
             queryContratanteBeneficiarios.agregarParametroValues("ID_PARENTESCO", parentesco);
             queryContratanteBeneficiarios.agregarParametroValues("ID_PERSONA", "idPersona");
-            //queryContratanteBeneficiarios.agregarParametroValues("ID_CONVENIO_PF", "idConvenioPf");
             queryContratanteBeneficiarios.agregarParametroValues("CVE_ACTA", "'" + claveActa + "'");
             queryContratanteBeneficiarios.agregarParametroValues("ID_USUARIO_ALTA", usuario);
             queryContratanteBeneficiarios.agregarParametroValues("IND_ACTIVO", "1");
@@ -421,17 +420,17 @@ public class ConvenioNuevoPF {
         Map<String, Object> datosPdf = new HashMap<>();
         datosPdf.put("rutaNombreReporte", pdfDto.getRutaNombreReporte());
         datosPdf.put("tipoReporte", "pdf");
-        datosPdf.put("nombreAfiliado", infoReporte.getNombrePersona() + " " + infoReporte.getPrimerApellido() + " " + infoReporte.getSegundoApellido()); // sacar datos de query
-        datosPdf.put("numeroINE", infoReporte.getNumIne());// sacar datos de query
-        datosPdf.put("paqueteContratado", infoReporte.getNombrePaquete());// sacar datos de query
-        datosPdf.put("serviciosIncluidos", infoReporte.getDesPaquete());// sacar datos de query
-        datosPdf.put("costoPaquete", infoReporte.getMonPrecio());// sacar datos de query
-        datosPdf.put("nombreTitular", infoReporte.getNombrePersona() + " " + infoReporte.getPrimerApellido() + " " + infoReporte.getSegundoApellido());// sacar datos de query
-        datosPdf.put("rfc", infoReporte.getRfc());// sacar datos de query
-        datosPdf.put("idConvenio", pdfDto.getIdConvenio());// sacar datos de query
-        datosPdf.put("ciudadExpedicion", pdfDto.getCiudadExpedicion());// sacar datos de query
-        datosPdf.put("fechaExpedicion", pdfDto.getFechaExpedicion());// sacar datos de query
-        datosPdf.put("folioConvenio", infoReporte.getFolio());// sacar datos de query
+        datosPdf.put("nombreAfiliado", infoReporte.getNombrePersona() + " " + infoReporte.getPrimerApellido() + " " + infoReporte.getSegundoApellido());
+        datosPdf.put("numeroINE", infoReporte.getNumIne());
+        datosPdf.put("paqueteContratado", infoReporte.getNombrePaquete());
+        datosPdf.put("serviciosIncluidos", infoReporte.getDesPaquete());
+        datosPdf.put("costoPaquete", infoReporte.getMonPrecio());
+        datosPdf.put("nombreTitular", infoReporte.getNombrePersona() + " " + infoReporte.getPrimerApellido() + " " + infoReporte.getSegundoApellido());
+        datosPdf.put("rfc", infoReporte.getRfc());
+        datosPdf.put("idConvenio", pdfDto.getIdConvenio());
+        datosPdf.put("ciudadExpedicion", pdfDto.getCiudadExpedicion());
+        datosPdf.put("fechaExpedicion", pdfDto.getFechaExpedicion());
+        datosPdf.put("folioConvenio", infoReporte.getFolio());
         return datosPdf;
     }
 
