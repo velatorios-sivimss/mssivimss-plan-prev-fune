@@ -313,7 +313,7 @@ public class ConvenioNuevoPF {
                         "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIPO_PERSONA AS tipoPersona", "SP.NUM_INE AS numIne",
                         "CPF.ID_PAQUETE AS idPaquete", "PAQ.DES_NOM_PAQUETE AS nombrePaquete", "DATE_FORMAT(SP.FEC_NAC,'%Y-%m-%d') AS fechaNacimiento",
                         "SD.DES_CALLE AS calle", "SD.NUM_EXTERIOR AS numExterior","SD.NUM_INTERIOR AS numInterior","SD.DES_CP AS cp","SD.DES_COLONIA AS colonia",
-                        "SD.DES_MUNICIPIO AS municipio","SD.DES_ESTADO AS estado")
+                        "SD.DES_MUNICIPIO AS municipio","SD.DES_ESTADO AS estado", "CPF.ID_ENFERMEDAD_PREXISTENTE AS idEnfermedadPreexistente", "CPF.DES_OTRA_ENFERMEDAD AS otraEnfermedad")
                 .from("SVT_CONVENIO_PF SCP")
                 .leftJoin("SVC_VELATORIO SV", "SCP.ID_VELATORIO = SV.ID_VELATORIO")
                 .leftJoin("SVT_PROMOTOR PROM", "SCP.ID_PROMOTOR = PROM.ID_PROMOTOR")
