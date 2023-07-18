@@ -2,6 +2,7 @@ package com.imss.sivimss.planfunerario.model.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import com.imss.sivimss.planfunerario.model.BeneficiarioModel;
+import com.imss.sivimss.planfunerario.model.DocBeneficiariosPlanAnteriorModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +30,7 @@ public class PersonaRequest {
 	private String correoE;
 	private String tel;
 	private BeneficiarioModel beneficiario;
-		
-	
+	private DocBeneficiariosPlanAnteriorModel docPlanAnterior;
+//	private Integer tipoPrevision;	
+
 }

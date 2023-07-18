@@ -9,5 +9,5 @@ public class PdfDto {
     private String rutaNombreReporte;
     private String ciudadExpedicion;
     private String fechaExpedicion;
-    private String folioConvenio;
+    private String idConvenio;
 }

@@ -49,7 +49,7 @@ public class ModificarConvenioPfImpl implements ModificarConvenioPfService {
                 persona.getPersona().getMunicipio(),persona.getPersona().getEstado(),usuarioDto.getIdUsuario().toString());
         String[] queryBeneficiarios = new String[persona.getPersona().getBeneficiarios().length];
         for (int i = 0; i < persona.getPersona().getBeneficiarios().length; i++) {
-            queryBeneficiarios[i] = DatatypeConverter.printBase64Binary(modificar.generaQueryActualizaPersona(persona.getPersona().getBeneficiarios()[i], usuarioDto.getIdUsuario().toString(), persona.getPersona().getBeneficiarios()[i].getIdPersona()).getBytes("UTF-8"));
+            queryBeneficiarios[i] = DatatypeConverter.printBase64Binary(modificar.generaQueryActualizaPersonaBeneficiario(persona.getPersona().getBeneficiarios()[i], usuarioDto.getIdUsuario().toString(), persona.getPersona().getBeneficiarios()[i].getIdPersona()).getBytes("UTF-8"));
          }
         mapa.put("datosPersonaContratante", DatatypeConverter.printBase64Binary(consultaModificarDatosPersona.getBytes("UTF-8")));
         mapa.put("datosDomicilioContratante",DatatypeConverter.printBase64Binary(consultaModificaDomicilio.getBytes("UTF-8")));
