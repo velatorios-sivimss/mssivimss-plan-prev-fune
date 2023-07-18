@@ -254,7 +254,7 @@ public class ConsultaConvenios {
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVT_CONTRATANTE_BENEFICIARIOS beneficiario",
                         "beneficiario.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = contratanteConvenio.ID_CONTRATANTE_PAQUETE_CONVENIO_PF",
-                        "beneficiario.IND_ACTIVO = true",
+//                        "beneficiario.IND_ACTIVO = true",
                         "beneficiario.ID_PERSONA = finado.ID_PERSONA")
                 .join("SVC_PARENTESCO parentesco",
                         "parentesco.ID_PARENTESCO = beneficiario.ID_PARENTESCO")
@@ -304,7 +304,7 @@ public class ConsultaConvenios {
                         "presupuesto.ID_ORDEN_SERVICIO = ods.ID_ORDEN_SERVICIO")
                 .join("SVT_PAGO_BITACORA pago",
                         "pago.CVE_FOLIO = ods.CVE_FOLIO",
-                        "pago.CVE_ESTATUS_PAGO = 2") // sacar a una constante
+                        "pago.CVE_ESTATUS_PAGO in (4, 5)") // sacar a una constante
                 .where("convenio.DES_FOLIO = :folioConvenio",
                         "ods.ID_ESTATUS_ORDEN_SERVICIO in (4, 5)")// sacar a una constante
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
