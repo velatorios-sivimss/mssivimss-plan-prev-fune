@@ -43,4 +43,6 @@ public class ContratanteResponse {
     private String colonia;
     private String municipio;
     private String estado;
+    private String idEnfermedadPreexistente;
+    private String otraEnfermedad;
 }
