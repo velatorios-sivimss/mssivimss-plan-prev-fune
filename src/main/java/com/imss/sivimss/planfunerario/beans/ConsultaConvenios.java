@@ -333,17 +333,9 @@ public class ConsultaConvenios {
                         "velatorio.DES_VELATORIO as nombreVelatorio",
                         recuperarNombrePersona("personaAfiliada", "nombreAfiliado"),
                         "empresaContratante.DES_RFC as rfcTitular",
-                        "if(" +
-                                "personaAfiliada.FEC_NAC is null, " +
-                                "' ', " +
-                                formatearFecha("personaAfiliada.FEC_NAC") + ") " +
-                                "as " + ALIAS_FECHA_NACIMIENTO,
-                        "if(" +
-                                "personaAfiliada.FEC_NAC is null, " +
-                                "' ', " +
-                                recuperarEdadSinAlias("personaAfiliada") + ") " +
-                                "as " + ALIAS_EDAD,
-                        "if(personaAfiliada.NUM_SEXO is null, ' ', personaAfiliada.NUM_SEXO) as genero",
+                        formatearFecha("personaAfiliada.FEC_NAC") + "as " + ALIAS_FECHA_NACIMIENTO,
+                        recuperarEdad("personaAfiliada"),
+                        "personaAfiliada.NUM_SEXO as genero",
                         "personaAfiliada.DES_CORREO as correo"
                 )
                 .from("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratantePaquete")
