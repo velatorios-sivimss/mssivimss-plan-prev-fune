@@ -346,8 +346,6 @@ public class ConsultaConvenios {
                         "velatorio.ID_VELATORIO = convenio.ID_VELATORIO")
                 .join("SVT_EMPRESA_CONVENIO_PF empresaContratante",
                         "empresaContratante.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-                .join("SVC_CONTRATANTE_CONVENIO_PF_EMPRESA convenioEmpresa",
-                        "convenioEmpresa.ID_EMPRESA_CONVENIO_PF = empresaContratante.ID_EMPRESA_CONVENIO_PF")
                 .join("SVC_CONTRATANTE contratante",
                         "contratante.ID_CONTRATANTE = contratantePaquete.ID_CONTRATANTE")
                 .join("SVC_PERSONA personaAfiliada",
