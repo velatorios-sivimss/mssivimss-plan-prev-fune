@@ -333,9 +333,17 @@ public class ConsultaConvenios {
                         "velatorio.DES_VELATORIO as nombreVelatorio",
                         recuperarNombrePersona("personaAfiliada", "nombreAfiliado"),
                         "empresaContratante.DES_RFC as rfcTitular",
-                        formatearFecha("personaAfiliada.FEC_NAC") + " as " + ALIAS_FECHA_NACIMIENTO,
-                        recuperarEdad("personaAfiliada"),
-                        "personaAfiliada.NUM_SEXO as genero",
+                        "if(" +
+                                "personaAfiliada.FEC_NAC is null, " +
+                                "' ', " +
+                                formatearFecha("personaAfiliada.FEC_NAC") + ") " +
+                                "as " + ALIAS_FECHA_NACIMIENTO,
+                        "if(" +
+                                "personaAfiliada.FEC_NAC is null, " +
+                                "' ', " +
+                                recuperarEdadSinAlias("personaAfiliada") + ") " +
+                                "as " + ALIAS_EDAD,
+                        "if(personaAfiliada.NUM_SEXO is null, ' ', personaAfiliada.NUM_SEXO) as genero",
                         "personaAfiliada.DES_CORREO as correo"
                 )
                 .from("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratantePaquete")
@@ -433,10 +441,13 @@ public class ConsultaConvenios {
                         formatearFecha("factura.FEC_FACTURACION") + " as fecha", // cambiar por la fecha que se estaria registrando
                         "factura.CVE_RFC_CONTRATANTE as rfc",
                         "factura.DES_RAZON_SOCIAL as cliente",
+                        "factura.DES_COMENTARIOS as nota",
                         "factura.IMP_TOTAL as total",
-                        "factura.ID_ESTATUS_FACTURA as estatusFactura"
+                        "estatus.DES_ESTATUS as estatusFactura"
                 )
                 .from("SVC_FACTURA factura")
+                .join("SVC_ESTATUS_FACTURA estatus",
+                        "estatus.ID_ESTATUS_FACTURA = factura.ID_ESTATUS_FACTURA")
                 .join("SVT_PAGO_BITACORA pago",
                         "pago.ID_PAGO_BITACORA = factura.ID_PAGO")
                 .join(CONVENIO_ALIAS,
@@ -569,7 +580,18 @@ public class ConsultaConvenios {
      * @return
      */
     private static String recuperarEdad(String aliasTabla) {
-        return "TIMESTAMPDIFF(YEAR, " + aliasTabla + ".FEC_NAC, CURDATE()) as " + ALIAS_EDAD;
+//        return "TIMESTAMPDIFF(YEAR, " + aliasTabla + ".FEC_NAC, CURDATE()) as " + ALIAS_EDAD;
+        return recuperarEdadSinAlias(aliasTabla) + "as " + ALIAS_EDAD;
+    }
+
+    /**
+     * Recuprea la edad de la persona con su fecha de nacimiento.
+     *
+     * @param aliasTabla
+     * @return
+     */
+    private static String recuperarEdadSinAlias(String aliasTabla) {
+        return "TIMESTAMPDIFF(YEAR, " + aliasTabla + ".FEC_NAC, CURDATE())";
     }
 
     /**
