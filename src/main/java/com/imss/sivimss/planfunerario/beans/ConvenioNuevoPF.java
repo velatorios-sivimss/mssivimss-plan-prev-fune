@@ -305,8 +305,8 @@ public class ConvenioNuevoPF {
         Map<String, Object> parametro = new HashMap<>();
         SelectQueryUtil querySelect = new SelectQueryUtil();
         querySelect.select("SCP.ID_CONVENIO_PF AS idConvenioPf", "SCP.DES_FOLIO AS folioConvenioPf", "SCP.ID_VELATORIO AS idVelatorio", "SV.DES_VELATORIO AS nombreVelatorio",
-                        "SCP.ID_PROMOTOR AS idPromotor", "PROM.NUM_EMPLEDO AS numeroEmpleado", "PROM.NOM_PROMOTOR AS nombrePromotor", "PROM.NOM_PAPELLIDO AS primerApellido",
-                        "PROM.NOM_SAPELLIDO AS segundoApellido", "CPF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF AS idContratanteConvenioPf", "CPF.ID_CONTRATANTE AS idContratante",
+                        "SCP.ID_PROMOTOR AS idPromotor", "PROM.NUM_EMPLEDO AS numeroEmpleado", "PROM.NOM_PROMOTOR AS nombrePromotor", "PROM.NOM_PAPELLIDO AS primerApellidoPromotor",
+                        "PROM.NOM_SAPELLIDO AS segundoApellidoPromotor", "CPF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF AS idContratanteConvenioPf", "CPF.ID_CONTRATANTE AS idContratante",
                         "SC.CVE_MATRICULA AS cveMatricula", "SC.ID_PERSONA AS idPersona", "SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss", "SP.NOM_PERSONA AS nombrePersona",
                         "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido", "SP.NUM_SEXO AS numSexo", "SP.ID_PAIS AS idPais", "SP.ID_ESTADO AS idEstado",
                         "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIPO_PERSONA AS tipoPersona", "SP.NUM_INE AS numIne",
