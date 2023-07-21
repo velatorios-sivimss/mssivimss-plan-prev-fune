@@ -107,13 +107,19 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
                 empresa.getEmpresa().getMunicipio(), empresa.getEmpresa().getEstado(), usuarioDto.getIdUsuario().toString());
         String queryEmpresaConvenioPF = convenioBean.generarQueryEmpresaConvenioPf(empresa.getEmpresa(), usuarioDto.getIdUsuario().toString());
 
-        log.info("--------- datos a enviar ----------");
+
         HashMap mapa = new HashMap();
         mapa.put("datosConvenio", DatatypeConverter.printBase64Binary(queryConvenioPf.getBytes("UTF-8")));
         mapa.put("datosDireccion", DatatypeConverter.printBase64Binary(queryDomicilio.getBytes("UTF-8")));
         mapa.put("datosEmpresaConvenio", DatatypeConverter.printBase64Binary(queryEmpresaConvenioPF.getBytes("UTF-8")));
         mapa.put("datosPersonas", empresa.getEmpresa().getPersonas());
         mapa.put("usuario", usuarioDto.getIdUsuario().toString());
+
+        //irwin
+        mapa.put("idVelatorio", empresa.getIdVelatorio());
+        mapa.put("nombreContratante", empresa.getEmpresa().getNombreEmpresa());
+        mapa.put("usuarioAlta", usuarioDto.getIdUsuario());
+        mapa.put("idPaquete", empresa.getEmpresa().getPersonas()[0].getPaquete());
         return providerRestTemplate.consumirServicio(mapa, urlDominioConvenios + "/insertConvenios/empresa", authentication);
     }
 
