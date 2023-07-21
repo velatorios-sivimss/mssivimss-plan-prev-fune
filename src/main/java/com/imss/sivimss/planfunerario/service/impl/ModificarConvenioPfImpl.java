@@ -51,9 +51,7 @@ public class ModificarConvenioPfImpl implements ModificarConvenioPfService {
         for (int i = 0; i < persona.getPersona().getBeneficiarios().length; i++) {
             queryBeneficiarios[i] = DatatypeConverter.printBase64Binary(modificar.generaQueryActualizaPersonaBeneficiario(persona.getPersona().getBeneficiarios()[i], usuarioDto.getIdUsuario().toString(), persona.getPersona().getBeneficiarios()[i].getIdPersona()).getBytes("UTF-8"));
          }
-        if(queryBeneficiarios.length !=0){
-            mapa.put("beneficiariosContratante",queryBeneficiarios);
-        }
+
         mapa.put("datosPersonaContratante", DatatypeConverter.printBase64Binary(consultaModificarDatosPersona.getBytes("UTF-8")));
         mapa.put("datosDomicilioContratante",DatatypeConverter.printBase64Binary(consultaModificaDomicilio.getBytes("UTF-8")));
         mapa.put("folioConvenio",persona.getFolioConvenio());
