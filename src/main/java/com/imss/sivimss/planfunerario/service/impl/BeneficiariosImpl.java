@@ -90,18 +90,15 @@ public class BeneficiariosImpl implements BeneficiariosService {
 			benefBean = new BeneficiariosBean(benefRequest);
 			benefBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 
-			if (benefRequest.getBeneficiario().getIdContratanteConvenioPf() == null
-					|| benefRequest.getBeneficiario().getIdParentesco() == null) {
+			if (benefRequest.getBeneficiario().getIdContratanteConvenioPf() == null || benefRequest.getBeneficiario().getIdParentesco() == null) {
 				throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);
 			}
 			if (benefRequest.getDocPlanAnterior() != null) {
 				benefBean.setIndComprobanteEstudios(benefRequest.getDocPlanAnterior().getIndComprobanteEstudios());
 				benefBean.setIndActaMatrimonio(benefRequest.getDocPlanAnterior().getIndActaMatrimonio());
-				benefBean
-						.setIndDeclaracionConcubinato(benefRequest.getDocPlanAnterior().getIndDeclaracionConcubinato());
+				benefBean.setIndDeclaracionConcubinato(benefRequest.getDocPlanAnterior().getIndDeclaracionConcubinato());
 				response = providerRestTemplate.consumirServicio(benefBean.insertarPersonaPlanAnterior().getDatos(),
-						urlCrear,
-						authentication);
+						urlCrear,authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
 						this.getClass().getPackage().toString(), "Estatus OK", ALTA, authentication);
 				if (response.getCodigo() == 200) {

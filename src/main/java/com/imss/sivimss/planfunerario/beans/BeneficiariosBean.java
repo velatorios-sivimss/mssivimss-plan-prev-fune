@@ -180,9 +180,9 @@ public class BeneficiariosBean {
 		q.agregarParametroValues(NOM_SEGUNDO_APELLIDO, "'" + this.apellidoM + "'");
 		q.agregarParametroValues(FEC_NAC, "'" + this.fechaNac + "'");
 		q.agregarParametroValues(CVE_CURP, "'"+ this.curp + "'");
-		q.agregarParametroValues(CVE_RFC, "'" +this.rfc +"'");
-		q.agregarParametroValues(DES_CORREO, "'"+ this.correoE +"'");
-		q.agregarParametroValues(DES_TELEFONO, "'" + this.tel + "'");
+		q.agregarParametroValues(CVE_RFC, setValor(this.rfc));
+		q.agregarParametroValues(DES_CORREO, setValor(this.correoE));
+		q.agregarParametroValues(DES_TELEFONO, setValor(this.tel));
 		q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, ""+usuarioAlta+"");
 		q.agregarParametroValues(AppConstantes.FEC_ALTA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		String query = q.obtenerQueryInsertar();
@@ -250,9 +250,9 @@ public class BeneficiariosBean {
 		q.agregarParametroValues(NOM_SEGUNDO_APELLIDO, "'" + this.apellidoM + "'");
 		q.agregarParametroValues(FEC_NAC, "'" + this.fechaNac + "'");
 		q.agregarParametroValues(CVE_CURP, "'"+ this.curp + "'");
-		q.agregarParametroValues(CVE_RFC, "'" +this.rfc +"'");
-		q.agregarParametroValues(DES_CORREO, "'"+ this.correoE +"'");
-		q.agregarParametroValues(DES_TELEFONO, "'" + this.tel + "'");
+		q.agregarParametroValues(CVE_RFC, setValor(this.rfc));
+		q.agregarParametroValues(DES_CORREO, setValor(this.correoE));
+		q.agregarParametroValues(DES_TELEFONO, setValor(this.tel));
 		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+usuarioAlta+"");
 		q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		q.addWhere("ID_PERSONA = " + this.idPersona);
@@ -370,9 +370,9 @@ public class BeneficiariosBean {
 		q.agregarParametroValues(NOM_SEGUNDO_APELLIDO, "'" + this.apellidoM + "'");
 		q.agregarParametroValues(FEC_NAC, "'" + this.fechaNac + "'");
 		q.agregarParametroValues(CVE_CURP, "'"+ this.curp + "'");
-		q.agregarParametroValues(CVE_RFC, "'" +this.rfc +"'");
-		q.agregarParametroValues(DES_CORREO, "'"+ this.correoE +"'");
-		q.agregarParametroValues(DES_TELEFONO, "'" + this.tel + "'");
+		q.agregarParametroValues(CVE_RFC, setValor(this.rfc));
+		q.agregarParametroValues(DES_CORREO, setValor(this.correoE));
+		q.agregarParametroValues(DES_TELEFONO, setValor(this.tel));
 		q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, ""+usuarioAlta+"");
 		q.agregarParametroValues(AppConstantes.FEC_ALTA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		String query = q.obtenerQueryInsertar() +"$$"  + insertarBeneficiario();
@@ -494,6 +494,14 @@ public class BeneficiariosBean {
 	
 	private static String encodedQuery(String query) {
         return DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+    }
+	
+	private String setValor(String valor) {
+        if (valor==null || valor.equals("")) {
+            return "NULL";
+        }else {
+            return "'"+valor+"'";
+        }
     }
 
 }
