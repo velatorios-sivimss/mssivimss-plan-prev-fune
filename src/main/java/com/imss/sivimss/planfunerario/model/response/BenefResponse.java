@@ -9,5 +9,6 @@ public class BenefResponse {
 	
 	private String nombreBeneficiario;
 	private Integer id;
+	private Integer idpersona;
 
 }

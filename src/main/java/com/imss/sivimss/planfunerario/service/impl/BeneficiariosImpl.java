@@ -1,5 +1,6 @@
 package com.imss.sivimss.planfunerario.service.impl;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -13,8 +14,12 @@ import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
 import com.imss.sivimss.planfunerario.model.request.CatalogosRequest;
 import com.imss.sivimss.planfunerario.model.request.FiltrosBeneficiariosRequest;
 import com.imss.sivimss.planfunerario.model.request.UsuarioDto;
+import com.imss.sivimss.planfunerario.model.response.BenefResponse;
+import com.imss.sivimss.planfunerario.model.response.BuscarBeneficiariosResponse;
+import com.imss.sivimss.planfunerario.model.response.DatosConvenioResponse;
 import com.imss.sivimss.planfunerario.service.BeneficiariosService;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
+import com.imss.sivimss.planfunerario.util.ConvertirGenerico;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.LogUtil;
 import com.imss.sivimss.planfunerario.util.ProviderServiceRestTemplate;
@@ -23,6 +28,8 @@ import com.imss.sivimss.planfunerario.util.Response;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 
 import javax.xml.bind.DatatypeConverter;
@@ -57,6 +64,9 @@ public class BeneficiariosImpl implements BeneficiariosService {
 
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 
 	Gson gson = new Gson();
 
@@ -64,8 +74,30 @@ public class BeneficiariosImpl implements BeneficiariosService {
 
 	@Override
 	public Response<?> buscarBeneficiarios(DatosRequest request, Authentication authentication) throws IOException {
-		return providerRestTemplate.consumirServicio(benefBean.beneficiarios(request).getDatos(), urlConsulta,
+		String palabra = request.getDatos().get("palabra").toString();
+		Response<?> response = new Response<>();
+		List<BuscarBeneficiariosResponse> buscarbeneficiarios;
+		List<BenefResponse> beneficiarios;
+		BuscarBeneficiariosResponse datosBeneficiarios = new BuscarBeneficiariosResponse();
+		Response<?> responsePaqueteBenef = providerRestTemplate.consumirServicio(benefBean.beneficiarios(request, palabra).getDatos(), urlConsulta,
 				authentication);
+		if(responsePaqueteBenef.getCodigo()==200) {
+			buscarbeneficiarios = Arrays.asList(modelMapper.map(responsePaqueteBenef.getDatos(), BuscarBeneficiariosResponse[].class));
+			beneficiarios = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(benefBean.buscarBeneficiarios(request, palabra).getDatos(), urlConsulta, authentication).getDatos(), BenefResponse[].class));  
+			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+					this.getClass().getPackage().toString(), "Consulta Beneficiarios Ok", CONSULTA, authentication);
+			datosBeneficiarios = buscarbeneficiarios.get(0);
+			datosBeneficiarios.setBeneficiarios(beneficiarios);
+		}
+		else {
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), this.getClass().getPackage().toString(), "No se pudo conectar a la BD", CONSULTA, authentication);
+			throw new BadRequestException(HttpStatus.BAD_REQUEST, "Error de conexion");
+		}
+		    response.setCodigo(200);
+            response.setError(false);
+            response.setMensaje("Exito");
+		    response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosBeneficiarios));
+		return response;
 	}
 
 	@Override

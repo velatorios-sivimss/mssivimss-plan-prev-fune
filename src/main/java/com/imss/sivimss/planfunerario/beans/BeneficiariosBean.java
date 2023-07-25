@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
- 
+
+import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
@@ -107,16 +108,10 @@ public class BeneficiariosBean {
 	public static final String 	SCPC_ID_CONVENIO_PF_PF_ID_CONVENIO_PF = "SCPC.ID_CONVENIO_PF = PF.ID_CONVENIO_PF";
 	
 	
-	public DatosRequest beneficiarios(DatosRequest request) {
+	public DatosRequest beneficiarios(DatosRequest request, String palabra) {
 		Map<String, Object> parametros = new HashMap<>();
-		String palabra = request.getDatos().get("palabra").toString();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SCPC.ID_CONVENIO_PF AS idConvenio",
-				SB_ID_CONTRATANTE_BENEFICIARIOS +" AS idBenef",
-				"CONCAT(SP.NOM_PERSONA,' '",
-				"SP.NOM_PRIMER_APELLIDO, ' '",
-				"SP.NOM_SEGUNDO_APELLIDO) AS nombre",
-				SP_ID_PERSONA+" AS idPersona",
 				"SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF AS idContratanteConvenioPf")
 		.from(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF)
 		.join(SVT_CONVENIO_PF, SCPC_ID_CONVENIO_PF_PF_ID_CONVENIO_PF)
@@ -124,7 +119,6 @@ public class BeneficiariosBean {
 		.leftJoin(SVC_PERSONA, "SB.ID_PERSONA=SP.ID_PERSONA");
       	//queryUtil.where("PF.ID_TIPO_PREVISION= 1");
 		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio").and("(SB.IND_SINIESTROS=0 OR SB.IND_SINIESTROS IS NULL)")
- 
 		.setParameter("idConvenio", Integer.parseInt(palabra));
 		String query = obtieneQuery(queryUtil);
 		log.info("-> " +query);
@@ -132,6 +126,28 @@ public class BeneficiariosBean {
 	    parametros.put(AppConstantes.QUERY, encoded);
 	    request.setDatos(parametros);
 	    return request;
+	}
+	
+	public  DatosRequest buscarBeneficiarios(DatosRequest request, String palabra) {
+		Map<String, Object> parametros = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select(SB_ID_CONTRATANTE_BENEFICIARIOS + " AS id",
+				 "CONCAT(SP.NOM_PERSONA,' ',"
+				+ "SP.NOM_PRIMER_APELLIDO, ' ',"
+				+ "SP.NOM_SEGUNDO_APELLIDO) AS nombreBeneficiario",
+				 " SP.ID_PERSONA AS idPersona")
+		.from(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF)
+		.join(SVT_CONVENIO_PF, SCPC_ID_CONVENIO_PF_PF_ID_CONVENIO_PF)
+		.join(SVT_CONTRATANTE_BENEFICIARIOS, "SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
+		.join(SVC_PERSONA, "SB.ID_PERSONA=SP.ID_PERSONA");
+		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio").and("(SB.IND_SINIESTROS=0 OR SB.IND_SINIESTROS IS NULL)")
+		.setParameter("idConvenio", Integer.parseInt(palabra));
+		String query = obtieneQuery(queryUtil);
+		log.info("-> " +query);
+		String encoded = encodedQuery(query);
+	    parametros.put(AppConstantes.QUERY, encoded);
+	    request.setDatos(parametros);
+		return request;
 	}
 		
 	public DatosRequest detalleBeneficiarios(DatosRequest request, Integer idBeneficiario) {
@@ -503,5 +519,6 @@ public class BeneficiariosBean {
             return "'"+valor+"'";
         }
     }
+
 
 }
