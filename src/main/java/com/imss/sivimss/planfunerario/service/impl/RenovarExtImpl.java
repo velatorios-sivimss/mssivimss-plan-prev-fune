@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
 import com.imss.sivimss.planfunerario.beans.RenovarExt;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioExtRequest;
+import com.imss.sivimss.planfunerario.model.response.BenefResponse;
 import com.imss.sivimss.planfunerario.model.response.RenovacionExtResponse;
 import com.imss.sivimss.planfunerario.service.RenovarExtService;
 import com.imss.sivimss.planfunerario.util.ConvertirGenerico;
@@ -81,14 +82,24 @@ public class RenovarExtImpl implements RenovarExtService{
 
 	@Override
 	public Response<?> verDetalleRenovacionExt(DatosRequest request, Authentication authentication) throws IOException {
+		String palabra = request.getDatos().get("palabra").toString();
+		Response<?> response = new Response<>();
 		List<RenovacionExtResponse> renovacionExtResponse;
-		Response<?> response = providerRestTemplate.consumirServicio(renovarExt.verDetalle(request).getDatos(), urlConsulta,
+		List<BenefResponse> beneficiarios;
+		RenovacionExtResponse datosRenovacionExt = new RenovacionExtResponse();
+		Response<?> responseConsultaDetalle = providerRestTemplate.consumirServicio(renovarExt.verDetalle(request, palabra).getDatos(), urlConsulta,
 				authentication);
-		if (response.getCodigo() == 200) {
-			renovacionExtResponse = Arrays.asList(modelMapper.map(response.getDatos(), RenovacionExtResponse[].class));
-			response.setDatos(ConvertirGenerico.convertInstanceOfObject(renovacionExtResponse));
+		if (responseConsultaDetalle.getCodigo() == 200) {
+			renovacionExtResponse = Arrays.asList(modelMapper.map(responseConsultaDetalle.getDatos(), RenovacionExtResponse[].class));
+			beneficiarios = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(renovarExt.buscarBeneficiarios(request, palabra).getDatos(), urlConsulta, authentication).getDatos(), BenefResponse[].class));  
+			datosRenovacionExt = renovacionExtResponse.get(0);
+			datosRenovacionExt.setBeneficiarios(beneficiarios);
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DETALLE CONVENIO OK", CONSULTA, authentication);
 		}
+		 response.setCodigo(200);
+         response.setError(false);
+         response.setMensaje("Exito");
+		response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosRenovacionExt));
 		return response;
 	}
 

@@ -67,9 +67,8 @@ public class RenovarExt {
 		return request;
 	}
 	
-	public DatosRequest verDetalle(DatosRequest request) {
+	public DatosRequest verDetalle(DatosRequest request, String palabra) {
 		Map<String, Object> parametros = new HashMap<>();
-		String palabra = request.getDatos().get("palabra").toString();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SV.DES_VELATORIO AS velatorio",
 				"PF.ID_CONVENIO_PF AS idConvenio",
@@ -102,6 +101,28 @@ public class RenovarExt {
 		return request;
 	}
 	
+	public DatosRequest buscarBeneficiarios(DatosRequest request, String palabra) {
+		Map<String, Object> parametros = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("SCB.ID_CONTRATANTE_BENEFICIARIOS AS id",
+				"CONCAT(SP.NOM_PERSONA, ' ',"
+				+"SP.NOM_PRIMER_APELLIDO, ' ',"
+				+"SP.NOM_SEGUNDO_APELLIDO) AS nombreBeneficiario",
+				"SP.ID_PERSONA AS idPersona")
+		.from("SVT_CONVENIO_PF PF")
+		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "PF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
+		.join("SVT_CONTRATANTE_BENEFICIARIOS SCB", "SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
+		.join("SVC_PERSONA SP", "SCB.ID_PERSONA = SP.ID_PERSONA");
+		queryUtil.where("PF.ID_CONVENIO_PF = :idConvenio").and("SCB.IND_ACTIVO=1").and("(SCB.IND_SINIESTROS=0 OR SCB.IND_SINIESTROS IS NULL)")
+		.setParameter("idConvenio", Integer.parseInt(palabra));
+		String query = obtieneQuery(queryUtil);
+		log.info("-> " +query);
+		String encoded = encodedQuery(query);
+	    parametros.put(AppConstantes.QUERY, encoded);
+	    request.setDatos(parametros);
+		return request;
+	}
+	
 	
 	private static String obtieneQuery(SelectQueryUtil queryUtil) {
         return queryUtil.build();
@@ -110,5 +131,4 @@ public class RenovarExt {
 	private static String encodedQuery(String query) {
         return DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
     }
-
 }

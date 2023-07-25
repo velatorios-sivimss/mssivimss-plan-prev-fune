@@ -74,7 +74,6 @@ public class BeneficiariosImpl implements BeneficiariosService {
 
 	@Override
 	public Response<?> buscarBeneficiarios(DatosRequest request, Authentication authentication) throws IOException {
-		
 		String palabra = request.getDatos().get("palabra").toString();
 		Response<?> response = new Response<>();
 		List<BuscarBeneficiariosResponse> buscarbeneficiarios;
