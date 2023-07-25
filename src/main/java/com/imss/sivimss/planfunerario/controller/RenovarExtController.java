@@ -49,9 +49,20 @@ public class RenovarExtController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	@PostMapping("buscar-renovacion-ext")
-	public CompletableFuture<?> buscarConvenioPFNuevo(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
-		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Buscar Convenio PF", CONSULTA, authentication);
+	public CompletableFuture<?> buscarConvenioRenovacionExt(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Buscar Renovacion Ext", CONSULTA, authentication);
 		Response<?> response = renovarExt.buscarRenovacionExt(request,authentication); 
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@TimeLimiter(name = "msflujo")
+	@PostMapping("detalle-renovacion-ext")
+	public CompletableFuture<?> detalleRenovacionExt(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Detalle Renovacion Ext", CONSULTA, authentication);
+		Response<?> response = renovarExt.verDetalleRenovacionExt(request,authentication); 
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}

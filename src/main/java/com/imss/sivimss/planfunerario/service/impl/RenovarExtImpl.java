@@ -1,6 +1,8 @@
 package com.imss.sivimss.planfunerario.service.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.modelmapper.ModelMapper;
@@ -12,7 +14,9 @@ import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
 import com.imss.sivimss.planfunerario.beans.RenovarExt;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioExtRequest;
+import com.imss.sivimss.planfunerario.model.response.RenovacionExtResponse;
 import com.imss.sivimss.planfunerario.service.RenovarExtService;
+import com.imss.sivimss.planfunerario.util.ConvertirGenerico;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.LogUtil;
 import com.imss.sivimss.planfunerario.util.ProviderServiceRestTemplate;
@@ -36,6 +40,8 @@ public class RenovarExtImpl implements RenovarExtService{
 	@Autowired
 	private ModelMapper modelMapper;
 	
+	@Value("${endpoints.rutas.dominio-consulta}")
+	private String urlConsulta;
 	@Value("${endpoints.rutas.dominio-consulta-paginado}")
 	private String urlPaginado;
 	@Value("${endpoints.rutas.dominio-actualizar}")
@@ -53,7 +59,6 @@ public class RenovarExtImpl implements RenovarExtService{
 	
 	@Override
 	public Response<?> buscarRenovacionExt(DatosRequest request, Authentication authentication) throws IOException {
-
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
 		FiltrosConvenioExtRequest filtros = gson.fromJson(datosJson, FiltrosConvenioExtRequest.class);
 		 Integer pagina = Integer.valueOf(Integer.parseInt(request.getDatos().get("pagina").toString()));
@@ -63,7 +68,7 @@ public class RenovarExtImpl implements RenovarExtService{
 		Response<?> response = providerRestTemplate.consumirServicio(renovarExt.buscarConvenioExt(request, filtros).getDatos(), urlPaginado,
 					authentication);
 		if(response.getDatos().toString().contains("id")){
-			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CONSULTA CONTRATANTES OK", CONSULTA, authentication);
+			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CONSULTA CONVENIO RENOVACION EXT OK", CONSULTA, authentication);
 			return response;
 		}else {
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"No se encontro información relacionada a tu busqueda.", CONSULTA, authentication);
@@ -71,6 +76,20 @@ public class RenovarExtImpl implements RenovarExtService{
 			response.setMensaje("45");
 			return response;
 		}
+	}
+
+
+	@Override
+	public Response<?> verDetalleRenovacionExt(DatosRequest request, Authentication authentication) throws IOException {
+		List<RenovacionExtResponse> renovacionExtResponse;
+		Response<?> response = providerRestTemplate.consumirServicio(renovarExt.verDetalle(request).getDatos(), urlConsulta,
+				authentication);
+		if (response.getCodigo() == 200) {
+			renovacionExtResponse = Arrays.asList(modelMapper.map(response.getDatos(), RenovacionExtResponse[].class));
+			response.setDatos(ConvertirGenerico.convertInstanceOfObject(renovacionExtResponse));
+			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DETALLE CONVENIO OK", CONSULTA, authentication);
+		}
+		return response;
 	}
 
 
