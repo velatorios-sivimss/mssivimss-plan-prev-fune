@@ -118,7 +118,8 @@ public class BeneficiariosBean {
 		.leftJoin(SVT_CONTRATANTE_BENEFICIARIOS, "SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
 		.leftJoin(SVC_PERSONA, "SB.ID_PERSONA=SP.ID_PERSONA");
       	//queryUtil.where("PF.ID_TIPO_PREVISION= 1");
-		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio").and("(SB.IND_SINIESTROS=0 OR SB.IND_SINIESTROS IS NULL)")
+		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio")
+		//.and("(SB.IND_SINIESTROS=0 OR SB.IND_SINIESTROS IS NULL)")
 		.setParameter("idConvenio", Integer.parseInt(palabra));
 		String query = obtieneQuery(queryUtil);
 		log.info("-> " +query);
@@ -140,7 +141,7 @@ public class BeneficiariosBean {
 		.join(SVT_CONVENIO_PF, SCPC_ID_CONVENIO_PF_PF_ID_CONVENIO_PF)
 		.join(SVT_CONTRATANTE_BENEFICIARIOS, "SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
 		.join(SVC_PERSONA, "SB.ID_PERSONA=SP.ID_PERSONA");
-		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio").and("(SB.IND_SINIESTROS=0 OR SB.IND_SINIESTROS IS NULL)")
+		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio").and("SB.IND_ACTIVO=1").and("(SB.IND_SINIESTROS=0 OR SB.IND_SINIESTROS IS NULL)")
 		.setParameter("idConvenio", Integer.parseInt(palabra));
 		String query = obtieneQuery(queryUtil);
 		log.info("-> " +query);
@@ -158,6 +159,7 @@ public class BeneficiariosBean {
 				 "SP.NOM_PRIMER_APELLIDO AS primerApellido",
 				 "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
 				 "TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURRENT_TIMESTAMP()) AS edad",
+				 "SB.ID_PARENTESCO AS idParentesco",
 			    "PAR.DES_PARENTESCO AS parentesco",
 				 "SP.CVE_CURP AS curp",
 				 "SP.CVE_RFC AS rfc",
@@ -191,10 +193,10 @@ public class BeneficiariosBean {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVC_PERSONA ");
-		q.agregarParametroValues(NOM_PERSONA, "'" + this.nombre + "'");
-		q.agregarParametroValues(NOM_PRIMER_APELLIDO, "'" + this.apellidoP + "'");
-		q.agregarParametroValues(NOM_SEGUNDO_APELLIDO, "'" + this.apellidoM + "'");
-		q.agregarParametroValues(FEC_NAC, "'" + this.fechaNac + "'");
+		q.agregarParametroValues(NOM_PERSONA, setValor(this.nombre));
+		q.agregarParametroValues(NOM_PRIMER_APELLIDO, setValor(this.apellidoP));
+		q.agregarParametroValues(NOM_SEGUNDO_APELLIDO, setValor(this.apellidoM));
+		q.agregarParametroValues(FEC_NAC, setValor(this.fechaNac));
 		q.agregarParametroValues(CVE_CURP, "'"+ this.curp + "'");
 		q.agregarParametroValues(CVE_RFC, setValor(this.rfc));
 		q.agregarParametroValues(DES_CORREO, setValor(this.correoE));
@@ -381,10 +383,10 @@ public class BeneficiariosBean {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVC_PERSONA ");
-		q.agregarParametroValues(NOM_PERSONA, "'" + this.nombre + "'");
-		q.agregarParametroValues(NOM_PRIMER_APELLIDO, "'" + this.apellidoP + "'");
-		q.agregarParametroValues(NOM_SEGUNDO_APELLIDO, "'" + this.apellidoM + "'");
-		q.agregarParametroValues(FEC_NAC, "'" + this.fechaNac + "'");
+		q.agregarParametroValues(NOM_PERSONA, setValor(this.nombre));
+		q.agregarParametroValues(NOM_PRIMER_APELLIDO, setValor(this.apellidoP));
+		q.agregarParametroValues(NOM_SEGUNDO_APELLIDO, setValor(this.apellidoM));
+		q.agregarParametroValues(FEC_NAC, setValor(this.fechaNac));
 		q.agregarParametroValues(CVE_CURP, "'"+ this.curp + "'");
 		q.agregarParametroValues(CVE_RFC, setValor(this.rfc));
 		q.agregarParametroValues(DES_CORREO, setValor(this.correoE));

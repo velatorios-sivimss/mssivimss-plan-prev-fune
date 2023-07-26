@@ -13,14 +13,15 @@ import lombok.Setter;
 @Getter
 public class RenovacionExtResponse {
 
-	private String velatorio; 
 	private Integer idConvenio;
 	private String folio;
 	private String rfc;
+	private String matricula;
 	private String nombre;
 	private String primerApellido;
 	private String segundoApellido;
 	private Integer tipoPrevision;
+	private Integer idEstatus;
 	private String tipoPaquete;
 	private Double cuotaRecuperacion;
 	private String fecInicio;
