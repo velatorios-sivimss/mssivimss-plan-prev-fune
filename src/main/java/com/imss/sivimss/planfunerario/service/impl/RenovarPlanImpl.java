@@ -230,12 +230,14 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	
 	@Override
 	public Response<?> renovarConvenio(DatosRequest request, Authentication authentication) throws IOException {
-		Response<?> response;
-		try {
+		    Response<?> response;
 			String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		    RenovarPlanPFRequest renovarRequest = gson.fromJson(datosJson, RenovarPlanPFRequest .class);	
-			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-			
+			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);	
+			if ( renovarRequest.getIdConvenioPf() == null ||  renovarRequest.getIndRenovacion() ==null ) {
+				throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);
+			}
+		try {
 			renovarBean = new RenovarBean(renovarRequest);
 			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 			Date dateF = new SimpleDateFormat("dd-MM-yyyy").parse(renovarRequest.getVigencia());
@@ -362,14 +364,12 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private int getDia() {
 	SimpleDateFormat sdf = new SimpleDateFormat("dd");
 		String date = sdf.format(new Date());
-		//String date ="21";
 		return Integer.parseInt(date);
 	}
 	
 	private Integer anioMesActual() {
 	    SimpleDateFormat sdfMes = new SimpleDateFormat("yyyyMM");
 		String date = sdfMes.format(new Date());
-		//String date ="7";
 		return Integer.parseInt(date);
 	}
 	
