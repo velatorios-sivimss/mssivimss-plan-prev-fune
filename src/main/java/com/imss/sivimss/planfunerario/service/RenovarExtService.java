@@ -13,4 +13,6 @@ public interface RenovarExtService {
 
 	Response<?> verDetalleRenovacionExt(DatosRequest request, Authentication authentication) throws IOException;
 
+	Response<?> actualizarEstatus(DatosRequest request, Authentication authentication) throws IOException;
+
 }

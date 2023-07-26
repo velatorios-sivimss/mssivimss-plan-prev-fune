@@ -67,6 +67,17 @@ public class RenovarExtController {
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 	
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@TimeLimiter(name = "msflujo")
+	@PostMapping("actualizar/estatus-convenio")
+	public CompletableFuture<?> actualizarEstatusConvenio(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Se actualiza estatus convenio", MODIFICACION, authentication);
+		Response<?> response = renovarExt.actualizarEstatus(request,authentication); 
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
 	/**
 	 * fallbacks generico
 	 * 
