@@ -28,6 +28,7 @@ public class RenovacionExtResponse {
 	private String fecVigencia;
 	private String correo;
 	private String tel;
+	private Integer indRenovacion;
 	private List<BenefResponse> beneficiarios;
 	
 }
