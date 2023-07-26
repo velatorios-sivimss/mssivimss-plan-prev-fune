@@ -10,6 +10,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -36,10 +37,9 @@ import lombok.extern.slf4j.Slf4j;
 public class RenovarExtImpl implements RenovarExtService{
 	
 	private static final String ALTA = "alta";
-	private static final String BAJA = "baja";
 	private static final String MODIFICACION = "modificacion";
 	private static final String CONSULTA = "consulta";
-	//private static final String INFORMACION_INCOMPLETA = "Informacion incompleta";
+	private static final String INFORMACION_INCOMPLETA = "Informacion incompleta";
 	
 	@Autowired
 	private LogUtil logUtil;
@@ -115,20 +115,22 @@ public class RenovarExtImpl implements RenovarExtService{
 
 	@Override
 	public Response<?> actualizarEstatus(DatosRequest request, Authentication authentication) throws IOException {
-		Response<?> response = new Response<>();
-	
-			
-	
+		Response<?> response;
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 	    RenovarPlanExtRequest extRequest = gson.fromJson(datosJson, RenovarPlanExtRequest.class);	
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+		if (extRequest.getIndRenovacion() == null || extRequest.getIdConvenio()==null ) {
+			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);
+		}
 		try {
 			if(extRequest.getIndRenovacion()==1) {
 				response = providerRestTemplate.consumirServicio(renovarExt.actualizarVigenciaConvenio(extRequest.getIdConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar,
 						authentication);
+				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"SE ACTUALIZO CORECTAMENTE LA VIGENCIA DEL CONVENIO", MODIFICACION, authentication);
 				if(response.getCodigo()==200) {
 					providerRestTemplate.consumirServicio(renovarExt.actualizarEstatusConvenio(extRequest, usuarioDto.getIdUsuario()).getDatos(), urlInsertarMultiple,
 							authentication);
+					logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"SE ACTUALIZO EL ESTATUS DEL CONVENIO OK", MODIFICACION, authentication);
 			}
 		
 		}else {
@@ -139,9 +141,10 @@ public class RenovarExtImpl implements RenovarExtService{
 			String consulta = renovarExt.actualizarVigenciaConvenio(extRequest.getIdConvenio(), usuarioDto.getIdUsuario()).getDatos().get("query").toString();
 			String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error("Error al ejecutar la query " +encoded);
-			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"ERROR AL ACTUALIZAR EL ESTATUS DEL CONVENIO: Fallo al ejecutar la query", ALTA, authentication);
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"ERROR AL ACTUALIZAR EL ESTATUS DEL CONVENIO: Fallo al ejecutar la query", MODIFICACION, authentication);
 			throw new IOException("5", e.getCause());
 		}
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"SE AGREGO CORRECTAMENTE LA JUSTIFICACION", ALTA, authentication);
 		return response;
 	}
 
