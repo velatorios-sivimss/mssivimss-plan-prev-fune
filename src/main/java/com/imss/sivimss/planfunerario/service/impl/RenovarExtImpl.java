@@ -97,6 +97,16 @@ public class RenovarExtImpl implements RenovarExtService{
 		RenovacionExtResponse datosRenovacionExt = new RenovacionExtResponse();
 		Response<?> responseConsultaDetalle = providerRestTemplate.consumirServicio(renovarExt.verDetalle(request, palabra, fecFormat).getDatos(), urlConsulta,
 				authentication);
+		if(validarFallecido(palabra, authentication)) {
+			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
+		//	providerRestTemplate.consumirServicio(renovarExt.cambiarEstatusPlan(palabra, usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
+		//	logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
+			 response.setCodigo(200);
+	          response.setError(false);
+  			response.setDatos(null);
+  			 response.setMensaje("39");
+  			return response;
+		  }
 		if (responseConsultaDetalle.getCodigo() == 200 && responseConsultaDetalle.getDatos().toString().contains("id")) {
 			renovacionExtResponse = Arrays.asList(modelMapper.map(responseConsultaDetalle.getDatos(), RenovacionExtResponse[].class));
 			beneficiarios = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(renovarExt.buscarBeneficiarios(request, palabra).getDatos(), urlConsulta, authentication).getDatos(), BenefResponse[].class));  
@@ -110,6 +120,14 @@ public class RenovarExtImpl implements RenovarExtService{
          response.setMensaje("Exito");
 		
 		return response;
+	}
+
+
+	private boolean validarFallecido(String palabra, Authentication authentication) throws IOException {
+		Response<?> response= providerRestTemplate.consumirServicio(renovarExt.validarFallecido(palabra).getDatos(), urlConsulta,
+				authentication);
+	Object rst=response.getDatos();
+	return !rst.toString().equals("[]");
 	}
 
 

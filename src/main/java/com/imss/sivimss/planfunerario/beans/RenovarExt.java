@@ -169,7 +169,7 @@ public class RenovarExt {
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVT_RENOVACION_EXT_CONVENIO_PF");
 		q.agregarParametroValues("ID_CONVENIO_PF", ""+idConvenio+"");
-		q.agregarParametroValues("DES_JUSTIFICACION", "'"+justificacion+"'");
+		q.agregarParametroValues("DES_JUSTIFICACION", setValor(justificacion));
 		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_ALTA+"", ""+idUsuario+"");
 		q.agregarParametroValues(""+AppConstantes.FEC_ALTA+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		q.addWhere("ID_CONVENIO_PF =" + idConvenio);
@@ -180,6 +180,27 @@ public class RenovarExt {
 		request.setDatos(parametro);
 		return query;
 	}
+	
+	public DatosRequest validarFallecido(String palabra) {
+		DatosRequest request= new DatosRequest();
+		Map<String, Object> parametro = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("SP.CVE_RFC",
+				"SP.NOM_PERSONA")
+		.from("SVC_FINADO SF")
+		.join("SVC_PERSONA SP", "SF.ID_PERSONA = SP.ID_PERSONA")
+		.join("SVC_CONTRATANTE SC", "SP.ID_PERSONA = SC.ID_PERSONA")
+		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SC.ID_CONTRATANTE = SCPC.ID_CONTRATANTE")
+		.join("SVT_CONVENIO_PF SPF", "SCPC.ID_CONVENIO_PF = SPF.ID_CONVENIO_PF");
+			queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio")
+			.setParameter("idConvenio", Integer.parseInt(palabra));
+			String query = obtieneQuery(queryUtil);
+			log.info("validar fallecido ->"+query);
+			String encoded = encodedQuery(query);
+			parametro.put(AppConstantes.QUERY, encoded);
+			request.setDatos(parametro);
+			return request;
+	}
 
 	private static String obtieneQuery(SelectQueryUtil queryUtil) {
         return queryUtil.build();
@@ -189,4 +210,11 @@ public class RenovarExt {
         return DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
     }
 	
+	private String setValor(String valor) {
+        if (valor==null || valor.equals("")) {
+            return "NULL";
+        }else {
+            return "'"+valor+"'";
+        }
+	}
 }
