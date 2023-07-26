@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
-import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioExtRequest;
 import com.imss.sivimss.planfunerario.model.request.RenovarPlanExtRequest;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
@@ -19,6 +18,19 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RenovarExt {
+	
+	//Tablas
+	public static final String SVT_CONVENIO_PF = "SVT_CONVENIO_PF PF";
+	public static final String SVT_CONTRATANTE_PAQUETE_CONVENIO_PF = "SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC";
+	public static final String SVC_PERSONA = "SVC_PERSONA SP";
+	public static final String SVC_CONTRATANTE = "SVC_CONTRATANTE SC";
+	
+	//parameters
+	public static final String ID_CONVENIO = "idConvenio";
+	
+	//Campos
+	public static final String ID_CONVENIO_PF = "ID_CONVENIO_PF";
+	
 
 	public DatosRequest buscarConvenioExt(DatosRequest request, FiltrosConvenioExtRequest filtros, String fecFormat) {
 		Map<String, Object> parametros = new HashMap<>();
@@ -35,13 +47,13 @@ public class RenovarExt {
 				"PAQ.MON_COSTO_REFERENCIA AS cuotaRecuperacion",
 				"IF(PF.IND_RENOVACION=0, (DATE_FORMAT(PF.FEC_INICIO, '"+fecFormat+"')), DATE_FORMAT(RPF.FEC_INICIO, '"+fecFormat+"')) AS fecInicio",
 				"IF(PF.IND_RENOVACION=0, (DATE_FORMAT(PF.FEC_VIGENCIA, '"+fecFormat+"')), DATE_FORMAT(RPF.FEC_VIGENCIA, '"+fecFormat+"')) AS fecVigencia")
-		.from("SVT_CONVENIO_PF PF")
+		.from(SVT_CONVENIO_PF)
 		.join("SVC_VELATORIO SV", "PF.ID_VELATORIO = SV.ID_VELATORIO")
 		.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "PF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS = 1")
-		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "PF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
+		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "PF.ID_CONVENIO_PF=SCPC.ID_CONVENIO_PF")
 		.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
-		.join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
-		.join("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA");
+		.join(SVC_CONTRATANTE, "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
+		.join(SVC_PERSONA, "SC.ID_PERSONA = SP.ID_PERSONA");
 		queryUtil.where("PF.ID_ESTATUS_CONVENIO = 4");
 		if(filtros.getIdDelegacion()!=null) {
 			queryUtil.where("SV.ID_DELEGACION= :idDelegacion")
@@ -89,14 +101,14 @@ public class RenovarExt {
 				"SP.DES_TELEFONO AS tel",
 				"SP.DES_CORREO AS correo",
 				"PF.IND_RENOVACION AS indRenovacion")
-		.from("SVT_CONVENIO_PF PF")
+		.from(SVT_CONVENIO_PF)
 		.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "PF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS = 1")
-		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "PF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
+		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "PF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
-		.join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
-		.join("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA");
+		.join(SVC_CONTRATANTE, "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
+		.join(SVC_PERSONA, "SC.ID_PERSONA = SP.ID_PERSONA");
 		queryUtil.where("PF.ID_CONVENIO_PF = :idConvenio").and("PF.ID_ESTATUS_CONVENIO= 4")
-		.setParameter("idConvenio", Integer.parseInt(palabra));
+		.setParameter(ID_CONVENIO, Integer.parseInt(palabra));
 		String query = obtieneQuery(queryUtil);
 		log.info("-> " +query);
 		String encoded = encodedQuery(query);
@@ -113,12 +125,12 @@ public class RenovarExt {
 				+"SP.NOM_PRIMER_APELLIDO, ' ',"
 				+"SP.NOM_SEGUNDO_APELLIDO) AS nombreBeneficiario",
 				"SP.ID_PERSONA AS idPersona")
-		.from("SVT_CONVENIO_PF PF")
-		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "PF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
+		.from(SVT_CONVENIO_PF)
+		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "PF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join("SVT_CONTRATANTE_BENEFICIARIOS SCB", "SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
-		.join("SVC_PERSONA SP", "SCB.ID_PERSONA = SP.ID_PERSONA");
+		.join(SVC_PERSONA, "SCB.ID_PERSONA = SP.ID_PERSONA");
 		queryUtil.where("PF.ID_CONVENIO_PF = :idConvenio").and("SCB.IND_ACTIVO=1").and("(SCB.IND_SINIESTROS=0 OR SCB.IND_SINIESTROS IS NULL)")
-		.setParameter("idConvenio", Integer.parseInt(palabra));
+		.setParameter(ID_CONVENIO, Integer.parseInt(palabra));
 		String query = obtieneQuery(queryUtil);
 		log.info("-> " +query);
 		String encoded = encodedQuery(query);
@@ -134,7 +146,7 @@ public class RenovarExt {
 		q.agregarParametroValues("FEC_VIGENCIA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"");
 		q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
-		q.addWhere("ID_CONVENIO_PF =" + idConvenio +" AND IND_ESTATUS= 1");
+		q.addWhere(ID_CONVENIO_PF +"="+ idConvenio +" AND IND_ESTATUS= 1");
 		String query = q.obtenerQueryActualizar();
 		log.info("actualizar estatus convenio --> "+query);
 		String encoded = encodedQuery(query);
@@ -168,7 +180,7 @@ public class RenovarExt {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVT_RENOVACION_EXT_CONVENIO_PF");
-		q.agregarParametroValues("ID_CONVENIO_PF", ""+idConvenio+"");
+		q.agregarParametroValues(ID_CONVENIO_PF, ""+idConvenio+"");
 		q.agregarParametroValues("DES_JUSTIFICACION", setValor(justificacion));
 		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_ALTA+"", ""+idUsuario+"");
 		q.agregarParametroValues(""+AppConstantes.FEC_ALTA+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
@@ -188,12 +200,12 @@ public class RenovarExt {
 		queryUtil.select("SP.CVE_RFC",
 				"SP.NOM_PERSONA")
 		.from("SVC_FINADO SF")
-		.join("SVC_PERSONA SP", "SF.ID_PERSONA = SP.ID_PERSONA")
-		.join("SVC_CONTRATANTE SC", "SP.ID_PERSONA = SC.ID_PERSONA")
-		.join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC", "SC.ID_CONTRATANTE = SCPC.ID_CONTRATANTE")
+		.join(SVC_PERSONA, "SF.ID_PERSONA = SP.ID_PERSONA")
+		.join(SVC_CONTRATANTE, "SP.ID_PERSONA = SC.ID_PERSONA")
+		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SC.ID_CONTRATANTE = SCPC.ID_CONTRATANTE")
 		.join("SVT_CONVENIO_PF SPF", "SCPC.ID_CONVENIO_PF = SPF.ID_CONVENIO_PF");
 			queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio")
-			.setParameter("idConvenio", Integer.parseInt(palabra));
+			.setParameter(ID_CONVENIO, Integer.parseInt(palabra));
 			String query = obtieneQuery(queryUtil);
 			log.info("validar fallecido ->"+query);
 			String encoded = encodedQuery(query);

@@ -99,10 +99,8 @@ public class RenovarExtImpl implements RenovarExtService{
 				authentication);
 		if(validarFallecido(palabra, authentication)) {
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
-		//	providerRestTemplate.consumirServicio(renovarExt.cambiarEstatusPlan(palabra, usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
-		//	logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
-			 response.setCodigo(200);
-	          response.setError(false);
+			response.setCodigo(200);
+	         response.setError(false);
   			response.setDatos(null);
   			 response.setMensaje("39");
   			return response;
