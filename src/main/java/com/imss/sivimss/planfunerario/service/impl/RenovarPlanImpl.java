@@ -130,7 +130,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    		    	logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 CONVENIO INACTIVO ", CONSULTA, authentication);
 		    		    	 response.setCodigo(200);
 					          response.setError(false);
-					          response.setMensaje("36 CONVENIO INACTIVO");
+					          response.setMensaje("36");
 				  			return response;
 		    		    } 
 		    		if(validarFallecido(filtros, authentication)) {
@@ -205,7 +205,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			    			 logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO SE ENCUENTRA INACTIVO", CONSULTA, authentication);
 			    			    response.setCodigo(200);
 						        response.setError(false);
-						        response.setMensaje("36 CONVENIO INACTIVO");
+						        response.setMensaje("36");
 					    	     return response;
 			    		}
 			    		  if(validarFallecido(filtros, authentication)) {

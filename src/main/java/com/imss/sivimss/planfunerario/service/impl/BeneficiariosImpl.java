@@ -122,7 +122,7 @@ public class BeneficiariosImpl implements BeneficiariosService {
 			benefBean = new BeneficiariosBean(benefRequest);
 			benefBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 
-			if (benefRequest.getBeneficiario().getIdContratanteConvenioPf() == null || benefRequest.getBeneficiario().getIdParentesco() == null) {
+			if (benefRequest.getBeneficiario().getIdContratanteConvenioPf() == null ) {
 				throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);
 			}
 			if (benefRequest.getDocPlanAnterior() != null) {
