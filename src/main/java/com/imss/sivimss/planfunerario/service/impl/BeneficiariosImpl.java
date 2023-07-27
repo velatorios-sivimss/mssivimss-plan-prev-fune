@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.imss.sivimss.planfunerario.beans.BeneficiariosBean;
+import com.imss.sivimss.planfunerario.beans.RenovarBean;
 import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
 import com.imss.sivimss.planfunerario.model.request.CatalogosRequest;
@@ -16,7 +17,6 @@ import com.imss.sivimss.planfunerario.model.request.FiltrosBeneficiariosRequest;
 import com.imss.sivimss.planfunerario.model.request.UsuarioDto;
 import com.imss.sivimss.planfunerario.model.response.BenefResponse;
 import com.imss.sivimss.planfunerario.model.response.BuscarBeneficiariosResponse;
-import com.imss.sivimss.planfunerario.model.response.DatosConvenioResponse;
 import com.imss.sivimss.planfunerario.service.BeneficiariosService;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.ConvertirGenerico;
@@ -71,14 +71,20 @@ public class BeneficiariosImpl implements BeneficiariosService {
 	Gson gson = new Gson();
 
 	BeneficiariosBean benefBean = new BeneficiariosBean();
+	
 
 	@Override
 	public Response<?> buscarBeneficiarios(DatosRequest request, Authentication authentication) throws IOException {
+		RenovarBean renovarBean = new RenovarBean();
 		String palabra = request.getDatos().get("palabra").toString();
+		Integer numConvenio = Integer.parseInt(palabra);
+		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		Response<?> response = new Response<>();
 		List<BuscarBeneficiariosResponse> buscarbeneficiarios;
 		List<BenefResponse> beneficiarios;
-		BuscarBeneficiariosResponse datosBeneficiarios = new BuscarBeneficiariosResponse();
+		 providerRestTemplate.consumirServicio(renovarBean.validarBeneficiarios(request, numConvenio, usuarioDto.getIdUsuario()).getDatos(), urlActualizar,
+	  				authentication);
+		//BuscarBeneficiariosResponse datosBeneficiarios = new BuscarBeneficiariosResponse();
 		Response<?> responsePaqueteBenef = providerRestTemplate.consumirServicio(benefBean.beneficiarios(request, palabra).getDatos(), urlConsulta,
 				authentication);
 		if(responsePaqueteBenef.getCodigo()==200) {
@@ -86,8 +92,9 @@ public class BeneficiariosImpl implements BeneficiariosService {
 			beneficiarios = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(benefBean.buscarBeneficiarios(request, palabra).getDatos(), urlConsulta, authentication).getDatos(), BenefResponse[].class));  
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
 					this.getClass().getPackage().toString(), "Consulta Beneficiarios Ok", CONSULTA, authentication);
-			datosBeneficiarios = buscarbeneficiarios.get(0);
+			BuscarBeneficiariosResponse datosBeneficiarios = buscarbeneficiarios.get(0);
 			datosBeneficiarios.setBeneficiarios(beneficiarios);
+			 response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosBeneficiarios));
 		}
 		else {
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), this.getClass().getPackage().toString(), "No se pudo conectar a la BD", CONSULTA, authentication);
@@ -96,7 +103,6 @@ public class BeneficiariosImpl implements BeneficiariosService {
 		    response.setCodigo(200);
             response.setError(false);
             response.setMensaje("Exito");
-		    response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosBeneficiarios));
 		return response;
 	}
 
@@ -132,7 +138,7 @@ public class BeneficiariosImpl implements BeneficiariosService {
 				response = providerRestTemplate.consumirServicio(benefBean.insertarPersonaPlanAnterior().getDatos(),
 						urlCrear,authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
-						this.getClass().getPackage().toString(), "Estatus OK", ALTA, authentication);
+						this.getClass().getPackage().toString(), "SE HA GUARDADO LOS DATOS DEL BENEFICIARIOS PLAN ANTERIOR CORRECTAMENTE", ALTA, authentication);
 				if (response.getCodigo() == 200) {
 					Integer id = (Integer) response.getDatos();
 					providerRestTemplate.consumirServicio(benefBean.insertarBeneficiarioPlanAnterior(id).getDatos(),
@@ -144,14 +150,16 @@ public class BeneficiariosImpl implements BeneficiariosService {
 						urlCrearMultiple,
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
-						this.getClass().getPackage().toString(), "Estatus OK", ALTA, authentication);
+						this.getClass().getPackage().toString(), "SE HA GUARDADO LOS DATOS DEL BENEFICIARIOS PLAN NUEVO CORRECTAMENTE", ALTA, authentication);
 			}
+			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+					this.getClass().getPackage().toString(), "ALTA OK", ALTA, authentication);
 			return response;
 
 		} catch (Exception e) {
 			String consulta = benefBean.insertarPersona().getDatos().get("" + AppConstantes.QUERY + "").toString();
 			String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
-			log.error("Error al ejecutar la query" + encoded);
+			log.error("HA OCURRIDO UN ERROR: Error al ejecutar la query" + encoded);
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
 					this.getClass().getPackage().toString(), ERROR, CONSULTA, authentication);
 			throw new IOException("5", e.getCause());
