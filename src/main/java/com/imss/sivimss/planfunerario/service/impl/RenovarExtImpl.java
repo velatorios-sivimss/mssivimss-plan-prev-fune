@@ -69,11 +69,16 @@ public class RenovarExtImpl implements RenovarExtService{
 	@Override
 	public Response<?> buscarRenovacionExt(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get("datos"));
+		UsuarioDto usuario = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		FiltrosConvenioExtRequest filtros = gson.fromJson(datosJson, FiltrosConvenioExtRequest.class);
 		 Integer pagina = Integer.valueOf(Integer.parseInt(request.getDatos().get("pagina").toString()));
 	        Integer tamanio = Integer.valueOf(Integer.parseInt(request.getDatos().get("tamanio").toString()));
 	        filtros.setTamanio(tamanio.toString());
 	        filtros.setPagina(pagina.toString());
+	        if(usuario.getIdOficina()==3) {
+	        	usuario.setIdDelegacion(filtros.getIdDelegacion());
+	        	usuario.setIdVelatorio(filtros.getIdVelatorio());
+	        }
 		Response<?> response = providerRestTemplate.consumirServicio(renovarExt.buscarConvenioExt(request, filtros, fecFormat).getDatos(), urlPaginado,
 					authentication);
 		if(response.getDatos().toString().contains("id")){
@@ -94,7 +99,6 @@ public class RenovarExtImpl implements RenovarExtService{
 		Response<?> response = new Response<>();
 		List<RenovacionExtResponse> renovacionExtResponse;
 		List<BenefResponse> beneficiarios;
-		RenovacionExtResponse datosRenovacionExt = new RenovacionExtResponse();
 		Response<?> responseConsultaDetalle = providerRestTemplate.consumirServicio(renovarExt.verDetalle(request, palabra, fecFormat).getDatos(), urlConsulta,
 				authentication);
 		if(validarFallecido(palabra, authentication)) {
@@ -108,7 +112,7 @@ public class RenovarExtImpl implements RenovarExtService{
 		if (responseConsultaDetalle.getCodigo() == 200 && responseConsultaDetalle.getDatos().toString().contains("id")) {
 			renovacionExtResponse = Arrays.asList(modelMapper.map(responseConsultaDetalle.getDatos(), RenovacionExtResponse[].class));
 			beneficiarios = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(renovarExt.buscarBeneficiarios(request, palabra).getDatos(), urlConsulta, authentication).getDatos(), BenefResponse[].class));  
-			datosRenovacionExt = renovacionExtResponse.get(0);
+			RenovacionExtResponse datosRenovacionExt = renovacionExtResponse.get(0);
 			datosRenovacionExt.setBeneficiarios(beneficiarios);
 			response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosRenovacionExt));
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DETALLE CONVENIO OK", CONSULTA, authentication);
