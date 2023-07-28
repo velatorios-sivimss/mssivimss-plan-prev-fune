@@ -444,7 +444,7 @@ public class RenovarBean {
 		return request;
 	}
 	
-	public DatosRequest validarBeneficiarios(DatosRequest request, Integer idConvenio, Integer idUsuario) {
+	public DatosRequest validarBeneficiarios(DatosRequest request, Integer idConvenio, Integer idContra, Integer idUsuario) {
 		Map<String, Object> parametro = new HashMap<>();
 		String query;
 			final QueryHelper q = new QueryHelper("UPDATE SVT_CONTRATANTE_BENEFICIARIOS SB");
@@ -461,7 +461,16 @@ public class RenovarBean {
 			.join("SVT_CONVENIO_PF PF", "SCPC.ID_CONVENIO_PF= PF.ID_CONVENIO_PF")
 			.join("SVC_PERSONA SP ON SB.ID_PERSONA = SP.ID_PERSONA");
 			queryUtil.where("(IF(SB.ID_PARENTESCO=8 OR SB.ID_PARENTESCO=9 AND TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURDATE())>18, SB.ID_PARENTESCO, NULL))")
-			.and("PF.ID_TIPO_PREVISION=2").and("PF.ID_CONVENIO_PF=" +idConvenio).and("(SBD.IND_COMPROBANTE_ESTUDIOS = 0 OR SBD.IND_COMPROBANTE_ESTUDIOS IS NULL))");
+			.and("PF.ID_TIPO_PREVISION=2");
+			if(idConvenio!=null) {
+				queryUtil.where("PF.ID_CONVENIO_PF= :idConvenio")
+				.setParameter("idConvenio", idConvenio);	
+			}
+			if(idContra!=null && idConvenio==null) {
+				queryUtil.where("SCPC.ID_CONTRATANTE= :idContra")
+				.setParameter("idContra", idContra);	
+			}
+			queryUtil.where("(SBD.IND_COMPROBANTE_ESTUDIOS = 0 OR SBD.IND_COMPROBANTE_ESTUDIOS IS NULL))");
 			String queryConsulta = obtieneQuery(queryUtil);
 			String consultaFinal=query+queryConsulta;
 		log.info("update -> "+consultaFinal);

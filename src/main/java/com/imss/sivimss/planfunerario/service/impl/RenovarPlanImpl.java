@@ -168,11 +168,10 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		filtros.setTipoPrevision(2);
 		DatosConvenioResponse datosConvenio = new DatosConvenioResponse();
 	try {
-		 providerRestTemplate.consumirServicio(renovarBean.validarBeneficiarios(request, filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar,
+		 providerRestTemplate.consumirServicio(renovarBean.validarBeneficiarios(request, filtros.getNumeroConvenio(), filtros.getNumeroContratante(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar,
   				authentication);
 
 		 Response<?> responseDatosConvenio = providerRestTemplate.consumirServicio(renovarBean.buscarConvenio(request, filtros, fecFormat).getDatos(), urlConsulta,
-
 				authentication);
 	      if(responseDatosConvenio.getDatos().toString().equals("[]")){
 	    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getNumeroConvenio(), CONSULTA, authentication);

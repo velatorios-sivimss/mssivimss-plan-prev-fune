@@ -78,11 +78,12 @@ public class BeneficiariosImpl implements BeneficiariosService {
 		RenovarBean renovarBean = new RenovarBean();
 		String palabra = request.getDatos().get("palabra").toString();
 		Integer numConvenio = Integer.parseInt(palabra);
+		Integer idContra = null;
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		Response<?> response = new Response<>();
 		List<BuscarBeneficiariosResponse> buscarbeneficiarios;
 		List<BenefResponse> beneficiarios;
-		 providerRestTemplate.consumirServicio(renovarBean.validarBeneficiarios(request, numConvenio, usuarioDto.getIdUsuario()).getDatos(), urlActualizar,
+		 providerRestTemplate.consumirServicio(renovarBean.validarBeneficiarios(request, numConvenio, idContra, usuarioDto.getIdUsuario()).getDatos(), urlActualizar,
 	  				authentication);
 		Response<?> responsePaqueteBenef = providerRestTemplate.consumirServicio(benefBean.beneficiarios(request, palabra).getDatos(), urlConsulta,
 				authentication);
