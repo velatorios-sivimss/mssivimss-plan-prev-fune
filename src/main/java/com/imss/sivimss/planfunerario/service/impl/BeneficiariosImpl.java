@@ -84,7 +84,6 @@ public class BeneficiariosImpl implements BeneficiariosService {
 		List<BenefResponse> beneficiarios;
 		 providerRestTemplate.consumirServicio(renovarBean.validarBeneficiarios(request, numConvenio, usuarioDto.getIdUsuario()).getDatos(), urlActualizar,
 	  				authentication);
-		//BuscarBeneficiariosResponse datosBeneficiarios = new BuscarBeneficiariosResponse();
 		Response<?> responsePaqueteBenef = providerRestTemplate.consumirServicio(benefBean.beneficiarios(request, palabra).getDatos(), urlConsulta,
 				authentication);
 		if(responsePaqueteBenef.getCodigo()==200) {
