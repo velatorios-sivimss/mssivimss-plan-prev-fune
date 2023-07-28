@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
-import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.PersonaRequest;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
@@ -295,7 +294,7 @@ public class BeneficiariosBean {
 	       if(indIne!=null) {
 	    	   q.agregarParametroValues(IND_INE_BENEFICIARIO, ""+indIne+"");   
 	       }
-	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
+	       // q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 	        q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"" );
 			q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 			q.addWhere("ID_PERSONA = " + idPersona);
