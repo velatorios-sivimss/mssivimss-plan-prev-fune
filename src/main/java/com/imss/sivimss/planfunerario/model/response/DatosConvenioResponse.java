@@ -15,7 +15,7 @@ import lombok.Setter;
 public class DatosConvenioResponse {
 	
 	private String estado;
-	private Integer costoRenovacion;
+	private Double costoRenovacion;
 	private Integer indRenovacion;
 	private String segundoApellido;
 	private Integer estatusConvenio;

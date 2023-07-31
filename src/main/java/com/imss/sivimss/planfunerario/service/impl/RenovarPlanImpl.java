@@ -38,6 +38,7 @@ import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.ConvertirGenerico;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.LogUtil;
+import com.imss.sivimss.planfunerario.util.MensajeResponseUtil;
 import com.imss.sivimss.planfunerario.util.ProviderServiceRestTemplate;
 import com.imss.sivimss.planfunerario.util.Response;
 
@@ -53,6 +54,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private static final String CONSULTA = "consulta";
 	private static final String IMPRIMIR = "imprimir";
 	private static final String INFORMACION_INCOMPLETA = "Informacion incompleta";
+	private static final String EXITO = "EXITO";
 	
 	@Autowired
 	private LogUtil logUtil;
@@ -126,7 +128,6 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    			return response;
 		    	  }
 		    	  Integer vig = obtieneVigencia(datosConvenio.getFecVigencia());
-		    
 		    	  if(getDia()>20 && getDia()>vig || anioMesActual()>anioMesVigencia) {		  
 		    			  logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 		    		    	providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), filtros.getNumeroConvenio() , usuarioDto.getIdUsuario()).getDatos(), urlActualizar,authentication);
@@ -134,6 +135,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    		    	 response.setCodigo(200);
 					          response.setError(false);
 					          response.setMensaje("36");
+					          log.info("ESTATUS INACTIVO: CONTRATO CERRADO");
 				  			return response;
 		    		    } 
 		    		if(validarFallecido(filtros, authentication)) {
@@ -151,8 +153,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		            response.setMensaje("Exito");
 			      response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));
 	}catch(Exception e) {
-		log.info("estoy aqui" +e.getCause());
-		e.getCause();
+		log.info("Fallo al e ejecutar la query {} ", e.getCause());
+		throw new IOException("5", e.getCause()) ;
 	}
 		      return response;   
 	
@@ -208,6 +210,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			    			    response.setCodigo(200);
 						        response.setError(false);
 						        response.setMensaje("36");
+						        log.info("ESTATUS INACTIVO: CONTRATO CERRADO");
 					    	     return response;
 			    		}
 			    		  if(validarFallecido(filtros, authentication)) {
@@ -224,7 +227,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			    		   response.setMensaje("Exito");
 			    		 response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));
    }catch(Exception e) {
-	   e.getCause();
+	   log.info("Fallo al e ejecutar la query {} ", e.getCause());
+	   throw new IOException("5", e.getCause()) ;
    }
   
 		return response;
@@ -232,7 +236,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	
 	@Override
 	public Response<?> renovarConvenio(DatosRequest request, Authentication authentication) throws IOException {
-		    Response<?> response;
+		    Response<?> response = new Response<>();
 			String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		    RenovarPlanPFRequest renovarRequest = gson.fromJson(datosJson, RenovarPlanPFRequest .class);	
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);	
@@ -244,12 +248,21 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
 			Date dateF = new SimpleDateFormat("dd-MM-yyyy").parse(renovarRequest.getVigencia());
 	        DateFormat anioMes = new SimpleDateFormat("yyyy-MM-dd", new Locale("es", "MX"));
+	        DateFormat anioFormat = new SimpleDateFormat("yyyy", new Locale("es", "MX"));
+	        String anio= anioFormat.format(dateF);
 	        String fecha=anioMes.format(dateF);
 	        log.info("-> "+fecha);
 	        renovarBean.setVigencia(fecha);
 		Integer contador = contadorRenovaciones(renovarRequest.getIdConvenioPf(), authentication) +1;	
 				 String folioAdenda=buildFolio(contador,renovarRequest.getFolio());
 				 renovarBean.setFolioAdenda(folioAdenda);
+				 if(validaRenovaciones(renovarRequest.getIdConvenioPf(), anio, authentication)>=1) {
+					 response.setCodigo(200);
+					 response.setError(true);
+					 response.setMensaje("5");
+					 response.setDatos(null);
+					 return response;
+				 }
 				response = providerRestTemplate.consumirServicio(renovarBean.renovarPlan().getDatos(), urlCrear,
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
@@ -276,28 +289,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		}
 	}
 
-	private int contadorRenovaciones(Integer idConvenioPf, Authentication authentication) throws IOException {
-		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.contador(idConvenioPf).getDatos(), urlConsulta,
-				authentication);
-		
-		String resultado=response.getDatos().toString();
-		Integer contador = 0;
 	
-		Pattern pattern = Pattern.compile("c=(\\d+)");
-		Matcher matcher = pattern.matcher(resultado);
-		if (matcher.find()) {
-		    contador = Integer.parseInt(matcher.group(1));
-		}
-		return contador;
-	}
-
-
-
-	private String buildFolio(Integer contador, String folio) {
-	    String formatearConvenioCeros = String.format("%02d", contador);
-		return folio+"-"+formatearConvenioCeros;
-	}
-
 
 
 /*	private boolean validarFallecidoCtoAnterior(Integer numContratante, Integer numConvenio, Authentication authentication) throws IOException {
@@ -307,13 +299,6 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	return !rst.toString().equals("[]");
 	} */
 
-	private boolean validarFallecido(FiltrosConvenioPFRequest filtros, Authentication authentication) throws IOException {	
-		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarFallecido(filtros).getDatos(), urlConsulta,
-				authentication);
-	Object rst=response.getDatos();
-	return !rst.toString().equals("[]");
-	}
-	
 	@Override
 	public Response<?> descargarAdendaRenovacionAnual(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
@@ -368,6 +353,46 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		}
 	}
 	
+	private boolean validarFallecido(FiltrosConvenioPFRequest filtros, Authentication authentication) throws IOException {	
+		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarFallecido(filtros).getDatos(), urlConsulta,
+				authentication);
+		MensajeResponseUtil.mensajeConsultaResponse(response, EXITO);
+	Object rst=response.getDatos();
+	return !rst.toString().equals("[]");
+	}
+	
+	private int validaRenovaciones(Integer idConvenioPf, String anio, Authentication authentication) throws IOException {
+		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.validaRenovacion(idConvenioPf, anio).getDatos(), urlConsulta,
+				authentication);
+		MensajeResponseUtil.mensajeConsultaResponse(response, EXITO);
+		return recuperaDato(response.getDatos().toString());
+	}
+
+
+	private int contadorRenovaciones(Integer idConvenioPf, Authentication authentication) throws IOException {
+		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.contador(idConvenioPf).getDatos(), urlConsulta,authentication);
+		MensajeResponseUtil.mensajeConsultaResponse(response, EXITO);
+		return recuperaDato(response.getDatos().toString());
+	}
+	
+	private int recuperaDato(String respuesta) {
+		Integer contador = 0;
+		Pattern pattern = Pattern.compile("c=(\\d+)");
+		Matcher matcher = pattern.matcher(respuesta);
+		if (matcher.find()) {
+		    contador = Integer.parseInt(matcher.group(1));
+		}
+		log.info("validacion ->" +contador);
+		return contador;
+	}
+
+
+	private String buildFolio(Integer contador, String folio) {
+	    String formatearConvenioCeros = String.format("%02d", contador);
+		return folio+"-"+formatearConvenioCeros;
+	}
+
+	
 	private int getDia() {
 	SimpleDateFormat sdf = new SimpleDateFormat("dd");
 		String date = sdf.format(new Date());
@@ -383,14 +408,14 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private boolean validarPeriodoRenovacion(FiltrosConvenioPFRequest filtros, Authentication authentication) throws IOException {
 		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarPeriodo(filtros).getDatos(), urlConsulta,
 				authentication);
+	MensajeResponseUtil.mensajeConsultaResponse(response, EXITO);
 	Object rst=response.getDatos();
 	String fec = rst.toString();
-	obtieneMesVigencia(fec);
+	anioMesVigencia = recuperaDato(fec);
 	return !rst.toString().equals("[]");
 	}
 	
-
-	private void obtieneMesVigencia(String fec) {
+	/*private void obtieneMesVigencia(String fec) {
 		Integer vigencia = 0;
 		Pattern pattern = Pattern.compile("vig=(\\d+)");
 		Matcher matcher = pattern.matcher(fec);
@@ -399,7 +424,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		}
 		log.info("-> " +vigencia);
 		anioMesVigencia = vigencia;
-	}
+	} */
 	
 	private Integer obtieneVigencia(String fecVigencia) throws ParseException {
 		Date sdf = new SimpleDateFormat("dd/MM/yyyy").parse(fecVigencia);
