@@ -258,6 +258,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 					 response.setError(true);
 					 response.setMensaje("5");
 					 response.setDatos(null);
+					 logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"NO SE PUEDE RENOVAR: YA CUENTA CON RENOVACION EN TRAMITE", ALTA, authentication);
 					 return response;
 				 }
 				response = providerRestTemplate.consumirServicio(renovarBean.renovarPlan().getDatos(), urlCrear,

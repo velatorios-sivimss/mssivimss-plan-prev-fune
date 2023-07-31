@@ -138,6 +138,7 @@ public class BeneficiariosImpl implements BeneficiariosService {
 				 response.setError(true);
 				 response.setMensaje("5");
 				 response.setDatos(null);
+				 logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"NO SE PUEDE REGISTRAR BENEFICIARIO: YA CUENTA CON 3 REGISTROS", ALTA, authentication);
 				 return response;
 			}
 			if (benefRequest.getDocPlanAnterior() != null) {
@@ -251,6 +252,7 @@ public class BeneficiariosImpl implements BeneficiariosService {
 			 response.setError(true);
 			 response.setMensaje("5");
 			 response.setDatos(null);
+			 logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"NO SE PUEDE RACTIVAR BENEFICIARIO: YA CUENTA CON 3 REGISTROS ACTIVOS", MODIFICACION, authentication);
 			 return response;
 		}
 		response = providerRestTemplate.consumirServicio(
