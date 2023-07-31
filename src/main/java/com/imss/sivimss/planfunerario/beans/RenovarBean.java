@@ -89,7 +89,7 @@ public class RenovarBean {
 		 "PAQ.MON_COSTO_REFERENCIA AS costoRenovacion",
 		 "SCP.IND_RENOVACION AS indRenovacion")
 		.from("SVT_CONVENIO_PF SCP")
-		.leftJoin(SVT_RENOVACION_CONVENIO_PF, "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS=1")
+		.leftJoin(SVT_RENOVACION_CONVENIO_PF, "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS=2")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
 		.join(SVC_CONTRATANTE, SCPC_ID_CONTRATANTE_SC_ID_CONTRATANTE)
@@ -179,9 +179,9 @@ public class RenovarBean {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("IF(SPF.IND_RENOVACION=0, (DATE_FORMAT(SPF.FEC_VIGENCIA, \"%Y%m\")), DATE_FORMAT(RPF.FEC_VIGENCIA, \"%Y%m\")) AS vig")
+		queryUtil.select("IF(SPF.IND_RENOVACION=0, (DATE_FORMAT(SPF.FEC_VIGENCIA, \"%Y%m\")), DATE_FORMAT(RPF.FEC_VIGENCIA, \"%Y%m\")) AS c")
 		.from(SVT_CONVENIO_PF)
-		.leftJoin(SVT_RENOVACION_CONVENIO_PF, "SPF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS=1")
+		.leftJoin(SVT_RENOVACION_CONVENIO_PF, "SPF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS=2")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SPF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF ")
 		.join(SVC_CONTRATANTE, SCPC_ID_CONTRATANTE_SC_ID_CONTRATANTE)
 		.join(SVC_PERSONA, "SC.ID_PERSONA=SP.ID_PERSONA");
@@ -192,6 +192,7 @@ public class RenovarBean {
 	    if(filtros.getNumeroConvenio()!=null) {
 	    	queryUtil.where("SPF.ID_CONVENIO_PF = "+filtros.getNumeroConvenio()+"");
 	    }
+	    queryUtil.groupBy("SPF.ID_CONVENIO_PF");
 		String query = obtieneQuery(queryUtil);
 		log.info("valida ->"+query);
 		String encoded = encodedQuery(query);
@@ -213,7 +214,7 @@ public class RenovarBean {
 			q.agregarParametroValues("DES_DATOS_BANCARIOS", "'" + this.datosBancarios + "'");	
 		}
 		q.agregarParametroValues("FEC_VIGENCIA", "DATE_ADD('"+ this.vigencia +"', INTERVAL 365 DAY)");
-		q.agregarParametroValues("IND_ESTATUS", "1");
+		q.agregarParametroValues("ID_ESTATUS", "1");
 		q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"");
 		q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		String query = q.obtenerQueryInsertar();
@@ -244,7 +245,7 @@ public class RenovarBean {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("UPDATE SVT_RENOVACION_CONVENIO_PF");
-		q.agregarParametroValues("IND_ESTATUS", "0");
+		q.agregarParametroValues("ID_ESTATUS", "3");
 		q.agregarParametroValues(AppConstantes.ID_USUARIO_BAJA, ""+usuarioAlta+"");
 		q.agregarParametroValues(AppConstantes.FEC_BAJA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		q.addWhere("ID_CONVENIO_PF=" + idConvenioPf +" AND FEC_VIGENCIA = '"+ vigencia +"'");
@@ -464,7 +465,7 @@ public class RenovarBean {
 			.and("PF.ID_TIPO_PREVISION=2");
 			if(idConvenio!=null) {
 				queryUtil.where("PF.ID_CONVENIO_PF= :idConvenio")
-				.setParameter("idConvenio", idConvenio);	
+				.setParameter(ID_CONVENIO, idConvenio);	
 			}
 			if(idContra!=null && idConvenio==null) {
 				queryUtil.where("SCPC.ID_CONTRATANTE= :idContra")
@@ -510,6 +511,23 @@ public class RenovarBean {
 	    return request;
 	}
 	
+	public DatosRequest validaRenovacion(Integer idConvenio, String anio) {
+		DatosRequest request= new DatosRequest();
+		Map<String, Object> parametros = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("COUNT(RPF.ID_CONVENIO_PF) AS c")
+		.from(SVT_RENOVACION_CONVENIO_PF);
+			queryUtil.where("RPF.ID_CONVENIO_PF= :idConvenio")
+			.setParameter(ID_CONVENIO, idConvenio).and("RPF.FEC_INICIO LIKE '%"+anio+"%' ");	
+		String query = obtieneQuery(queryUtil);
+		log.info("validacion renonacion -> " +query);
+		String encoded = encodedQuery(query);
+	    parametros.put(AppConstantes.QUERY, encoded );
+	    request.setDatos(parametros);
+	    return request;
+	}
+	
+	
 	private static String obtieneQuery(SelectQueryUtil queryUtil) {
         return queryUtil.build();
     }
@@ -517,4 +535,5 @@ public class RenovarBean {
 	private static String encodedQuery(String query) {
 		return DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 	}
+
 }
