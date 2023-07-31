@@ -18,6 +18,7 @@ import lombok.Setter;
 @JsonIgnoreType(value = true)
 public class PersonaRequest {
 
+	private Integer idConvenio;
 	private Integer idBeneficiario;
 	private Integer idPersona;
 	private Boolean estatusBenefic;

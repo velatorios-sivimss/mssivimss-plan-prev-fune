@@ -22,6 +22,7 @@ import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.ConvertirGenerico;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.LogUtil;
+import com.imss.sivimss.planfunerario.util.MensajeResponseUtil;
 import com.imss.sivimss.planfunerario.util.ProviderServiceRestTemplate;
 import com.imss.sivimss.planfunerario.util.Response;
 
@@ -31,6 +32,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -83,8 +86,7 @@ public class BeneficiariosImpl implements BeneficiariosService {
 		Response<?> response = new Response<>();
 		List<BuscarBeneficiariosResponse> buscarbeneficiarios;
 		List<BenefResponse> beneficiarios;
-		 providerRestTemplate.consumirServicio(renovarBean.validarBeneficiarios(request, numConvenio, idContra, usuarioDto.getIdUsuario()).getDatos(), urlActualizar,
-	  				authentication);
+		 providerRestTemplate.consumirServicio(renovarBean.validarBeneficiarios(request, numConvenio, idContra, usuarioDto.getIdUsuario()).getDatos(), urlActualizar,authentication);
 		Response<?> responsePaqueteBenef = providerRestTemplate.consumirServicio(benefBean.beneficiarios(request, palabra).getDatos(), urlConsulta,
 				authentication);
 		if(responsePaqueteBenef.getCodigo()==200) {
@@ -131,6 +133,13 @@ public class BeneficiariosImpl implements BeneficiariosService {
 			if (benefRequest.getBeneficiario().getIdContratanteConvenioPf() == null ) {
 				throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);
 			}
+			if(validarNumBeneficiariosPlan(benefRequest.getBeneficiario().getIdContratanteConvenioPf(), authentication)>=3) {
+				 response.setCodigo(200);
+				 response.setError(true);
+				 response.setMensaje("5");
+				 response.setDatos(null);
+				 return response;
+			}
 			if (benefRequest.getDocPlanAnterior() != null) {
 				benefBean.setIndComprobanteEstudios(benefRequest.getDocPlanAnterior().getIndComprobanteEstudios());
 				benefBean.setIndActaMatrimonio(benefRequest.getDocPlanAnterior().getIndActaMatrimonio());
@@ -165,6 +174,23 @@ public class BeneficiariosImpl implements BeneficiariosService {
 			throw new IOException("5", e.getCause());
 		}
 
+	}
+
+
+
+	private int validarNumBeneficiariosPlan(Integer idContratanteConvenioPf,  Authentication authentication) throws IOException {
+		Response<?> response = providerRestTemplate.consumirServicio(benefBean.validaNumeBenef(idContratanteConvenioPf).getDatos(), urlConsulta,
+				authentication);
+		MensajeResponseUtil.mensajeConsultaResponse(response, "EXITO");
+		String respuesta = response.getDatos().toString();
+		Integer contador = 0;
+		Pattern pattern = Pattern.compile("c=(\\d+)");
+		Matcher matcher = pattern.matcher(respuesta);
+		if (matcher.find()) {
+		    contador = Integer.parseInt(matcher.group(1));
+		}
+		log.info("validacion ->" +contador);
+		return contador;
 	}
 
 	@Override
@@ -214,11 +240,20 @@ public class BeneficiariosImpl implements BeneficiariosService {
 
 	@Override
 	public Response<?> estatusBeneficiario(DatosRequest request, Authentication authentication) throws IOException {
+		Response<?> response = new Response<>();
 		UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		benefBean.setUsuarioBaja(usuarioDto.getIdUsuario());
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);
-		Response<?> response = providerRestTemplate.consumirServicio(
+		
+		if(validarNumBeneficiariosPlan(benefRequest.getIdConvenio(), authentication)>=3 && Boolean.TRUE.equals(benefRequest.getEstatusBenefic())) {
+			 response.setCodigo(200);
+			 response.setError(true);
+			 response.setMensaje("5");
+			 response.setDatos(null);
+			 return response;
+		}
+		response = providerRestTemplate.consumirServicio(
 				benefBean.cambiarEstatus(benefRequest.getIdBeneficiario(), benefRequest.getEstatusBenefic()).getDatos(),
 				urlActualizar,
 				authentication);
