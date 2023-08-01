@@ -116,10 +116,10 @@ public class RenovarBean {
 			queryUtil.where("SP.CVE_RFC = :cveRfc")
 			.setParameter(CVE_RFC, filtros.getRfc());
 		}
-		if(filtros.getNumIne()!=null) {
+	/*	if(filtros.getNumIne()!=null) {
 			queryUtil.where("SP.NUM_INE = :numIne")
 			.setParameter(NUM_INE, filtros.getNumIne());
-		}
+		} */
 		queryUtil.groupBy("CP.CVE_CODIGO_POSTAL");
 		String query = obtieneQuery(queryUtil);
 		log.info("buscar convenio " +query);
