@@ -15,6 +15,7 @@ public class BuscarBeneficiariosResponse {
 	
 	private Integer idConvenio;
 	private Integer idContratanteConvenioPf;
+	private Integer tipoPlan;
 	private Integer activos;
 	private List<BenefResponse> beneficiarios;
 
