@@ -247,7 +247,7 @@ public class BeneficiariosImpl implements BeneficiariosService {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		PersonaRequest benefRequest = gson.fromJson(datosJson, PersonaRequest.class);
 		
-		if(validarNumBeneficiariosPlan(benefRequest.getIdConvenio(), authentication)>=3 && Boolean.TRUE.equals(benefRequest.getEstatusBenefic())) {
+		if(validarNumBeneficiariosPlan(benefRequest.getIdContratanteConvenio(), authentication)>=3 && Boolean.TRUE.equals(benefRequest.getEstatusBenefic())) {
 			 response.setCodigo(200);
 			 response.setError(true);
 			 response.setMensaje("5");
