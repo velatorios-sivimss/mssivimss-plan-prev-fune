@@ -536,4 +536,25 @@ public class RenovarBean {
 		return DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 	}
 
+	public DatosRequest  obtieneCostoRenovacion(Integer idConvenio) {
+		DatosRequest request = new DatosRequest();
+		Map<String, Object> parametros = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("PAQ.MON_COSTO_REFERENCIA AS c")
+		.from("SVT_CONVENIO_PF SCP")
+		.join(SVT_RENOVACION_CONVENIO_PF, "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF")
+		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
+		.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE");
+		queryUtil.where("SCP.ID_ESTATUS_CONVENIO = 2 AND RPF.ID_ESTATUS=2");
+		queryUtil.where("SCP.ID_TIPO_PREVISION = 2");
+			queryUtil.where("SCP.ID_CONVENIO_PF = :idConvenio")
+			.setParameter(ID_CONVENIO, idConvenio);
+		String query = obtieneQuery(queryUtil);
+		log.info("costo renovacion -> " +query);
+		String encoded = encodedQuery(query);
+	    parametros.put(AppConstantes.QUERY, encoded);
+	    request.setDatos(parametros);
+	    return request;
+	}
+
 }
