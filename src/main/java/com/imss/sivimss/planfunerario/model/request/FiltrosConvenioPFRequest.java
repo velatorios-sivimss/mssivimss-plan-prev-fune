@@ -21,6 +21,4 @@ public class FiltrosConvenioPFRequest {
 	private Integer numeroContratante;
 	private String folio;
 	private String rfc;
-	private String numIne;
-	
 }
