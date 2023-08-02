@@ -372,7 +372,8 @@ public class BeneficiariosBean {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("DES_PARENTESCO AS parentesco",
 				"ID_PARENTESCO AS id")
-		.from("SVC_PARENTESCO");
+		.from("SVC_PARENTESCO PAR");
+		queryUtil.where("PAR.ID_PARENTESCO=12 OR PAR.ID_PARENTESCO=5 OR PAR.ID_PARENTESCO=9 OR PAR.ID_PARENTESCO=11 OR PAR.ID_PARENTESCO=17 ");
 		String query = obtieneQuery(queryUtil);
 	   String encoded = encodedQuery(query);
 	   parametros.put(AppConstantes.QUERY, encoded);
