@@ -307,9 +307,9 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	public Response<?> descargarConvenioPlanAnterior(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		ReporteDto reporteDto= gson.fromJson(datosJson, ReporteDto.class);
-	//	Response<?> response = providerRestTemplate.consumirServicio(renovarBean.obtieneCostoRenovacion(reporteDto.getIdConvenio()).getDatos(), urlConsulta, authentication);
-		//MensajeResponseUtil.mensajeConsultaResponse(response, EXITO);
-		//reporteDto.setCostoRenovacion(recuperaDato(response.getDatos().toString()));
+		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.obtieneCostoRenovacion(reporteDto.getIdConvenio()).getDatos(), urlConsulta, authentication);
+		MensajeResponseUtil.mensajeConsultaResponse(response, EXITO);
+		reporteDto.setCostoRenovacion(recuperaDato(response.getDatos().toString()));
 		Map<String, Object> envioDatos = new RenovarBean().generarConvenioAnterior(reporteDto);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DESCARGA CORRECTA PLANTILLA CONVENIO RENOVACION PLAN ANTERIOR", IMPRIMIR, authentication);
 		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
