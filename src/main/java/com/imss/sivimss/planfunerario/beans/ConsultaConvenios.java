@@ -62,6 +62,7 @@ public class ConsultaConvenios {
                                 + " as fechaVigenciaFin",
                         "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
                         "if(convenio.IND_RENOVACION = false, 'No Renovado', 'Renovado') as situacion",
+                        "if(convenio.IND_RENOVACION = false, null, renovacionConvenio.ID_ESTATUS) as estatusRenovacion",
                         "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
                         formatearImporte("paquete.MON_PRECIO") + " as importeConvenio",
                         "estatus.DES_ESTATUS as estatusConvenio")
@@ -98,6 +99,7 @@ public class ConsultaConvenios {
                                 + " as fechaVigenciaFin",
                         "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
                         "if(convenio.IND_RENOVACION = false, 'No Renovado', 'Renovado') as situacion",
+                        "if(convenio.IND_RENOVACION = false, null, renovacionConvenio.ID_ESTATUS) as estatusRenovacion",
                         "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
                         formatearImporte("paquete.MON_PRECIO") + " as importeConvenio",
                         "estatus.DES_ESTATUS as estatusConvenio")
