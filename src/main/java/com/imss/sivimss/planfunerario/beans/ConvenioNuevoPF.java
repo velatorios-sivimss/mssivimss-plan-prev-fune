@@ -254,11 +254,13 @@ public class ConvenioNuevoPF {
             query.select("SP.ID_PERSONA as idPersona","SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss", "SP.NOM_PERSONA AS nomPersona",
                             "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
                             "SP.NUM_SEXO AS sexo", "SP.FEC_NAC AS fechaNacimiento", "SP.ID_PAIS AS idPais", "SP.ID_ESTADO AS idEstado",
-                            "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIPO_PERSONA AS tipoPersona")
+                            "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIPO_PERSONA AS tipoPersona",
+                            "(SELECT COUNT(CPF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF) FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ) AS tieneConvenio")
                     .from("SVC_CONTRATANTE SC")
                     .leftJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
                     .where("SP.CVE_CURP = " + curp);
             String consulta = query.build();
+            log.info(consulta);
             String encoded = DatatypeConverter.printBase64Binary(consulta.getBytes());
             parametro.put(AppConstantes.QUERY, encoded);
             dr.setDatos(parametro);
@@ -276,12 +278,14 @@ public class ConvenioNuevoPF {
         query.select("SP.ID_PERSONA as idPersona", "SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss", "SP.NOM_PERSONA AS nomPersona",
                         "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
                         "SP.NUM_SEXO AS sexo", "SP.FEC_NAC AS fechaNacimiento", "SP.ID_PAIS AS idPais", "SP.ID_ESTADO AS idEstado",
-                        "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIPO_PERSONA AS tipoPersona")
+                        "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIPO_PERSONA AS tipoPersona",
+                        "(SELECT COUNT(CPF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF) FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ) AS tieneConvenio")
                 .from("SVC_CONTRATANTE SC")
                 .leftJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
                 .where("SP.CVE_RFC = " + rfc)
                 .or("SP.CVE_CURP = " + curp);
         String consulta = query.build();
+        log.info(consulta);
         return consulta;
     }
 
