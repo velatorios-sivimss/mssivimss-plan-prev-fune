@@ -353,7 +353,7 @@ public class RenovarBean {
 		envioDatos.put(ID_CONVENIO, reporteDto.getIdConvenio());
 		envioDatos.put("costoConvenio", reporteDto.getCostoRenovacion());
 		envioDatos.put("version", "1.0.0");
-		envioDatos.put("letraCosto", costoLetra+" Pesos 00/100 M/N");
+		envioDatos.put("letraCosto", costoLetra.toUpperCase() +" PESOS 00/100 M/N");
 		envioDatos.put("nomFibeso", " ");
 		return envioDatos;
 	}
