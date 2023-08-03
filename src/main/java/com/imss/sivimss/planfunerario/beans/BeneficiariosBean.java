@@ -499,7 +499,7 @@ public class BeneficiariosBean {
         .leftJoin("SVT_PAGO_BITACORA SPB", "PF.DES_FOLIO = SPB.CVE_FOLIO") 
         .leftJoin("SVT_PAGO_DETALLE SPD", "SPB.ID_PAGO_BITACORA = SPD.ID_PAGO_BITACORA")
         .leftJoin("SVC_METODO_PAGO SMP", "SPD.ID_METODO_PAGO = SMP.ID_METODO_PAGO")
-        .where("PF.ID_CONVENIO_PF=" +idConvenio)
+        .where("(RPF.ID_ESTATUS=1 OR RPF.ID_ESTATUS=2) AND PF.ID_CONVENIO_PF=" +idConvenio )
         .groupBy("PF.ID_CONVENIO_PF");
 		String query = obtieneQuery(queryUtil);
 	   String encoded = encodedQuery(query);
