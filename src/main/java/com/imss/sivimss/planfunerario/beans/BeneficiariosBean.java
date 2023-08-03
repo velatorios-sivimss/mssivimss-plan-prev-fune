@@ -373,7 +373,6 @@ public class BeneficiariosBean {
 		queryUtil.select("DES_PARENTESCO AS parentesco",
 				"ID_PARENTESCO AS id")
 		.from("SVC_PARENTESCO PAR");
-		queryUtil.where("PAR.ID_PARENTESCO=12 OR PAR.ID_PARENTESCO=5 OR PAR.ID_PARENTESCO=9 OR PAR.ID_PARENTESCO=11 OR PAR.ID_PARENTESCO=20 ");
 		String query = obtieneQuery(queryUtil);
 	   String encoded = encodedQuery(query);
 	   parametros.put(AppConstantes.QUERY, encoded);
@@ -499,7 +498,7 @@ public class BeneficiariosBean {
         .leftJoin("SVT_PAGO_BITACORA SPB", "PF.DES_FOLIO = SPB.CVE_FOLIO") 
         .leftJoin("SVT_PAGO_DETALLE SPD", "SPB.ID_PAGO_BITACORA = SPD.ID_PAGO_BITACORA")
         .leftJoin("SVC_METODO_PAGO SMP", "SPD.ID_METODO_PAGO = SMP.ID_METODO_PAGO")
-        .where("PF.ID_CONVENIO_PF=" +idConvenio)
+        .where("(RPF.ID_ESTATUS=1 OR RPF.ID_ESTATUS=2) AND PF.ID_CONVENIO_PF=" +idConvenio )
         .groupBy("PF.ID_CONVENIO_PF");
 		String query = obtieneQuery(queryUtil);
 	   String encoded = encodedQuery(query);

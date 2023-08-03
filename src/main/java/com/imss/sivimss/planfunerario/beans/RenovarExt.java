@@ -49,7 +49,7 @@ public class RenovarExt {
 				"IF(PF.IND_RENOVACION=0, (DATE_FORMAT(PF.FEC_VIGENCIA, '"+fecFormat+"')), DATE_FORMAT(RPF.FEC_VIGENCIA, '"+fecFormat+"')) AS fecVigencia")
 		.from(SVT_CONVENIO_PF)
 		.join("SVC_VELATORIO SV", "PF.ID_VELATORIO = SV.ID_VELATORIO")
-		.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "PF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS = 1")
+		.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "PF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS = 2")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "PF.ID_CONVENIO_PF=SCPC.ID_CONVENIO_PF")
 		.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
 		.join(SVC_CONTRATANTE, "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
@@ -102,7 +102,7 @@ public class RenovarExt {
 				"SP.DES_CORREO AS correo",
 				"PF.IND_RENOVACION AS indRenovacion")
 		.from(SVT_CONVENIO_PF)
-		.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "PF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.IND_ESTATUS = 1")
+		.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "PF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS = 2")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "PF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
 		.join(SVC_CONTRATANTE, "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
@@ -146,7 +146,7 @@ public class RenovarExt {
 		q.agregarParametroValues("FEC_VIGENCIA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"");
 		q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
-		q.addWhere(ID_CONVENIO_PF +"="+ idConvenio +" AND IND_ESTATUS= 1");
+		q.addWhere(ID_CONVENIO_PF +"="+ idConvenio +" AND ID_ESTATUS= 2");
 		String query = q.obtenerQueryActualizar();
 		log.info("actualizar estatus convenio --> "+query);
 		String encoded = encodedQuery(query);
