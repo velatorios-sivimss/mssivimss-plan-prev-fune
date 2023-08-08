@@ -46,6 +46,8 @@ public class PersonaAltaConvenio {
     @JsonProperty
     private String estado;
     @JsonProperty
+    private String entidadFederativa;
+    @JsonProperty
     private String pais;
     @JsonProperty
     private String correoElectronico;

@@ -40,7 +40,7 @@ public class ConvenioNuevoPF {
             queryPersona.agregarParametroValues("DES_OTRO_SEXO", "'" + persona.getOtroSexo() + "'");
             queryPersona.agregarParametroValues("FEC_NAC", "'" + persona.getFechaNacimiento() + "'");
             queryPersona.agregarParametroValues("ID_PAIS", "'" + persona.getPais() + "'");
-            queryPersona.agregarParametroValues("ID_ESTADO", "'" + persona.getEstado() + "'");
+            queryPersona.agregarParametroValues("ID_ESTADO", "'" + persona.getEntidadFederativa() + "'");
             queryPersona.agregarParametroValues("DES_TELEFONO", "'" + persona.getTelefono() + "'");
             queryPersona.agregarParametroValues("DES_CORREO", "'" + persona.getCorreoElectronico() + "'");
             queryPersona.agregarParametroValues("TIPO_PERSONA", "'" + persona.getTipoPersona() + "'");
