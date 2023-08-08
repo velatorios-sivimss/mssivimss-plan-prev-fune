@@ -58,11 +58,11 @@ public class ConvenioNuevoPF {
         queryPersona.agregarParametroValues("NOM_PERSONA", "'" + personaBeneficiario.getNombre() + "'");
         queryPersona.agregarParametroValues("NOM_PRIMER_APELLIDO", "'" + personaBeneficiario.getPrimerApellido() + "'");
         queryPersona.agregarParametroValues("NOM_SEGUNDO_APELLIDO", "'" + personaBeneficiario.getSegundoApellido() + "'");
-       // queryPersona.agregarParametroValues("NUM_SEXO", "'" + personaBeneficiario.getSexo() + "'");
+        queryPersona.agregarParametroValues("NUM_SEXO", "'" + personaBeneficiario.getSexo() + "'");
         queryPersona.agregarParametroValues("DES_OTRO_SEXO", "'" + personaBeneficiario.getOtroSexo() + "'");
         queryPersona.agregarParametroValues("FEC_NAC", "'" + personaBeneficiario.getFechaNacimiento() + "'");
         queryPersona.agregarParametroValues("ID_PAIS", "'" + personaBeneficiario.getPais() + "'");
-        //queryPersona.agregarParametroValues("ID_ESTADO", "'" + personaBeneficiario.getEstado() + "'");
+        queryPersona.agregarParametroValues("ID_ESTADO", "'" + personaBeneficiario.getEntidadFederativa() + "'");
         queryPersona.agregarParametroValues("DES_TELEFONO", "'" + personaBeneficiario.getTelefono() + "'");
         queryPersona.agregarParametroValues("DES_CORREO", "'" + personaBeneficiario.getCorreoElectronico() + "'");
         queryPersona.agregarParametroValues("TIPO_PERSONA", "'" + personaBeneficiario.getTipoPersona() + "'");
@@ -318,6 +318,7 @@ public class ConvenioNuevoPF {
                         "SC.CVE_MATRICULA AS cveMatricula", "SC.ID_PERSONA AS idPersona", "SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss", "SP.NOM_PERSONA AS nombrePersona",
                         "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido", "SP.NUM_SEXO AS numSexo", "SP.ID_PAIS AS idPais", "SP.ID_ESTADO AS idEstado",
                         "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIPO_PERSONA AS tipoPersona", "SP.NUM_INE AS numIne",
+                        "SP.DES_OTRO_SEXO AS otroSexo",
                         "CPF.ID_PAQUETE AS idPaquete", "PAQ.DES_NOM_PAQUETE AS nombrePaquete", "DATE_FORMAT(SP.FEC_NAC,'%Y-%m-%d') AS fechaNacimiento",
                         "SD.DES_CALLE AS calle", "SD.NUM_EXTERIOR AS numExterior","SD.NUM_INTERIOR AS numInterior","SD.DES_CP AS cp","SD.DES_COLONIA AS colonia",
                         "SD.DES_MUNICIPIO AS municipio","SD.DES_ESTADO AS estado", "CPF.ID_ENFERMEDAD_PREXISTENTE AS idEnfermedadPreexistente", "CPF.DES_OTRA_ENFERMEDAD AS otraEnfermedad")
@@ -370,7 +371,8 @@ public class ConvenioNuevoPF {
         SelectQueryUtil querySelect = new SelectQueryUtil();
         querySelect.select("SP2.ID_PERSONA AS idPersona", "SP2.NOM_PERSONA AS nombreBeneficiario", "SP2.NOM_PRIMER_APELLIDO AS primerApellido",
                         "SP2.NOM_SEGUNDO_APELLIDO AS segundoApellido", "DATE_FORMAT(SP2.FEC_NAC,'%Y-%m-%d') AS fechaNacimiento",
-                        "SP2.CVE_RFC AS rfc", "SP2.CVE_CURP AS curp", "SP2.CVE_NSS  AS nss", "SP2.NUM_SEXO AS numSexo",
+                        "SP2.CVE_RFC AS rfc", "SP2.CVE_CURP AS curp", "SP2.CVE_NSS  AS nss", "SP2.NUM_SEXO AS numSexo", "SP2.DES_OTRO_SEXO AS otroSexo","SP2.NUM_SEXO AS numSexo","SP2.ID_ESTADO AS idEstado",
+                        "SP2.ID_ESTADO as idEstado", "E.DES_ESTADO AS desEstado",
                         "SP2.DES_TELEFONO AS telefono", "SP2.DES_CORREO AS correo", "SP2.TIPO_PERSONA AS tipoPersona", "SP2.NUM_INE AS numIne", "TIMESTAMPDIFF(YEAR, SP2.FEC_NAC , NOW()) AS edad",
                         "SCB.IND_INE_BENEFICIARIO AS validaIneBeneficiario" , "SCB.IND_ACTA_NACIMIENTO AS validaActaNacimientoBeneficiario", "SCB.ID_PARENTESCO  AS idParentesco","SCB.CVE_ACTA as cveActa",
                         "SV.ID_VELATORIO AS idVelatorio","SV.DES_VELATORIO AS nomVelatorio")
@@ -383,6 +385,7 @@ public class ConvenioNuevoPF {
                 .leftJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
                 .leftJoin("SVT_CONTRATANTE_BENEFICIARIOS SCB", "CPF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
                 .leftJoin("SVC_PERSONA SP2", "SCB.ID_PERSONA = SP2.ID_PERSONA")
+                .leftJoin("SVC_ESTADO E","SP2.ID_ESTADO = E.ID_ESTADO")
                 .where("SCP.DES_FOLIO = " + folioConvenio);
         String consulta = querySelect.build();
         log.info(consulta);
