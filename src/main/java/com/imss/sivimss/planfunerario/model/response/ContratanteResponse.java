@@ -47,4 +47,5 @@ public class ContratanteResponse {
     private String estado;
     private String idEnfermedadPreexistente;
     private String otraEnfermedad;
+    private String otroSexo;
 }

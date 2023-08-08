@@ -9,6 +9,7 @@ public class BeneficiarioResponse {
 private String tipoPersona;
 private String primerApellido;
 private String numSexo;
+private String otroSexo;
 private String nombreBeneficiario;
 private String fechaNacimiento;
 private String correo;
@@ -25,4 +26,6 @@ private String cveActa;
 private String idParentesco;
 private String idVelatorio;
 private String nomVelatorio;
+private String idEstado;
+private String desEstado;
 }
