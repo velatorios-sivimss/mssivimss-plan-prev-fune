@@ -36,11 +36,11 @@ public class ConvenioNuevoPF {
             queryPersona.agregarParametroValues("NOM_PERSONA", "'" + persona.getNombre() + "'");
             queryPersona.agregarParametroValues("NOM_PRIMER_APELLIDO", "'" + persona.getPrimerApellido() + "'");
             queryPersona.agregarParametroValues("NOM_SEGUNDO_APELLIDO", "'" + persona.getSegundoApellido() + "'");
-            //queryPersona.agregarParametroValues("NUM_SEXO", "'" + persona.getSexo() + "'");
+            queryPersona.agregarParametroValues("NUM_SEXO", "'" + persona.getSexo() + "'");
             queryPersona.agregarParametroValues("DES_OTRO_SEXO", "'" + persona.getOtroSexo() + "'");
-            //queryPersona.agregarParametroValues("FEC_NAC", "'" + persona.getFechaNacimiento() + "'");
+            queryPersona.agregarParametroValues("FEC_NAC", "'" + persona.getFechaNacimiento() + "'");
             queryPersona.agregarParametroValues("ID_PAIS", "'" + persona.getPais() + "'");
-           // queryPersona.agregarParametroValues("ID_ESTADO", "'" + persona.getEstado() + "'");
+            queryPersona.agregarParametroValues("ID_ESTADO", "'" + persona.getEstado() + "'");
             queryPersona.agregarParametroValues("DES_TELEFONO", "'" + persona.getTelefono() + "'");
             queryPersona.agregarParametroValues("DES_CORREO", "'" + persona.getCorreoElectronico() + "'");
             queryPersona.agregarParametroValues("TIPO_PERSONA", "'" + persona.getTipoPersona() + "'");
