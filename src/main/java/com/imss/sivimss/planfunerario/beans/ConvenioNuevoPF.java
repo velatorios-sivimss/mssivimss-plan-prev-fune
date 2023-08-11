@@ -250,8 +250,10 @@ public class ConvenioNuevoPF {
         DatosRequest dr = new DatosRequest();
         Map<String, Object> parametro = new HashMap<>();
         if(rfc.equals("\"\"")){
+            log.info("rfc vacio");
             SelectQueryUtil query = new SelectQueryUtil();
             query.select("SP.ID_PERSONA as idPersona","SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss", "SP.NOM_PERSONA AS nomPersona",
+                            "SC.ID_CONTRATANTE as idDelContratante",
                             "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
                             "SP.NUM_SEXO AS sexo", "SP.FEC_NAC AS fechaNacimiento", "SP.ID_PAIS AS idPais", "SP.ID_ESTADO AS idEstado",
                             "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIPO_PERSONA AS tipoPersona",
@@ -278,6 +280,7 @@ public class ConvenioNuevoPF {
     public String busquedaRfcCurp(String curp, String rfc) {
         SelectQueryUtil query = new SelectQueryUtil();
         query.select("SP.ID_PERSONA as idPersona", "SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss", "SP.NOM_PERSONA AS nomPersona",
+                        "SC.ID_CONTRATANTE as idDelContratante",
                         "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
                         "SP.NUM_SEXO AS sexo", "SP.FEC_NAC AS fechaNacimiento", "SP.ID_PAIS AS idPais", "SP.ID_ESTADO AS idEstado",
                         "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIPO_PERSONA AS tipoPersona",
