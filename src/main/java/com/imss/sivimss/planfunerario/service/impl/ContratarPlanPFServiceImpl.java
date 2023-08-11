@@ -143,8 +143,8 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
             RenapoResponse rp = new RenapoResponse();
             String curp = String.valueOf(objeto.get("curp"));
             String rfc = String.valueOf(objeto.get("rfc"));
-            Response response = providerRestTemplate.consumirServicio(convenioBean.consultarCurpRfc(curp, rfc).getDatos(), urlDominioConsulta, authentication);
-            if (response.getDatos().toString().equals("[]")) {
+            Response responsePersona = providerRestTemplate.consumirServicio(convenioBean.consultarCurpRfc(curp, rfc).getDatos(), urlDominioConsulta, authentication);
+            if (responsePersona.getDatos().toString().equals("[]")) {
                 Response respuestaRenapo = providerRestTemplate.consumirServicioExternoGet(urlRenapo + "/" + curp.replace("\"", ""));
                 JsonObject objRenapo = (JsonObject) jsonParser.parse(respuestaRenapo.getDatos().toString());
                 rp.setCurp(objRenapo.get("curp").getAsString());
@@ -167,7 +167,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
                 respuesta.setDatos(rp);
                 return respuesta;
             }
-            return response;
+            return responsePersona;
         } catch (Exception ex) {
             ex.getMessage();
             ex.printStackTrace();
