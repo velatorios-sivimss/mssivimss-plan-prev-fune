@@ -515,10 +515,11 @@ public class BeneficiariosBean {
 		.from(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF)
 		.join(SVT_CONTRATANTE_BENEFICIARIOS, " SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF=SB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
         .join(SVT_CONVENIO_PF, "SCPC.ID_CONVENIO_PF = PF.ID_CONVENIO_PF ")
+        .join(SVC_PERSONA, "SB.ID_PERSONA = SP.ID_PERSONA")
         .where("SB.IND_ACTIVO=1").and("PF.ID_TIPO_PREVISION = 1");
 			queryUtil.where("SCPC.ID_CONTRATANTE_PAQUETE_CONVENIO_PF="+idContratanteConvenioPf);	
 		String query = obtieneQuery(queryUtil);
-		log.info(query);
+		log.info("count benef "+query);
 	   String encoded = encodedQuery(query);
 	   parametros.put(AppConstantes.QUERY, encoded);
 	    request.setDatos(parametros);
