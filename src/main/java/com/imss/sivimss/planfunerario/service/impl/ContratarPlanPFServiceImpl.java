@@ -87,7 +87,11 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         mapa.put("idPersona", persona.getIdPersona());
         mapa.put("idContratante", persona.getIdContratante());
         mapa.put("idDomicilio", persona.getIdDomicilio());
-        //MensajeResponseUtil.mensajeResponse(providerRestTemplate.consumirServicio(salas.registrarEntrada(registroEntrada, usuarioDto).getDatos(), urlDominioConsulta + "/crear", authentication), REGISTRO_CORRECTO);
+        //irwin
+        mapa.put("idVelatorio", persona.getIdVelatorio());
+        mapa.put("nombreContratante", persona.getPersona().getNombre() + " " + persona.getPersona().getPrimerApellido() + " " + persona.getPersona().getSegundoApellido());
+        mapa.put("usuarioAlta", usuarioDto.getIdUsuario());
+        mapa.put("idPaquete", persona.getPersona().getPaquete());
         return MensajeResponseUtil.mensajeResponse(providerRestTemplate.consumirServicio(mapa, urlDominioConvenios + "/insertConvenios", authentication),"30");
     }
 
@@ -103,13 +107,19 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
                 empresa.getEmpresa().getMunicipio(), empresa.getEmpresa().getEstado(), usuarioDto.getIdUsuario().toString());
         String queryEmpresaConvenioPF = convenioBean.generarQueryEmpresaConvenioPf(empresa.getEmpresa(), usuarioDto.getIdUsuario().toString());
 
-        log.info("--------- datos a enviar ----------");
+
         HashMap mapa = new HashMap();
         mapa.put("datosConvenio", DatatypeConverter.printBase64Binary(queryConvenioPf.getBytes("UTF-8")));
         mapa.put("datosDireccion", DatatypeConverter.printBase64Binary(queryDomicilio.getBytes("UTF-8")));
         mapa.put("datosEmpresaConvenio", DatatypeConverter.printBase64Binary(queryEmpresaConvenioPF.getBytes("UTF-8")));
         mapa.put("datosPersonas", empresa.getEmpresa().getPersonas());
         mapa.put("usuario", usuarioDto.getIdUsuario().toString());
+
+        //irwin
+        mapa.put("idVelatorio", empresa.getIdVelatorio());
+        mapa.put("nombreContratante", empresa.getEmpresa().getNombreEmpresa());
+        mapa.put("usuarioAlta", usuarioDto.getIdUsuario());
+        mapa.put("idPaquete", empresa.getEmpresa().getPersonas()[0].getPaquete());
         return providerRestTemplate.consumirServicio(mapa, urlDominioConvenios + "/insertConvenios/empresa", authentication);
     }
 
@@ -133,8 +143,8 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
             RenapoResponse rp = new RenapoResponse();
             String curp = String.valueOf(objeto.get("curp"));
             String rfc = String.valueOf(objeto.get("rfc"));
-            Response response = providerRestTemplate.consumirServicio(convenioBean.consultarCurpRfc(curp, rfc).getDatos(), urlDominioConsulta, authentication);
-            if (response.getDatos().toString().equals("[]")) {
+            Response responsePersona = providerRestTemplate.consumirServicio(convenioBean.consultarCurpRfc(curp, rfc).getDatos(), urlDominioConsulta, authentication);
+            if (responsePersona.getDatos().toString().equals("[]")) {
                 Response respuestaRenapo = providerRestTemplate.consumirServicioExternoGet(urlRenapo + "/" + curp.replace("\"", ""));
                 JsonObject objRenapo = (JsonObject) jsonParser.parse(respuestaRenapo.getDatos().toString());
                 rp.setCurp(objRenapo.get("curp").getAsString());
@@ -157,7 +167,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
                 respuesta.setDatos(rp);
                 return respuesta;
             }
-            return response;
+            return responsePersona;
         } catch (Exception ex) {
             ex.getMessage();
             ex.printStackTrace();

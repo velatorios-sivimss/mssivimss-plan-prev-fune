@@ -44,7 +44,6 @@ public class ModificarConvenioNuevoPf {
         queryPersona.agregarParametroValues("DES_OTRO_SEXO", "'" + persona.getOtroSexo() + "'");
         queryPersona.agregarParametroValues("FEC_NAC", "'" + persona.getFechaNacimiento() + "'");
         queryPersona.agregarParametroValues("ID_PAIS", "'" + persona.getPais() + "'");
-        log.info("id pais bene");
         //queryPersona.agregarParametroValues("ID_ESTADO", "'" + persona.getEstado() + "'");
         queryPersona.agregarParametroValues("DES_TELEFONO", "'" + persona.getTelefono() + "'");
         queryPersona.agregarParametroValues("DES_CORREO", "'" + persona.getCorreoElectronico() + "'");

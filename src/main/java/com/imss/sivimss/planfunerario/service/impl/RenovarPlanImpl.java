@@ -32,6 +32,7 @@ import com.imss.sivimss.planfunerario.model.response.DatosConvenioResponse;
 import com.imss.sivimss.planfunerario.model.response.BenefResponse;
 import com.imss.sivimss.planfunerario.model.request.UsuarioDto;
 import com.imss.sivimss.planfunerario.model.request.VerificarDocumentacionRequest;
+import com.imss.sivimss.planfunerario.service.PagosService;
 import com.imss.sivimss.planfunerario.service.RenovarPlanService;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.ConvertirGenerico;
@@ -61,6 +62,9 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	@Autowired
 	private ModelMapper modelMapper;
 	
+	@Autowired
+	private PagosService pagosService;
+	
 	@Value("${endpoints.rutas.dominio-consulta}")
 	private String urlConsulta;
 	@Value("${endpoints.rutas.dominio-crear}")
@@ -75,7 +79,6 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private String urlReportes;
 	@Value("${formato-fecha}")
 	private String fecFormat;
-
 
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
@@ -264,6 +267,11 @@ public class RenovarPlanImpl implements RenovarPlanService {
 				response = providerRestTemplate.consumirServicio(renovarBean.renovarPlan().getDatos(), urlCrear,
 						authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
+				
+				if(response.getCodigo()==200) {
+					pagosService.insertar(renovarBean, response, authentication);
+				}
+				
 				if(response.getCodigo()==200 && renovarRequest.getIndRenovacion()==0) {
 					providerRestTemplate.consumirServicio(renovarBean.actualizarEstatusConvenio(renovarRequest.getIdConvenioPf()).getDatos(), urlActualizar,
 							authentication);
