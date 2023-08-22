@@ -42,7 +42,7 @@ public class ConsultaConvenios {
         SelectQueryUtil queryBeneficiarios = new SelectQueryUtil();
         queryBeneficiarios.select("count(*)")
                 .from("SVT_CONTRATANTE_BENEFICIARIOS beneficiarios")
-                .where("beneficiarios.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = contratanteConvenio.ID_CONTRATANTE_PAQUETE_CONVENIO_PF");
+                .where("beneficiarios.ID_CONTRA_PAQ_CONVENIO_PF = contratanteConvenio.ID_CONTRA_PAQ_CONVENIO_PF");
 
         SelectQueryUtil queryFacturas = new SelectQueryUtil();
         queryFacturas.select()
@@ -171,7 +171,7 @@ public class ConsultaConvenios {
         queryBeneficiariosNuevoPlan
                 .from("SVT_CONTRATANTE_BENEFICIARIOS beneficiario")
                 .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratantePaquete",
-                        "contratantePaquete.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = beneficiario.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
+                        "contratantePaquete.ID_CONTRA_PAQ_CONVENIO_PF = beneficiario.ID_CONTRA_PAQ_CONVENIO_PF")
                 .join("SVT_CONVENIO_PF convenio",
                         "convenio.ID_CONVENIO_PF = contratantePaquete.ID_CONVENIO_PF")
                 .join("SVC_PERSONA personaBeneficiario",
@@ -187,7 +187,7 @@ public class ConsultaConvenios {
                 .join("SVT_BENEFICIARIOS_DOCUMENTACION_PLAN_ANTERIOR documentacion",
                         "beneficiario.ID_CONTRATANTE_BENEFICIARIOS = documentacion.ID_CONTRATANTE_BENEFICIARIOS")
                 .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratantePaquete",
-                        "contratantePaquete.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = beneficiario.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
+                        "contratantePaquete.ID_CONTRA_PAQ_CONVENIO_PF = beneficiario.ID_CONTRA_PAQ_CONVENIO_PF")
                 .join("SVT_CONVENIO_PF convenio",
                         "convenio.ID_CONVENIO_PF = contratantePaquete.ID_CONVENIO_PF")
                 .join("SVC_PERSONA personaBeneficiario",
@@ -204,7 +204,7 @@ public class ConsultaConvenios {
                 .join("SVT_BENEFICIARIOS_DOCUMENTACION_PLAN_ANTERIOR documentacion",
                         "beneficiario.ID_CONTRATANTE_BENEFICIARIOS = documentacion.ID_CONTRATANTE_BENEFICIARIOS")
                 .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratantePaquete",
-                        "contratantePaquete.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = beneficiario.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
+                        "contratantePaquete.ID_CONTRA_PAQ_CONVENIO_PF = beneficiario.ID_CONTRA_PAQ_CONVENIO_PF")
                 .join("SVT_CONVENIO_PF convenio",
                         "convenio.ID_CONVENIO_PF = contratantePaquete.ID_CONVENIO_PF")
                 .join("SVC_PERSONA personaBeneficiario",
@@ -257,12 +257,12 @@ public class ConsultaConvenios {
                 .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVT_CONTRATANTE_BENEFICIARIOS beneficiario",
-                        "beneficiario.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = contratanteConvenio.ID_CONTRATANTE_PAQUETE_CONVENIO_PF",
+                        "beneficiario.ID_CONTRA_PAQ_CONVENIO_PF = contratanteConvenio.ID_CONTRA_PAQ_CONVENIO_PF",
 //                        "beneficiario.IND_ACTIVO = true",
                         "beneficiario.ID_PERSONA = finado.ID_PERSONA")
                 .join("SVC_PARENTESCO parentesco",
                         "parentesco.ID_PARENTESCO = beneficiario.ID_PARENTESCO")
-                .join("SVC_CARACTERISTICAS_PRESUPUESTO presupuesto",
+                .join("SVC_CARAC_PRESUPUESTO presupuesto",
                         "presupuesto.ID_ORDEN_SERVICIO = ods.ID_ORDEN_SERVICIO")
                 .where("convenio.DES_FOLIO = :folioConvenio",
                         "ods.ID_ESTATUS_ORDEN_SERVICIO in (4, 5)") // sacar a una constante
@@ -304,7 +304,7 @@ public class ConsultaConvenios {
                         "personaContratante.id_persona = personaFinado.id_persona")
                 .join("SVC_PARENTESCO parentesco",
                         "parentesco.ID_PARENTESCO = ods.ID_PARENTESCO")
-                .join("SVC_CARACTERISTICAS_PRESUPUESTO presupuesto",
+                .join("SVC_CARAC_PRESUPUESTO presupuesto",
                         "presupuesto.ID_ORDEN_SERVICIO = ods.ID_ORDEN_SERVICIO")
                 .join("SVT_PAGO_BITACORA pago",
                         "pago.CVE_FOLIO = ods.CVE_FOLIO",
