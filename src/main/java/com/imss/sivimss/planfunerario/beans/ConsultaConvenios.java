@@ -71,7 +71,8 @@ public class ConsultaConvenios {
                 .join("SVC_ESTATUS_CONVENIO_PF estatus",
                         "estatus.ID_ESTATUS_CONVENIO_PF = convenio.ID_ESTATUS_CONVENIO")
                 .leftJoin("SVT_RENOVACION_CONVENIO_PF renovacionConvenio",
-                        "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
+                        "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF",
+                        "renovacionConvenio.ID_ESTATUS = 2")
                 .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVT_PAQUETE paquete",
@@ -109,7 +110,8 @@ public class ConsultaConvenios {
                 .join("SVC_ESTATUS_CONVENIO_PF estatus",
                         "estatus.ID_ESTATUS_CONVENIO_PF = convenio.ID_ESTATUS_CONVENIO")
                 .leftJoin("SVT_RENOVACION_CONVENIO_PF renovacionConvenio",
-                        "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
+                        "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF",
+                        "renovacionConvenio.ID_ESTATUS = 2")
                 .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVT_PAQUETE paquete",
