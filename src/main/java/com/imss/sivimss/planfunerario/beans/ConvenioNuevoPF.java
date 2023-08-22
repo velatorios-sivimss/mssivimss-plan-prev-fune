@@ -43,7 +43,7 @@ public class ConvenioNuevoPF {
             queryPersona.agregarParametroValues("ID_ESTADO", "'" + persona.getEntidadFederativa() + "'");
             queryPersona.agregarParametroValues("DES_TELEFONO", "'" + persona.getTelefono() + "'");
             queryPersona.agregarParametroValues("DES_CORREO", "'" + persona.getCorreoElectronico() + "'");
-            queryPersona.agregarParametroValues("TIPO_PERSONA", "'" + persona.getTipoPersona() + "'");
+            queryPersona.agregarParametroValues("TIP_PERSONA", "'" + persona.getTipoPersona() + "'");
             queryPersona.agregarParametroValues("NUM_INE", "'" + persona.getNumIne() + "'");
             queryPersona.agregarParametroValues("ID_USUARIO_ALTA", "'" + usuario + "'");
             log.info("Query insert Persona: " + queryPersona.obtenerQueryInsertar());
@@ -65,7 +65,7 @@ public class ConvenioNuevoPF {
         queryPersona.agregarParametroValues("ID_ESTADO", "'" + personaBeneficiario.getEntidadFederativa() + "'");
         queryPersona.agregarParametroValues("DES_TELEFONO", "'" + personaBeneficiario.getTelefono() + "'");
         queryPersona.agregarParametroValues("DES_CORREO", "'" + personaBeneficiario.getCorreoElectronico() + "'");
-        queryPersona.agregarParametroValues("TIPO_PERSONA", "'" + personaBeneficiario.getTipoPersona() + "'");
+        queryPersona.agregarParametroValues("TIP_PERSONA", "'" + personaBeneficiario.getTipoPersona() + "'");
         queryPersona.agregarParametroValues("NUM_INE", "'" + personaBeneficiario.getNumIne() + "'");
         queryPersona.agregarParametroValues("ID_USUARIO_ALTA", "'" + usuario + "'");
         log.info("Query insert Persona beneficiaria: " + queryPersona.obtenerQueryInsertar());
@@ -132,7 +132,7 @@ public class ConvenioNuevoPF {
 
     public String generarQueryContratanteBeneficiarios(String parentesco, String claveActa, String usuario, PersonaAltaConvenio persona,Authentication authentication) throws IOException {
             final QueryHelper queryContratanteBeneficiarios = new QueryHelper("INSERT INTO SVT_CONTRATANTE_BENEFICIARIOS");
-            queryContratanteBeneficiarios.agregarParametroValues("ID_CONTRATANTE_PAQUETE_CONVENIO_PF", "idContratantePaqueteConvenio");
+            queryContratanteBeneficiarios.agregarParametroValues("ID_CONTRA_PAQ_CONVENIO_PF", "idContratantePaqueteConvenio");
             queryContratanteBeneficiarios.agregarParametroValues("ID_PARENTESCO", parentesco);
             queryContratanteBeneficiarios.agregarParametroValues("ID_PERSONA", "idPersona");
             queryContratanteBeneficiarios.agregarParametroValues("CVE_ACTA", "'" + claveActa + "'");
@@ -256,8 +256,8 @@ public class ConvenioNuevoPF {
                             "SC.ID_CONTRATANTE as idDelContratante",
                             "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
                             "SP.NUM_SEXO AS sexo", "SP.FEC_NAC AS fechaNacimiento", "SP.ID_PAIS AS idPais", "SP.ID_ESTADO AS idEstado",
-                            "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIPO_PERSONA AS tipoPersona",
-                            "(SELECT COUNT(CPF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF) FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ) AS tieneConvenio",
+                            "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIP_PERSONA AS tipoPersona",
+                            "(SELECT COUNT(CPF.ID_CONTRA_PAQ_CONVENIO_PF) FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ) AS tieneConvenio",
                             "(SELECT C.DES_FOLIO  FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF LEFT JOIN SVT_CONVENIO_PF C ON CPF.ID_CONVENIO_PF = C.ID_CONVENIO_PF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ) AS folioConvenio",
                             "DATE_FORMAT((SELECT C.FEC_ALTA  FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF LEFT JOIN SVT_CONVENIO_PF C ON CPF.ID_CONVENIO_PF = C.ID_CONVENIO_PF where CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ),'%d/%m/%Y') AS fecha")
                     .from("SVC_CONTRATANTE SC")
@@ -283,8 +283,8 @@ public class ConvenioNuevoPF {
                         "SC.ID_CONTRATANTE as idDelContratante",
                         "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
                         "SP.NUM_SEXO AS sexo", "SP.FEC_NAC AS fechaNacimiento", "SP.ID_PAIS AS idPais", "SP.ID_ESTADO AS idEstado",
-                        "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIPO_PERSONA AS tipoPersona",
-                        "(SELECT COUNT(CPF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF) FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ) AS tieneConvenio",
+                        "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIP_PERSONA AS tipoPersona",
+                        "(SELECT COUNT(CPF.ID_CONTRA_PAQ_CONVENIO_PF) FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ) AS tieneConvenio",
                         "(SELECT C.DES_FOLIO  FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF LEFT JOIN SVT_CONVENIO_PF C ON CPF.ID_CONVENIO_PF = C.ID_CONVENIO_PF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ) AS folioConvenio",
                 "DATE_FORMAT((SELECT C.FEC_ALTA  FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF LEFT JOIN SVT_CONVENIO_PF C ON CPF.ID_CONVENIO_PF = C.ID_CONVENIO_PF where CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ),'%d/%m/%Y') AS fecha")
                 .from("SVC_CONTRATANTE SC")
@@ -317,10 +317,10 @@ public class ConvenioNuevoPF {
         SelectQueryUtil querySelect = new SelectQueryUtil();
         querySelect.select("SCP.ID_CONVENIO_PF AS idConvenioPf", "SCP.DES_FOLIO AS folioConvenioPf", "SCP.ID_VELATORIO AS idVelatorio", "SV.DES_VELATORIO AS nombreVelatorio",
                         "SCP.ID_PROMOTOR AS idPromotor", "PROM.NUM_EMPLEDO AS numeroEmpleado", "PROM.NOM_PROMOTOR AS nombrePromotor", "PROM.NOM_PAPELLIDO AS primerApellidoPromotor",
-                        "PROM.NOM_SAPELLIDO AS segundoApellidoPromotor", "CPF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF AS idContratanteConvenioPf", "CPF.ID_CONTRATANTE AS idContratante",
+                        "PROM.NOM_SAPELLIDO AS segundoApellidoPromotor", "CPF.ID_CONTRA_PAQ_CONVENIO_PF AS idContratanteConvenioPf", "CPF.ID_CONTRATANTE AS idContratante",
                         "SC.CVE_MATRICULA AS cveMatricula", "SC.ID_PERSONA AS idPersona", "SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss", "SP.NOM_PERSONA AS nombrePersona",
                         "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido", "SP.NUM_SEXO AS numSexo", "SP.ID_PAIS AS idPais", "SP.ID_ESTADO AS idEstado",
-                        "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIPO_PERSONA AS tipoPersona", "SP.NUM_INE AS numIne",
+                        "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIP_PERSONA AS tipoPersona", "SP.NUM_INE AS numIne",
                         "SP.DES_OTRO_SEXO AS otroSexo",
                         "CPF.ID_PAQUETE AS idPaquete", "PAQ.DES_NOM_PAQUETE AS nombrePaquete", "DATE_FORMAT(SP.FEC_NAC,'%Y-%m-%d') AS fechaNacimiento",
                         "SD.DES_CALLE AS calle", "SD.NUM_EXTERIOR AS numExterior","SD.NUM_INTERIOR AS numInterior","SD.DES_CP AS cp","SD.DES_COLONIA AS colonia",
@@ -333,7 +333,7 @@ public class ConvenioNuevoPF {
                 .leftJoin("SVC_CONTRATANTE SC", "CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE")
                 .leftJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
                 .leftJoin("SVT_DOMICILIO SD"," SC.ID_DOMICILIO = SD.ID_DOMICILIO")
-                .leftJoin("SVT_CONTRATANTE_BENEFICIARIOS SCB", "CPF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
+                .leftJoin("SVT_CONTRATANTE_BENEFICIARIOS SCB", "CPF.ID_CONTRA_PAQ_CONVENIO_PF = SCB.ID_CONTRA_PAQ_CONVENIO_PF")
                 .where("SCP.DES_FOLIO = " + folioConvenio)
                 .groupBy("SCP.DES_FOLIO");
         String consulta = querySelect.build();
@@ -376,7 +376,7 @@ public class ConvenioNuevoPF {
                         "SP2.NOM_SEGUNDO_APELLIDO AS segundoApellido", "DATE_FORMAT(SP2.FEC_NAC,'%Y-%m-%d') AS fechaNacimiento",
                         "SP2.CVE_RFC AS rfc", "SP2.CVE_CURP AS curp", "SP2.CVE_NSS  AS nss", "SP2.NUM_SEXO AS numSexo", "SP2.DES_OTRO_SEXO AS otroSexo","SP2.NUM_SEXO AS numSexo","SP2.ID_ESTADO AS idEstado",
                         "SP2.ID_ESTADO as idEstado", "E.DES_ESTADO AS desEstado",
-                        "SP2.DES_TELEFONO AS telefono", "SP2.DES_CORREO AS correo", "SP2.TIPO_PERSONA AS tipoPersona", "SP2.NUM_INE AS numIne", "TIMESTAMPDIFF(YEAR, SP2.FEC_NAC , NOW()) AS edad",
+                        "SP2.DES_TELEFONO AS telefono", "SP2.DES_CORREO AS correo", "SP2.TIP_PERSONA AS tipoPersona", "SP2.NUM_INE AS numIne", "TIMESTAMPDIFF(YEAR, SP2.FEC_NAC , NOW()) AS edad",
                         "SCB.IND_INE_BENEFICIARIO AS validaIneBeneficiario" , "SCB.IND_ACTA_NACIMIENTO AS validaActaNacimientoBeneficiario", "SCB.ID_PARENTESCO  AS idParentesco","SCB.CVE_ACTA as cveActa",
                         "SV.ID_VELATORIO AS idVelatorio","SV.DES_VELATORIO AS nomVelatorio")
                 .from("SVT_CONVENIO_PF SCP")
@@ -386,7 +386,7 @@ public class ConvenioNuevoPF {
                 .leftJoin("SVT_PAQUETE PAQ", "CPF.ID_PAQUETE = PAQ.ID_PAQUETE")
                 .leftJoin("SVC_CONTRATANTE SC", "CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE")
                 .leftJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
-                .leftJoin("SVT_CONTRATANTE_BENEFICIARIOS SCB", "CPF.ID_CONTRATANTE_PAQUETE_CONVENIO_PF = SCB.ID_CONTRATANTE_PAQUETE_CONVENIO_PF")
+                .leftJoin("SVT_CONTRATANTE_BENEFICIARIOS SCB", "CPF.ID_CONTRA_PAQ_CONVENIO_PF = SCB.ID_CONTRA_PAQ_CONVENIO_PF")
                 .leftJoin("SVC_PERSONA SP2", "SCB.ID_PERSONA = SP2.ID_PERSONA")
                 .leftJoin("SVC_ESTADO E","SP2.ID_ESTADO = E.ID_ESTADO")
                 .where("SCP.DES_FOLIO = " + folioConvenio);

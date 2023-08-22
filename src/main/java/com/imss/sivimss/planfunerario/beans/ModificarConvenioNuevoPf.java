@@ -24,7 +24,7 @@ public class ModificarConvenioNuevoPf {
         //queryPersona.agregarParametroValues("ID_ESTADO", "'" + persona.getEstado() + "'");
         queryPersona.agregarParametroValues("DES_TELEFONO", "'" + persona.getTelefono() + "'");
         queryPersona.agregarParametroValues("DES_CORREO", "'" + persona.getCorreoElectronico() + "'");
-        queryPersona.agregarParametroValues("TIPO_PERSONA", "'" + persona.getTipoPersona() + "'");
+        queryPersona.agregarParametroValues("TIP_PERSONA", "'" + persona.getTipoPersona() + "'");
         queryPersona.agregarParametroValues("NUM_INE", "'" + persona.getNumIne() + "'");
         queryPersona.agregarParametroValues("ID_USUARIO_MODIFICA", usuario);
         queryPersona.agregarParametroValues("FEC_ACTUALIZACION", "NOW()");
@@ -47,7 +47,7 @@ public class ModificarConvenioNuevoPf {
         //queryPersona.agregarParametroValues("ID_ESTADO", "'" + persona.getEstado() + "'");
         queryPersona.agregarParametroValues("DES_TELEFONO", "'" + persona.getTelefono() + "'");
         queryPersona.agregarParametroValues("DES_CORREO", "'" + persona.getCorreoElectronico() + "'");
-        queryPersona.agregarParametroValues("TIPO_PERSONA", "'" + persona.getTipoPersona() + "'");
+        queryPersona.agregarParametroValues("TIP_PERSONA", "'" + persona.getTipoPersona() + "'");
         queryPersona.agregarParametroValues("NUM_INE", "'" + persona.getNumIne() + "'");
         queryPersona.agregarParametroValues("ID_USUARIO_MODIFICA", usuario);
         queryPersona.agregarParametroValues("FEC_ACTUALIZACION", "NOW()");
