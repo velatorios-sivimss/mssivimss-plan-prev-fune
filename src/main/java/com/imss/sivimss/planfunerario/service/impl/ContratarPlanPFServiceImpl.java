@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
@@ -92,7 +89,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         mapa.put("nombreContratante", persona.getPersona().getNombre() + " " + persona.getPersona().getPrimerApellido() + " " + persona.getPersona().getSegundoApellido());
         mapa.put("usuarioAlta", usuarioDto.getIdUsuario());
         mapa.put("idPaquete", persona.getPersona().getPaquete());
-        return MensajeResponseUtil.mensajeResponse(providerRestTemplate.consumirServicio(mapa, urlDominioConvenios + "/insertConvenios", authentication),"30");
+        return MensajeResponseUtil.mensajeResponse(providerRestTemplate.consumirServicio(mapa, urlDominioConvenios + "/insertConvenios", authentication), "30");
     }
 
     @Override
@@ -154,7 +151,10 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
                 rp.setIdEstado("");
                 rp.setFechaNacimiento(objRenapo.get("fechNac").getAsString());
                 rp.setIdPais("");
-                Integer sexo = objRenapo.get("sexo").equals("HOMBRE") ? 2 : 1;
+                String sexo = objRenapo.get("sexo").getAsString();
+                if (Objects.nonNull(sexo)) {
+                    sexo = String.valueOf(sexo.equals("HOMBRE") ? '2' : '1');
+                }
                 rp.setSexo(String.valueOf(sexo));
                 rp.setNomPersona(objRenapo.get("nombre").getAsString());
                 rp.setPrimerApellido(objRenapo.get("apellido1").getAsString());
