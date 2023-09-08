@@ -257,12 +257,13 @@ public class ConvenioNuevoPF {
                             "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
                             "SP.NUM_SEXO AS sexo","IFNULL(SP.DES_OTRO_SEXO,'') AS otroSexo" ,"SP.FEC_NAC AS fechaNacimiento", "SP.ID_PAIS AS idPais", "SP.ID_ESTADO AS idEstado",
                             "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIP_PERSONA AS tipoPersona",
-                            "(SELECT COUNT(CPF.ID_CONTRA_PAQ_CONVENIO_PF) FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ) AS tieneConvenio",
-                            "(SELECT C.DES_FOLIO  FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF LEFT JOIN SVT_CONVENIO_PF C ON CPF.ID_CONVENIO_PF = C.ID_CONVENIO_PF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ) AS folioConvenio",
-                            "DATE_FORMAT((SELECT C.FEC_ALTA  FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF LEFT JOIN SVT_CONVENIO_PF C ON CPF.ID_CONVENIO_PF = C.ID_CONVENIO_PF where CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ),'%d/%m/%Y') AS fecha")
+                            "(SELECT COUNT(CPF.ID_CONTRA_PAQ_CONVENIO_PF) FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE  LIMIT 1) AS tieneConvenio",
+                            "(SELECT C.DES_FOLIO  FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF LEFT JOIN SVT_CONVENIO_PF C ON CPF.ID_CONVENIO_PF = C.ID_CONVENIO_PF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE  LIMIT 1) AS folioConvenio",
+                            "DATE_FORMAT((SELECT C.FEC_ALTA  FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF LEFT JOIN SVT_CONVENIO_PF C ON CPF.ID_CONVENIO_PF = C.ID_CONVENIO_PF where CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE  LIMIT 1 ),'%d/%m/%Y') AS fecha")
                     .from("SVC_CONTRATANTE SC")
                     .leftJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
-                    .where("SP.CVE_CURP = " + curp);
+                    .where("SP.CVE_CURP = " + curp)
+                    .orderBy("SC.ID_CONTRATANTE DESC LIMIT 1");
             String consulta = query.build();
             log.info(consulta);
             String encoded = DatatypeConverter.printBase64Binary(consulta.getBytes());
@@ -284,12 +285,13 @@ public class ConvenioNuevoPF {
                         "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
                         "SP.NUM_SEXO AS sexo","IFNULL(SP.DES_OTRO_SEXO,'') AS otroSexo" , "SP.FEC_NAC AS fechaNacimiento", "SP.ID_PAIS AS idPais", "SP.ID_ESTADO AS idEstado",
                         "SP.DES_TELEFONO AS telefono", "SP.DES_CORREO AS correo", "SP.TIP_PERSONA AS tipoPersona",
-                        "(SELECT COUNT(CPF.ID_CONTRA_PAQ_CONVENIO_PF) FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ) AS tieneConvenio",
-                        "(SELECT C.DES_FOLIO  FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF LEFT JOIN SVT_CONVENIO_PF C ON CPF.ID_CONVENIO_PF = C.ID_CONVENIO_PF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ) AS folioConvenio",
-                "DATE_FORMAT((SELECT C.FEC_ALTA  FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF LEFT JOIN SVT_CONVENIO_PF C ON CPF.ID_CONVENIO_PF = C.ID_CONVENIO_PF where CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ),'%d/%m/%Y') AS fecha")
+                        "(SELECT COUNT(CPF.ID_CONTRA_PAQ_CONVENIO_PF) FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE LIMIT 1) AS tieneConvenio",
+                        "(SELECT C.DES_FOLIO  FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF LEFT JOIN SVT_CONVENIO_PF C ON CPF.ID_CONVENIO_PF = C.ID_CONVENIO_PF WHERE CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE LIMIT 1) AS folioConvenio",
+                "DATE_FORMAT((SELECT C.FEC_ALTA  FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF LEFT JOIN SVT_CONVENIO_PF C ON CPF.ID_CONVENIO_PF = C.ID_CONVENIO_PF where CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE LIMIT 1),'%d/%m/%Y') AS fecha")
                 .from("SVC_CONTRATANTE SC")
                 .leftJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
-                .where("SP.CVE_RFC = " + rfc);
+                .where("SP.CVE_RFC = " + rfc)
+                .orderBy("SC.ID_CONTRATANTE DESC LIMIT 1");
         String consulta = query.build();
         log.info(consulta);
         return consulta;
