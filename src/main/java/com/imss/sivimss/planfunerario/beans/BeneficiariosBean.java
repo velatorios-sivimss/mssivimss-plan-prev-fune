@@ -177,7 +177,7 @@ public class BeneficiariosBean {
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF)
 		.leftJoin("SVT_BENEFICIARIOS_DOCUMENTACION_PLAN_ANTERIOR SBD", "SB.ID_CONTRATANTE_BENEFICIARIOS = SBD.ID_CONTRATANTE_BENEFICIARIOS")
 		.join(SVC_PERSONA, " SB.ID_PERSONA = SP.ID_PERSONA")
-		.join("SVC_PARENTESCO PAR", "PAR.ID_PARENTESCO = SB.ID_PARENTESCO");
+		.leftJoin("SVC_PARENTESCO PAR", "PAR.ID_PARENTESCO = SB.ID_PARENTESCO");
 		queryUtil.where("SB.ID_CONTRATANTE_BENEFICIARIOS = :idBeneficiario")
 		//.setParameter("idConvenio", idConvenio)
 		.setParameter("idBeneficiario", idBeneficiario);
@@ -264,10 +264,10 @@ public class BeneficiariosBean {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("UPDATE SVC_PERSONA ");
-		q.agregarParametroValues(NOM_PERSONA, "'" + this.nombre + "'");
-		q.agregarParametroValues(NOM_PRIMER_APELLIDO, "'" + this.apellidoP + "'");
-		q.agregarParametroValues(NOM_SEGUNDO_APELLIDO, "'" + this.apellidoM + "'");
-		q.agregarParametroValues(FEC_NAC, "'" + this.fechaNac + "'");
+		q.agregarParametroValues(NOM_PERSONA, setValor(this.nombre));
+		q.agregarParametroValues(NOM_PRIMER_APELLIDO, setValor(this.apellidoP));
+		q.agregarParametroValues(NOM_SEGUNDO_APELLIDO, setValor(this.apellidoM));
+		q.agregarParametroValues(FEC_NAC, setValor(this.fechaNac));
 		q.agregarParametroValues(CVE_CURP, "'"+ this.curp + "'");
 		q.agregarParametroValues(CVE_RFC, setValor(this.rfc));
 		q.agregarParametroValues(DES_CORREO, setValor(this.correoE));
@@ -343,7 +343,7 @@ public class BeneficiariosBean {
 		      .from(SVT_CONTRATANTE_BENEFICIARIOS)
 		      .join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF)
 		      .join(SVT_CONVENIO_PF, SCPC_ID_CONVENIO_PF_PF_ID_CONVENIO_PF)
-		      .join(SVC_PERSONA, "SB.ID_PERSONA = SP.ID_PERSONA");
+		      .join(SVC_PERSONA, "SB.ID_PERSONA=SP.ID_PERSONA");
 		queryUno.where("PF.ID_TIPO_PREVISION=2").and("SB.IND_SINIESTROS=0").and("SB.ID_PARENTESCO !=4")
 		.and("PF.ID_CONVENIO_PF= "+palabra+"");
 		SelectQueryUtil queryDos = new SelectQueryUtil();
