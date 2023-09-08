@@ -289,8 +289,7 @@ public class ConvenioNuevoPF {
                 "DATE_FORMAT((SELECT C.FEC_ALTA  FROM SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPF LEFT JOIN SVT_CONVENIO_PF C ON CPF.ID_CONVENIO_PF = C.ID_CONVENIO_PF where CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE ),'%d/%m/%Y') AS fecha")
                 .from("SVC_CONTRATANTE SC")
                 .leftJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
-                .where("SP.CVE_RFC = " + rfc)
-                .or("SP.CVE_CURP = " + curp);
+                .where("SP.CVE_RFC = " + rfc);
         String consulta = query.build();
         log.info(consulta);
         return consulta;

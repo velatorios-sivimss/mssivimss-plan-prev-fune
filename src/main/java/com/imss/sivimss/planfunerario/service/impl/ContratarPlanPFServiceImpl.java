@@ -142,6 +142,14 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
             String rfc = String.valueOf(objeto.get("rfc"));
             Response responsePersona = providerRestTemplate.consumirServicio(convenioBean.consultarCurpRfc(curp, rfc).getDatos(), urlDominioConsulta, authentication);
             if (responsePersona.getDatos().toString().equals("[]")) {
+                if(curp.equals("\"\"")){
+                    Response respuesta = new Response();
+                    respuesta.setCodigo(200);
+                    respuesta.setError(true);
+                    respuesta.setMensaje("33");
+                    respuesta.setDatos("");
+                    return respuesta;
+                }
                 Response respuestaRenapo = providerRestTemplate.consumirServicioExternoGet(urlRenapo + "/" + curp.replace("\"", ""));
                 JsonObject objRenapo = (JsonObject) jsonParser.parse(respuestaRenapo.getDatos().toString());
                 rp.setCurp(objRenapo.get("curp").getAsString());
