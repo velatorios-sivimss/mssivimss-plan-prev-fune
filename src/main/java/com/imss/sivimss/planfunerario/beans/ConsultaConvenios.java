@@ -433,12 +433,12 @@ public class ConsultaConvenios {
         final String CONVENIO_ALIAS = SVT_CONVENIO + " convenio";
         queryFacturas.select(
                         "factura.CVE_FOLIO_FISCAL as numeroFactura",
-                        "factura.NUM_UUID as UUID", // cambiar por el nombre que va a tener en la base de datos
+                       // "factura.NUM_UUID as UUID", // cambiar por el nombre que va a tener en la base de datos
                         formatearFecha("factura.FEC_FACTURACION") + " as fecha", // cambiar por la fecha que se estaria registrando
                         "factura.CVE_RFC_CONTRATANTE as rfc",
                         "factura.DES_RAZON_SOCIAL as cliente",
                         "factura.DES_COMENTARIOS as nota",
-                        "factura.IMP_TOTAL as total",
+                        "factura.IMP_TOTAL_PAGADO as total",
                         "estatus.DES_ESTATUS as estatusFactura"
                 )
                 .from("SVC_FACTURA factura")
