@@ -13,6 +13,7 @@ public class RenapoResponse {
     private String rfc= "";
     private String nss= "";
     private String idEstado= "";
+    private String desEstado= "";
     private String correo= "";
     private String sexo= "";
     private String telefono= "";

@@ -157,6 +157,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
                 rp.setRfc("");
                 rp.setNss("");
                 rp.setIdEstado("");
+                rp.setDesEstado(objRenapo.get("desEntidadNac").getAsString());
                 rp.setFechaNacimiento(objRenapo.get("fechNac").getAsString());
                 rp.setIdPais("");
                 String sexo = objRenapo.get("sexo").getAsString();
