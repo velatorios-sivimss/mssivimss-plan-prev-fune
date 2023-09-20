@@ -234,8 +234,8 @@ public class ConvenioNuevoPF {
         String queryPaqueteServiciosArticulos=selectQueryUtilUnionPaqueteServicio.union(selectQueryUtilUnionPaqueteArticulo);
 
         selectQueryUtilPaquete.select("PAQUETES.ID_PAQUETE AS idPaquete","PAQUETES.DES_NOM_PAQUETE AS nomPaquete", "PAQUETES.DES_PAQUETE AS descPaquete")
-                .from("("+queryPaqueteRegion+") PAQUETES")
-                .where("PAQUETES.ID_PAQUETE IN("+queryPaqueteServiciosArticulos+")");
+                .from("("+queryPaqueteRegion+") PAQUETES");
+         //       .where("PAQUETES.ID_PAQUETE IN("+queryPaqueteServiciosArticulos+")");
 
         String query=selectQueryUtilPaquete.build();
         log.info(query);
