@@ -542,6 +542,7 @@ public class BeneficiariosBean {
         }
     }
 
+	
 	public DatosRequest buscarCatalogoEstatus(DatosRequest request) {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
