@@ -37,7 +37,7 @@ public class RenovarExt {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SV.DES_VELATORIO AS velatorio",
 				"PF.ID_CONVENIO_PF AS idConvenio",
-				"PF.DES_FOLIO AS folio",
+				"PF.REF_FOLIO AS folio",
 				"SP.CVE_RFC AS rfc",
 				"SP.NOM_PERSONA AS nombre",
 				"SP.NOM_PRIMER_APELLIDO AS primerApellido",
@@ -64,7 +64,7 @@ public class RenovarExt {
 			.setParameter("idVelatorio", filtros.getIdVelatorio());
 		}
 		if(filtros.getFolio()!=null) {
-			queryUtil.where("PF.DES_FOLIO= :folio")
+			queryUtil.where("PF.REF_FOLIO= :folio")
 			.setParameter("folio", filtros.getFolio());
 		}
 		if(filtros.getRfc()!=null) {
@@ -86,7 +86,7 @@ public class RenovarExt {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("PF.ID_CONVENIO_PF AS idConvenio",
-				"PF.DES_FOLIO AS folio",
+				"PF.REF_FOLIO AS folio",
 				"SP.CVE_RFC AS rfc",
 				"SC.CVE_MATRICULA AS matricula",
 				"SP.NOM_PERSONA AS nombre",

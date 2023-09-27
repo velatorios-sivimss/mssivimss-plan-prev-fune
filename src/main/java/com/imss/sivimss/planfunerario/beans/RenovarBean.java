@@ -64,7 +64,7 @@ public class RenovarBean {
 	public DatosRequest buscarConvenio(DatosRequest request, FiltrosConvenioPFRequest filtros, String fecFormat ) {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("SCP.DES_FOLIO AS folio",
+		queryUtil.select("SCP.REF_FOLIO AS folio",
 				"SCP.ID_CONVENIO_PF AS idConvenio",
 				 "SP.CVE_RFC AS rfc",
 				 "SC.CVE_MATRICULA AS matricula",
@@ -109,7 +109,7 @@ public class RenovarBean {
 			.setParameter("idNumeroContratante", filtros.getNumeroContratante());
 		}
 		if(filtros.getFolio()!=null) {
-			queryUtil.where("SCP.DES_FOLIO = :desFolio")
+			queryUtil.where("SCP.REF_FOLIO = :desFolio")
 			.setParameter(DES_FOLIO, filtros.getFolio());
 		}
 		if(filtros.getRfc()!=null) {
@@ -165,7 +165,7 @@ public class RenovarBean {
 			queryUtil.where("SCPC.ID_CONVENIO_PF =" +filtros.getNumeroConvenio()+"");
 		}
 		if(filtros.getFolio()!=null) {
-			queryUtil.where("SPF.DES_FOLIO= '"+filtros.getFolio()+"'");
+			queryUtil.where("SPF.REF_FOLIO= '"+filtros.getFolio()+"'");
 		}
 			String query = obtieneQuery(queryUtil);
 			log.info("validar fallecido ->"+query);
@@ -187,7 +187,7 @@ public class RenovarBean {
 		.join(SVC_PERSONA, "SC.ID_PERSONA=SP.ID_PERSONA");
 		queryUtil.where("IF(TIMESTAMPDIFF(DAY, IF(SPF.IND_RENOVACION=0, DATE_FORMAT(SPF.FEC_VIGENCIA, \"%Y/%m/%1\"), DATE_FORMAT(RPF.FEC_VIGENCIA, \"%Y/%m/%1\")), CURDATE())>=0, SPF.FEC_VIGENCIA, 0)");
 		if(filtros.getFolio()!=null) {
-			queryUtil.where("SPF.DES_FOLIO = '"+filtros.getFolio() +"'");
+			queryUtil.where("SPF.REF_FOLIO = '"+filtros.getFolio() +"'");
 		}
 	    if(filtros.getNumeroConvenio()!=null) {
 	    	queryUtil.where("SPF.ID_CONVENIO_PF = "+filtros.getNumeroConvenio()+"");
@@ -265,7 +265,7 @@ public class RenovarBean {
 		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+id+"");
 		q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		if(folio!=null) {
-			q.addWhere("DES_FOLIO = '"+folio+"'");
+			q.addWhere("REF_FOLIO = '"+folio+"'");
 		}
 		if(idConvenio!=null) {
 			q.addWhere(ID_CONVENIO_PF+"="+idConvenio+"");
@@ -499,7 +499,7 @@ public class RenovarBean {
 		.join("SVC_PERSONA PC", "SCB.ID_PERSONA = PC.ID_PERSONA");
 		queryUtil.where("SCB.IND_ACTIVO=1 AND SCB.IND_SINIESTROS=0");
 		if(folio!=null) {
-			queryUtil.where("PF.DES_FOLIO= :folio")
+			queryUtil.where("PF.REF_FOLIO= :folio")
 			.setParameter("folio", folio);	
 		}
 		if(id!=null) {
