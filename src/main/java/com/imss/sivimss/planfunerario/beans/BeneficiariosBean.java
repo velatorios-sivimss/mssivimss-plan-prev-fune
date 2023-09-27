@@ -367,7 +367,7 @@ public class BeneficiariosBean {
 	    return request;
 	}
 	
-	public DatosRequest  buscarCatalogosParentescos(DatosRequest request) {
+	public DatosRequest  buscarCatalogoParentescos(DatosRequest request) {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("DES_PARENTESCO AS parentesco",
@@ -541,4 +541,18 @@ public class BeneficiariosBean {
             return "'"+valor+"'";
         }
     }
+
+	
+	public DatosRequest buscarCatalogoEstatus(DatosRequest request) {
+		Map<String, Object> parametros = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("EC.ID_ESTATUS_CONVENIO_PF AS id",
+				"EC.DES_ESTATUS AS estatus")
+		.from("SVC_ESTATUS_CONVENIO_PF EC");
+		String query = obtieneQuery(queryUtil);
+	   String encoded = encodedQuery(query);
+	   parametros.put(AppConstantes.QUERY, encoded);
+	    request.setDatos(parametros);
+	    return request;
+	}
 }

@@ -288,10 +288,15 @@ public class BeneficiariosImpl implements BeneficiariosService {
 					authentication);
 		}
 		if (filtros.getIdCatalogo() == 3) {
-			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogosParentescos(request).getDatos(),
+			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogoParentescos(request).getDatos(),
 					urlConsulta,
 					authentication);
-		} else {
+		} 
+		if(filtros.getIdCatalogo() == 4) {
+			return providerRestTemplate.consumirServicio(benefBean.buscarCatalogoEstatus(request).getDatos(),
+					urlConsulta,
+					authentication);
+		}else {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, "INFORMACION INCOMPLETA");
 		}
 
