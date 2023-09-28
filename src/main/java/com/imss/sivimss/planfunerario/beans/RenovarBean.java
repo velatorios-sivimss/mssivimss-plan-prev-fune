@@ -116,10 +116,6 @@ public class RenovarBean {
 			queryUtil.where("SP.CVE_RFC = :cveRfc")
 			.setParameter(CVE_RFC, filtros.getRfc());
 		}
-	/*	if(filtros.getNumIne()!=null) {
-			queryUtil.where("SP.NUM_INE = :numIne")
-			.setParameter(NUM_INE, filtros.getNumIne());
-		} */
 		queryUtil.groupBy("CP.CVE_CODIGO_POSTAL");
 		String query = obtieneQuery(queryUtil);
 		log.info("buscar convenio " +query);
@@ -129,26 +125,6 @@ public class RenovarBean {
 	    return request;
 	}
 	
-/*	public DatosRequest validarFallecidoCtoAnterior(Integer idContratante, Integer idConvenio) {
-		DatosRequest request= new DatosRequest();
-		Map<String, Object> parametro = new HashMap<>();
-		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("SF.ID_PERSONA")
-		.from("SVC_FINADO SF")
-		.join(SVC_CONTRATANTE, "SF.ID_PERSONA = SC.ID_PERSONA")
-		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SC.ID_CONTRATANTE = SCPC.ID_CONTRATANTE");
-		if(idContratante!=null) {
-			queryUtil.where("SC.ID_CONTRATANTE= " +idContratante +"");
-		}else {
-			queryUtil.where("SCPC.ID_CONVENIO_PF =" +idConvenio +"");
-		}
-		String query = obtieneQuery(queryUtil);
-		log.info("validar "+query);
-		String encoded = encodedQuery(query);
-			parametro.put(AppConstantes.QUERY, encoded);
-			request.setDatos(parametro);
-			return request;
-	} */
 	
 	public DatosRequest validarFallecido(FiltrosConvenioPFRequest filtros) {
 		DatosRequest request= new DatosRequest();
@@ -278,45 +254,6 @@ public class RenovarBean {
 		return request;
 	}
 
-/*	public DatosRequest  cambiarEstatusPlanAnterior(Integer idConvenio, Integer idUsuario) {
-		DatosRequest request= new DatosRequest();
-		Map<String, Object> parametro = new HashMap<>();
-		String query;
-			final QueryHelper q = new QueryHelper(UPDATE_SVT_CONVENIO_PF);
-			q.agregarParametroValues(""+AppConstantes.ID_ESTATUS_CONVENIO+"", "3");
-			q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"");
-			q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
-			q.addWhere(ID_CONVENIO_PF+"="+idConvenio+"");
-			query = q.obtenerQueryActualizar();
-		log.info("renovar -> "+query);
-		String encoded = encodedQuery(query);
-		parametro.put(AppConstantes.QUERY, encoded);
-		request.setDatos(parametro);
-		return request;
-	} 
-
-
-	public DatosRequest cambiarEstatusACerrado(String folio, Integer idConvenio,Integer idUsuario) {
-		DatosRequest request= new DatosRequest();
-		Map<String, Object> parametro = new HashMap<>();
-		String query;
-			final QueryHelper q = new QueryHelper(UPDATE_SVT_CONVENIO_PF);
-			q.agregarParametroValues(""+AppConstantes.ID_ESTATUS_CONVENIO+"", "4");
-			q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"");
-			q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
-			if(idConvenio!=null) {
-				q.addWhere("ID_CONVENIO_PF = "+idConvenio+"");
-			}else {
-				q.addWhere("DES_FOLIO = '"+folio+"'");
-			}query = q.obtenerQueryActualizar();
-		log.info("a estatus cerrado "+query);
-		String encoded = encodedQuery(query);
-		parametro.put(AppConstantes.QUERY, encoded);
-		request.setDatos(parametro);
-		return request;
-	} */
-
-
 	public DatosRequest contador (Integer idConvenioPf) {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametros = new HashMap<>();
@@ -399,9 +336,6 @@ public class RenovarBean {
 	    	  final QueryHelper qh = new QueryHelper("INSERT INTO SVC_VALIDA_DOCS_RENV_CONV_PF");
 		        qh.agregarParametroValues("ID_VALIDACION_DOCUMENTO", ""+validacionDoc+"");
 		        qh.agregarParametroValues("IND_CONVENIO_ANTERIOR", ""+renovarDoc.getConvenioAnterior()+"");
-		        //qh.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS_BENEFICIARIO", ""+renovarDoc.getComprobanteEstudios()+"");
-		        //qh.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+renovarDoc.getActaMatrimonio()+"");
-		      //  qh.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+renovarDoc.getDeclaracionConcubinato()+"");
 		        qh.agregarParametroValues("IND_CARTA_PODER", ""+renovarDoc.getCartaPoder()+"");
 		        qh.agregarParametroValues("IND_INE_TESTIGO", ""+renovarDoc.getIneTestigo()+"");
 		        qh.agregarParametroValues("IND_INE_TESTIGO_DOS", ""+renovarDoc.getIneTestigoDos()+"");
@@ -411,9 +345,6 @@ public class RenovarBean {
 	        queries.append(query+ "ON DUPLICATE KEY ");
 	        final QueryHelper q = new QueryHelper("UPDATE");
 	        q.agregarParametroValues("IND_CONVENIO_ANTERIOR", ""+renovarDoc.getConvenioAnterior()+"");
-	        //q.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS_BENEFICIARIO", ""+renovarDoc.getComprobanteEstudios()+"");
-	        //q.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+renovarDoc.getActaMatrimonio()+"");
-	        //q.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+renovarDoc.getDeclaracionConcubinato()+"");
 	        q.agregarParametroValues("IND_CARTA_PODER", ""+renovarDoc.getCartaPoder()+"");
 	        q.agregarParametroValues("IND_INE_TESTIGO", ""+renovarDoc.getIneTestigo()+"");
 	        q.agregarParametroValues("IND_INE_TESTIGO_DOS", ""+renovarDoc.getIneTestigoDos()+"");

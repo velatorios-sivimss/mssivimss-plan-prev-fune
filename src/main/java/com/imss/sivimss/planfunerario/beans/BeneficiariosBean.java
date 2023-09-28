@@ -69,12 +69,6 @@ public class BeneficiariosBean {
 		this.tel = beneficiarioRequest.getTel();
 		this.indActa = beneficiarioRequest.getBeneficiario().getIndActa();
 		this.indIne = beneficiarioRequest.getBeneficiario().getIndIne();
-		/*this.indComprobanteEstudios = beneficiarioRequest.getDocPlanAnterior().getIndComprobanteEstudios();
-		this.indActaMatrimonio = beneficiarioRequest.getDocPlanAnterior().getIndActaMatrimonio();
-		this.indDeclaracionConcubinato = beneficiarioRequest.getDocPlanAnterior().getIndDeclaracionConcubinato();
-		this.indCartaPoder = beneficiarioRequest.getIndCartaPoder();
-		this.indIneTestigo = beneficiarioRequest.getIndIneTestigo();
-		this.indIneTestigoDos = beneficiarioRequest.getIndIneTestigoDos();*/
  
 	}
 
@@ -289,14 +283,12 @@ public class BeneficiariosBean {
 	        Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("UPDATE SVT_CONTRATANTE_BENEFICIARIOS");
 	        q.agregarParametroValues(ID_PARENTESCO, ""+parentesco+"");
-	       // q.agregarParametroValues("CVE_ACTA", "'"+acta+"'");
 	        if(indActa!=null) {
 	        	 q.agregarParametroValues(IND_ACTA_NACIMIENTO, ""+indActa+""); 	
 	        }
 	       if(indIne!=null) {
 	    	   q.agregarParametroValues(IND_INE_BENEFICIARIO, ""+indIne+"");   
 	       }
-	       // q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 	        q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"" );
 			q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 			q.addWhere("ID_PERSONA = " + idPersona);

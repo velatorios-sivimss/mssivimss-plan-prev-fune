@@ -549,16 +549,16 @@ public class ConsultaConvenios {
             }
         } else {
             if (filtros.getRfc() != null) {
-                selectQuery.where("empresaContratante.DES_RFC = :rfc")
+                selectQuery.where("empresaContratante.CVE_RFC = :rfc")
                         .setParameter("rfc", filtros.getRfc());
             }
             if (filtros.getNombre() != null) {
-                final String condicion = "empresaContratante.DES_NOMBRE like '%" + filtros.getNombre() + "%'";
+                final String condicion = "empresaContratante.REF_NOMBRE like '%" + filtros.getNombre() + "%'";
                 selectQuery.where(condicion);
             }
         }
         if (filtros.getFolioConvenio() != null) {
-            selectQuery.where("convenio.DES_FOLIO = :folioConvenio")
+            selectQuery.where("convenio.REF_FOLIO = :folioConvenio")
                     .setParameter("folioConvenio", filtros.getFolioConvenio());
         }
         if (filtros.getEstatusConvenio() != null) {
