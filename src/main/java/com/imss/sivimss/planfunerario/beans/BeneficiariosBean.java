@@ -69,18 +69,12 @@ public class BeneficiariosBean {
 		this.tel = beneficiarioRequest.getTel();
 		this.indActa = beneficiarioRequest.getBeneficiario().getIndActa();
 		this.indIne = beneficiarioRequest.getBeneficiario().getIndIne();
-		/*this.indComprobanteEstudios = beneficiarioRequest.getDocPlanAnterior().getIndComprobanteEstudios();
-		this.indActaMatrimonio = beneficiarioRequest.getDocPlanAnterior().getIndActaMatrimonio();
-		this.indDeclaracionConcubinato = beneficiarioRequest.getDocPlanAnterior().getIndDeclaracionConcubinato();
-		this.indCartaPoder = beneficiarioRequest.getIndCartaPoder();
-		this.indIneTestigo = beneficiarioRequest.getIndIneTestigo();
-		this.indIneTestigoDos = beneficiarioRequest.getIndIneTestigoDos();*/
  
 	}
 
 	//TABLAS
 	public static final String SVT_CONTRATANTE_BENEFICIARIOS = "SVT_CONTRATANTE_BENEFICIARIOS SB";
-	public static final String SVT_CONTRATANTE_PAQUETE_CONVENIO_PF = "SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC";
+	public static final String SVT_CONTRATANTE_PAQUETE_CONVENIO_PF = "SVT_CONTRA_PAQ_CONVENIO_PF SCPC";
 	public static final String SVC_PERSONA = "SVC_PERSONA SP";
 	public static final String SVT_CONVENIO_PF = "SVT_CONVENIO_PF PF";
 	
@@ -175,7 +169,7 @@ public class BeneficiariosBean {
 				  "SBD.IND_DECLARACION_CONCUBINATO AS declaracionConcubinato")
 		.from(SVT_CONTRATANTE_BENEFICIARIOS)
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF)
-		.leftJoin("SVT_BENEFICIARIOS_DOCUMENTACION_PLAN_ANTERIOR SBD", "SB.ID_CONTRATANTE_BENEFICIARIOS = SBD.ID_CONTRATANTE_BENEFICIARIOS")
+		.leftJoin("SVT_BENEF_DOC_PLAN_ANTERIOR SBD", "SB.ID_CONTRATANTE_BENEFICIARIOS = SBD.ID_CONTRATANTE_BENEFICIARIOS")
 		.join(SVC_PERSONA, " SB.ID_PERSONA = SP.ID_PERSONA")
 		.leftJoin("SVC_PARENTESCO PAR", "PAR.ID_PARENTESCO = SB.ID_PARENTESCO");
 		queryUtil.where("SB.ID_CONTRATANTE_BENEFICIARIOS = :idBeneficiario")
@@ -245,7 +239,7 @@ public class BeneficiariosBean {
 	public String insertarDocPlanAnterior() {
 		 DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
-        final QueryHelper q = new QueryHelper("INSERT INTO SVT_BENEFICIARIOS_DOCUMENTACION_PLAN_ANTERIOR");
+        final QueryHelper q = new QueryHelper("INSERT INTO SVT_BENEF_DOC_PLAN_ANTERIOR");
         q.agregarParametroValues("ID_CONTRATANTE_BENEFICIARIOS", ID_TABLA);
         q.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS", ""+this.indComprobanteEstudios+"");
         q.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+this.indActaMatrimonio+"");
@@ -289,14 +283,12 @@ public class BeneficiariosBean {
 	        Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("UPDATE SVT_CONTRATANTE_BENEFICIARIOS");
 	        q.agregarParametroValues(ID_PARENTESCO, ""+parentesco+"");
-	       // q.agregarParametroValues("CVE_ACTA", "'"+acta+"'");
 	        if(indActa!=null) {
 	        	 q.agregarParametroValues(IND_ACTA_NACIMIENTO, ""+indActa+""); 	
 	        }
 	       if(indIne!=null) {
 	    	   q.agregarParametroValues(IND_INE_BENEFICIARIO, ""+indIne+"");   
 	       }
-	       // q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
 	        q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"" );
 			q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 			q.addWhere("ID_PERSONA = " + idPersona);
@@ -367,7 +359,7 @@ public class BeneficiariosBean {
 	    return request;
 	}
 	
-	public DatosRequest  buscarCatalogosParentescos(DatosRequest request) {
+	public DatosRequest  buscarCatalogoParentescos(DatosRequest request) {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("DES_PARENTESCO AS parentesco",
@@ -432,7 +424,7 @@ public class BeneficiariosBean {
 	public DatosRequest editarDocPlanAnterior() {
 		 DatosRequest request = new DatosRequest();
 			Map<String, Object> parametro = new HashMap<>();
-	        final QueryHelper q = new QueryHelper("UPDATE SVT_BENEFICIARIOS_DOCUMENTACION_PLAN_ANTERIOR");
+	        final QueryHelper q = new QueryHelper("UPDATE SVT_BENEF_DOC_PLAN_ANTERIOR");
 	        q.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS", ""+this.indComprobanteEstudios+"");
 	        q.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+this.indActaMatrimonio+"");
 	        q.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+this.indDeclaracionConcubinato+"");	
@@ -461,8 +453,8 @@ public class BeneficiariosBean {
 				 "SVDR.IND_CARTA_PODER AS cartaPoder",
 				 "SVDR.IND_INE_TESTIGO AS ineTestigo",
 				 "SVDR.IND_INE_TESTIGO_DOS AS ineTestigoDos")
-		.from("SVC_VALIDACION_DOCUMENTOS_CONVENIO_PF SVD")
-		.leftJoin("SVC_VALIDACION_DOCUMENTOS_RENOVACION_CONVENIO_PF SVDR", "SVD.ID_VALIDACION_DOCUMENTO = SVDR.ID_VALIDACION_DOCUMENTO")
+		.from("SVC_VALIDA_DOCS_CONVENIO_PF SVD")
+		.leftJoin("SVC_VALIDA_DOCS_RENV_CONV_PF SVDR", "SVD.ID_VALIDACION_DOCUMENTO = SVDR.ID_VALIDACION_DOCUMENTO")
 
 		.join(SVT_CONVENIO_PF, "SVD.ID_CONVENIO_PF=PF.ID_CONVENIO_PF")
         .join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "PF.ID_CONVENIO_PF =SCPC.ID_CONVENIO_PF")
@@ -487,7 +479,7 @@ public class BeneficiariosBean {
 				 "PAQ.MON_COSTO_REFERENCIA AS cuotaRecuperacion",
 				 "MAX(DATE_FORMAT(RPF.FEC_INICIO, '"+fecFormat+"')) AS fecInicio",
 				 "MAX(DATE_FORMAT(RPF.FEC_VIGENCIA, '"+fecFormat+"')) AS fecVigencia",
-				 "SMP.DESC_METODO_PAGO AS tipoPago",
+				 "SMP.DES_METODO_PAGO AS tipoPago",
 				 "PF.ID_ESTATUS_CONVENIO AS estatusConvenio",
 				 "DATE_FORMAT(PF.FEC_INICIO, '"+fecFormat+"') AS fechaContratacion",
 				 "MAX(DATE_FORMAT(RPF.FEC_ALTA, '"+fecFormat+"')) AS fechaRenovacion")
@@ -495,7 +487,7 @@ public class BeneficiariosBean {
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "PF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
         .join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
         .join("SVT_RENOVACION_CONVENIO_PF RPF", "PF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF")
-        .leftJoin("SVT_PAGO_BITACORA SPB", "PF.DES_FOLIO = SPB.CVE_FOLIO") 
+        .leftJoin("SVT_PAGO_BITACORA SPB", "PF.REF_FOLIO = SPB.CVE_FOLIO") 
         .leftJoin("SVT_PAGO_DETALLE SPD", "SPB.ID_PAGO_BITACORA = SPD.ID_PAGO_BITACORA")
         .leftJoin("SVC_METODO_PAGO SMP", "SPD.ID_METODO_PAGO = SMP.ID_METODO_PAGO")
         .where("(RPF.ID_ESTATUS=1 OR RPF.ID_ESTATUS=2) AND PF.ID_CONVENIO_PF=" +idConvenio )
@@ -541,4 +533,18 @@ public class BeneficiariosBean {
             return "'"+valor+"'";
         }
     }
+
+	
+	public DatosRequest buscarCatalogoEstatus(DatosRequest request) {
+		Map<String, Object> parametros = new HashMap<>();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("EC.ID_ESTATUS_CONVENIO_PF AS id",
+				"EC.DES_ESTATUS AS estatus")
+		.from("SVC_ESTATUS_CONVENIO_PF EC");
+		String query = obtieneQuery(queryUtil);
+	   String encoded = encodedQuery(query);
+	   parametros.put(AppConstantes.QUERY, encoded);
+	    request.setDatos(parametros);
+	    return request;
+	}
 }

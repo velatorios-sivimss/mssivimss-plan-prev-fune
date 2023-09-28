@@ -21,7 +21,7 @@ public class RenovarExt {
 	
 	//Tablas
 	public static final String SVT_CONVENIO_PF = "SVT_CONVENIO_PF PF";
-	public static final String SVT_CONTRATANTE_PAQUETE_CONVENIO_PF = "SVT_CONTRATANTE_PAQUETE_CONVENIO_PF SCPC";
+	public static final String SVT_CONTRATANTE_PAQUETE_CONVENIO_PF = "SVT_CONTRA_PAQ_CONVENIO_PF SCPC";
 	public static final String SVC_PERSONA = "SVC_PERSONA SP";
 	public static final String SVC_CONTRATANTE = "SVC_CONTRATANTE SC";
 	
@@ -37,7 +37,7 @@ public class RenovarExt {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SV.DES_VELATORIO AS velatorio",
 				"PF.ID_CONVENIO_PF AS idConvenio",
-				"PF.DES_FOLIO AS folio",
+				"PF.REF_FOLIO AS folio",
 				"SP.CVE_RFC AS rfc",
 				"SP.NOM_PERSONA AS nombre",
 				"SP.NOM_PRIMER_APELLIDO AS primerApellido",
@@ -64,7 +64,7 @@ public class RenovarExt {
 			.setParameter("idVelatorio", filtros.getIdVelatorio());
 		}
 		if(filtros.getFolio()!=null) {
-			queryUtil.where("PF.DES_FOLIO= :folio")
+			queryUtil.where("PF.REF_FOLIO= :folio")
 			.setParameter("folio", filtros.getFolio());
 		}
 		if(filtros.getRfc()!=null) {
@@ -86,7 +86,7 @@ public class RenovarExt {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("PF.ID_CONVENIO_PF AS idConvenio",
-				"PF.DES_FOLIO AS folio",
+				"PF.REF_FOLIO AS folio",
 				"SP.CVE_RFC AS rfc",
 				"SC.CVE_MATRICULA AS matricula",
 				"SP.NOM_PERSONA AS nombre",
@@ -181,7 +181,7 @@ public class RenovarExt {
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVT_RENOVACION_EXT_CONVENIO_PF");
 		q.agregarParametroValues(ID_CONVENIO_PF, ""+idConvenio+"");
-		q.agregarParametroValues("DES_JUSTIFICACION", setValor(justificacion));
+		q.agregarParametroValues("REF_JUSTIFICACION", setValor(justificacion));
 		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_ALTA+"", ""+idUsuario+"");
 		q.agregarParametroValues(""+AppConstantes.FEC_ALTA+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		q.addWhere("ID_CONVENIO_PF =" + idConvenio);

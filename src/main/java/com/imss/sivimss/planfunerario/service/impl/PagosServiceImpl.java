@@ -91,7 +91,7 @@ public class PagosServiceImpl implements PagosService {
 		q.agregarParametroValues("FEC_ODS", setValor(renovarBean.getVigencia()));
 		q.agregarParametroValues("NOM_CONTRATANTE", setValor(nomContratante));
 		q.agregarParametroValues("CVE_FOLIO", setValor(renovarBean.getFolioAdenda()));
-		q.agregarParametroValues("DESC_VALOR", setValor(valor.toString()));
+		q.agregarParametroValues("IMP_VALOR", setValor(valor.toString()));
 		q.agregarParametroValues("CVE_ESTATUS_PAGO", "2");
 		q.agregarParametroValues("ID_USUARIO_ALTA", renovarBean.getUsuarioAlta().toString());
 		
@@ -116,7 +116,7 @@ public class PagosServiceImpl implements PagosService {
 				+ "PAQ.MON_PRECIO AS valor,\r\n"
 				+ "CPF.ID_VELATORIO AS idVelatorio\r\n"
 				+ "FROM SVT_CONVENIO_PF CPF\r\n"
-				+ "INNER JOIN SVT_CONTRATANTE_PAQUETE_CONVENIO_PF CPAQ ON CPAQ.ID_CONVENIO_PF = CPF.ID_CONVENIO_PF\r\n"
+				+ "INNER JOIN SVT_CONTRA_PAQ_CONVENIO_PF CPAQ ON CPAQ.ID_CONVENIO_PF = CPF.ID_CONVENIO_PF\r\n"
 				+ "INNER JOIN SVC_CONTRATANTE CON ON CON.ID_CONTRATANTE = CPAQ.ID_CONTRATANTE\r\n"
 				+ "INNER JOIN SVC_PERSONA PER ON PER.ID_PERSONA = CON.ID_PERSONA\r\n"
 				+ "INNER JOIN SVT_PAQUETE PAQ ON PAQ.ID_PAQUETE = CPAQ.ID_PAQUETE\r\n"

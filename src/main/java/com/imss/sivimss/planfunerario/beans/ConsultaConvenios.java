@@ -50,11 +50,11 @@ public class ConsultaConvenios {
                 .join("SVT_PAGO_BITACORA pago",
                         "pago.ID_PAGO_BITACORA = factura.ID_PAGO",
                         "pago.CVE_ESTATUS_PAGO = 5")
-                .where("pago.CVE_FOLIO = convenio.DES_FOLIO");
+                .where("pago.CVE_FOLIO = convenio.REF_FOLIO");
 
         queryConveniosPersona.select("convenio.ID_CONVENIO_PF as idConvenio",
-                        "convenio.DES_FOLIO as folioConvenio",
-                        recuperarNombrePersona("personaContratante", "nombreContratante"),
+                        "convenio.REF_FOLIO as folioConvenio",
+                       recuperarNombrePersona("personaContratante", "nombreContratante"),
                         formatearFecha("convenio.FEC_INICIO") + " as fechaContratacion", // La fecha de inicio sera la fecha de contratacion o sera la fecha de alta
                         formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO)")
                                 + " as fechaVigenciaInicio", // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
@@ -73,7 +73,7 @@ public class ConsultaConvenios {
                 .leftJoin("SVT_RENOVACION_CONVENIO_PF renovacionConvenio",
                         "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF",
                         "renovacionConvenio.ID_ESTATUS = 2")
-                .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
+                .join("SVT_CONTRA_PAQ_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVT_PAQUETE paquete",
                         "paquete.ID_PAQUETE = contratanteConvenio.ID_PAQUETE")
@@ -92,8 +92,8 @@ public class ConsultaConvenios {
 
         queryConveniosEmpresa.select(
                         "convenio.ID_CONVENIO_PF as idConvenio",
-                        "convenio.DES_FOLIO as folioConvenio",
-                        "empresaContratante.DES_NOMBRE as nombreContratante",
+                        "convenio.REF_FOLIO as folioConvenio",
+                        "empresaContratante.REF_NOMBRE as nombreContratante",
                         formatearFecha("convenio.FEC_INICIO") + " as fechaContratacion",
                         formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO)")
                                 + " as fechaVigenciaInicio",
@@ -112,7 +112,7 @@ public class ConsultaConvenios {
                 .leftJoin("SVT_RENOVACION_CONVENIO_PF renovacionConvenio",
                         "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF",
                         "renovacionConvenio.ID_ESTATUS = 2")
-                .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
+                .join("SVT_CONTRA_PAQ_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVT_PAQUETE paquete",
                         "paquete.ID_PAQUETE = contratanteConvenio.ID_PAQUETE")
@@ -172,7 +172,7 @@ public class ConsultaConvenios {
         crearSelect(queryBeneficiariosNuevoPlan, columnas);
         queryBeneficiariosNuevoPlan
                 .from("SVT_CONTRATANTE_BENEFICIARIOS beneficiario")
-                .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratantePaquete",
+                .join("SVT_CONTRA_PAQ_CONVENIO_PF contratantePaquete",
                         "contratantePaquete.ID_CONTRA_PAQ_CONVENIO_PF = beneficiario.ID_CONTRA_PAQ_CONVENIO_PF")
                 .join("SVT_CONVENIO_PF convenio",
                         "convenio.ID_CONVENIO_PF = contratantePaquete.ID_CONVENIO_PF")
@@ -186,9 +186,9 @@ public class ConsultaConvenios {
         crearSelect(queryBeneficiariosPlanAnterior, columnas);
         queryBeneficiariosPlanAnterior
                 .from("SVT_CONTRATANTE_BENEFICIARIOS beneficiario")
-                .join("SVT_BENEFICIARIOS_DOCUMENTACION_PLAN_ANTERIOR documentacion",
+                .join("SVT_BENEF_DOC_PLAN_ANTERIOR documentacion",
                         "beneficiario.ID_CONTRATANTE_BENEFICIARIOS = documentacion.ID_CONTRATANTE_BENEFICIARIOS")
-                .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratantePaquete",
+                .join("SVT_CONTRA_PAQ_CONVENIO_PF contratantePaquete",
                         "contratantePaquete.ID_CONTRA_PAQ_CONVENIO_PF = beneficiario.ID_CONTRA_PAQ_CONVENIO_PF")
                 .join("SVT_CONVENIO_PF convenio",
                         "convenio.ID_CONVENIO_PF = contratantePaquete.ID_CONVENIO_PF")
@@ -203,9 +203,9 @@ public class ConsultaConvenios {
         crearSelect(queryBeneficiarioPlanAnteriorHijos, columnas);
         queryBeneficiarioPlanAnteriorHijos
                 .from("SVT_CONTRATANTE_BENEFICIARIOS beneficiario")
-                .join("SVT_BENEFICIARIOS_DOCUMENTACION_PLAN_ANTERIOR documentacion",
+                .join("SVT_BENEF_DOC_PLAN_ANTERIOR documentacion",
                         "beneficiario.ID_CONTRATANTE_BENEFICIARIOS = documentacion.ID_CONTRATANTE_BENEFICIARIOS")
-                .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratantePaquete",
+                .join("SVT_CONTRA_PAQ_CONVENIO_PF contratantePaquete",
                         "contratantePaquete.ID_CONTRA_PAQ_CONVENIO_PF = beneficiario.ID_CONTRA_PAQ_CONVENIO_PF")
                 .join("SVT_CONVENIO_PF convenio",
                         "convenio.ID_CONVENIO_PF = contratantePaquete.ID_CONVENIO_PF")
@@ -256,7 +256,7 @@ public class ConsultaConvenios {
                         "velatorioOrigen.ID_VELATORIO = convenio.ID_VELATORIO")
                 .join("SVC_PERSONA personaFinado",
                         "personaFinado.ID_PERSONA = finado.ID_PERSONA")
-                .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
+                .join("SVT_CONTRA_PAQ_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVT_CONTRATANTE_BENEFICIARIOS beneficiario",
                         "beneficiario.ID_CONTRA_PAQ_CONVENIO_PF = contratanteConvenio.ID_CONTRA_PAQ_CONVENIO_PF",
@@ -266,7 +266,7 @@ public class ConsultaConvenios {
                         "parentesco.ID_PARENTESCO = beneficiario.ID_PARENTESCO")
                 .join("SVC_CARAC_PRESUPUESTO presupuesto",
                         "presupuesto.ID_ORDEN_SERVICIO = ods.ID_ORDEN_SERVICIO")
-                .where("convenio.DES_FOLIO = :folioConvenio",
+                .where("convenio.REF_FOLIO = :folioConvenio",
                         "ods.ID_ESTATUS_ORDEN_SERVICIO in (4, 5)") // sacar a una constante
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
         if (filtros.getFolioSiniestro() != null) {
@@ -296,7 +296,7 @@ public class ConsultaConvenios {
                         "velatorioOrigen.ID_VELATORIO = convenio.ID_VELATORIO")
                 .join("SVC_PERSONA personaFinado",
                         "personaFinado.ID_PERSONA = finado.ID_PERSONA")
-                .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
+                .join("SVT_CONTRA_PAQ_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVC_CONTRATANTE contratante",
                         "contratante.ID_CONTRATANTE = ods.ID_CONTRATANTE",
@@ -311,7 +311,7 @@ public class ConsultaConvenios {
                 .join("SVT_PAGO_BITACORA pago",
                         "pago.CVE_FOLIO = ods.CVE_FOLIO",
                         "pago.CVE_ESTATUS_PAGO in (4, 5)") // sacar a una constante
-                .where("convenio.DES_FOLIO = :folioConvenio",
+                .where("convenio.REF_FOLIO = :folioConvenio",
                         "ods.ID_ESTATUS_ORDEN_SERVICIO in (4, 5)")// sacar a una constante
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
         if (filtros.getFolioSiniestro() != null) {
@@ -338,13 +338,13 @@ public class ConsultaConvenios {
         queryAfiliados.select(
                         "velatorio.DES_VELATORIO as nombreVelatorio",
                         recuperarNombrePersona("personaAfiliada", "nombreAfiliado"),
-                        "empresaContratante.DES_RFC as rfcTitular",
+                        "empresaContratante.CVE_RFC as rfcTitular",
                         formatearFecha("personaAfiliada.FEC_NAC") + "as " + ALIAS_FECHA_NACIMIENTO,
                         recuperarEdad("personaAfiliada"),
                         "personaAfiliada.NUM_SEXO as genero",
                         "personaAfiliada.DES_CORREO as correo"
                 )
-                .from("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratantePaquete")
+                .from("SVT_CONTRA_PAQ_CONVENIO_PF contratantePaquete")
                 .join("SVT_CONVENIO_PF convenio",
                         "convenio.ID_CONVENIO_PF = contratantePaquete.ID_CONVENIO_PF",
                         "convenio.IND_TIPO_CONTRATACION = false")
@@ -357,7 +357,7 @@ public class ConsultaConvenios {
                 .join("SVC_PERSONA personaAfiliada",
                         "personaAfiliada.ID_PERSONA = contratante.ID_PERSONA")
                 .where("convenio.IND_TIPO_CONTRATACION = false",
-                        "convenio.DES_FOLIO = :folioConvenio")
+                        "convenio.REF_FOLIO = :folioConvenio")
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
         if (filtros.getRfc() != null) {
             queryAfiliados.where("personaAfiliada.CVE_RFC = :rfc")
@@ -382,7 +382,7 @@ public class ConsultaConvenios {
 
         SelectQueryUtil queryVigencias = new SelectQueryUtil();
         queryVigencias.select(
-                        "convenio.DES_FOLIO as folioConvenio",
+                        "convenio.REF_FOLIO as folioConvenio",
                         formatearFecha("convenio.FEC_INICIO") + " as fechaInicio",
                         formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA)")
                                 + " as fechaFin", // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
@@ -392,12 +392,12 @@ public class ConsultaConvenios {
                 .from("SVT_CONVENIO_PF convenio")
                 .leftJoin("SVT_RENOVACION_CONVENIO_PF renovacionConvenio",
                         "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-                .where("convenio.DES_FOLIO = :folioConvenio") // persona -> true
+                .where("convenio.REF_FOLIO = :folioConvenio") // persona -> true
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
 
         SelectQueryUtil queryVigenciasEmpresa = new SelectQueryUtil();
         queryVigenciasEmpresa.select(
-                        "convenio.DES_FOLIO as folioConvenio",
+                        "convenio.REF_FOLIO as folioConvenio",
                         formatearFecha("convenio.FEC_INICIO") + " as fechaInicio",
                         formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA)")
                                 + " as fechaFin",
@@ -412,7 +412,7 @@ public class ConsultaConvenios {
                 .join("SVT_EMPRESA_CONVENIO_PF empresaContratante",
                         "empresaContratante.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .where("convenio.IND_TIPO_CONTRATACION = false",
-                        "convenio.des_folio = :folioConvenio") // empresa -> false
+                        "convenio.ref_folio = :folioConvenio") // empresa -> false
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
 
         final String query = queryVigencias.build();
@@ -438,8 +438,8 @@ public class ConsultaConvenios {
                        // "factura.NUM_UUID as UUID", // cambiar por el nombre que va a tener en la base de datos
                         formatearFecha("factura.FEC_FACTURACION") + " as fecha", // cambiar por la fecha que se estaria registrando
                         "factura.CVE_RFC_CONTRATANTE as rfc",
-                        "factura.DES_RAZON_SOCIAL as cliente",
-                        "factura.DES_COMENTARIOS as nota",
+                        "factura.REF_RAZON_SOCIAL as cliente",
+                        "factura.REF_COMENTARIOS as nota",
                         "factura.IMP_TOTAL_PAGADO as total",
                         "estatus.DES_ESTATUS as estatusFactura"
                 )
@@ -449,9 +449,9 @@ public class ConsultaConvenios {
                 .join("SVT_PAGO_BITACORA pago",
                         "pago.ID_PAGO_BITACORA = factura.ID_PAGO")
                 .join(CONVENIO_ALIAS,
-                        "convenio.DES_FOLIO = pago.CVE_FOLIO")
+                        "convenio.REF_FOLIO = pago.CVE_FOLIO")
 
-                .where("convenio.DES_FOLIO = :folioConvenio")
+                .where("convenio.REF_FOLIO = :folioConvenio")
                 .setParameter("folioConvenio", filtros.getFolioConvenio()); // empresa -> false
 
         if (filtros.getNumeroFactura() != null) {
@@ -516,7 +516,7 @@ public class ConsultaConvenios {
             queryUtil.where("convenio.ID_TIPO_PREVISION = 1");
         }
 
-        queryUtil.where("convenio.DES_FOLIO = :folioConvenio",
+        queryUtil.where("convenio.REF_FOLIO = :folioConvenio",
                         "beneficiario.IND_ACTIVO = true",
                         "beneficiario.IND_SINIESTROS = 0")
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
@@ -549,16 +549,16 @@ public class ConsultaConvenios {
             }
         } else {
             if (filtros.getRfc() != null) {
-                selectQuery.where("empresaContratante.DES_RFC = :rfc")
+                selectQuery.where("empresaContratante.CVE_RFC = :rfc")
                         .setParameter("rfc", filtros.getRfc());
             }
             if (filtros.getNombre() != null) {
-                final String condicion = "empresaContratante.DES_NOMBRE like '%" + filtros.getNombre() + "%'";
+                final String condicion = "empresaContratante.REF_NOMBRE like '%" + filtros.getNombre() + "%'";
                 selectQuery.where(condicion);
             }
         }
         if (filtros.getFolioConvenio() != null) {
-            selectQuery.where("convenio.DES_FOLIO = :folioConvenio")
+            selectQuery.where("convenio.REF_FOLIO = :folioConvenio")
                     .setParameter("folioConvenio", filtros.getFolioConvenio());
         }
         if (filtros.getEstatusConvenio() != null) {
