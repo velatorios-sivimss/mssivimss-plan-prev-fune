@@ -2,9 +2,13 @@ package com.imss.sivimss.planfunerario.beans;
 
 import com.imss.sivimss.planfunerario.model.request.ConsultaGeneralRequest;
 import com.imss.sivimss.planfunerario.model.request.DatosReporteRequest;
+import com.imss.sivimss.planfunerario.service.impl.ConsultaConveniosServiceImpl;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.SelectQueryUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class ConsultaConvenios {
     @Value("${formato_fecha}")
@@ -186,8 +191,8 @@ public class ConsultaConvenios {
         crearSelect(queryBeneficiariosPlanAnterior, columnas);
         queryBeneficiariosPlanAnterior
                 .from("SVT_CONTRATANTE_BENEFICIARIOS beneficiario")
-                .join("SVT_BENEFICIARIOS_DOCUMENTACION_PLAN_ANTERIOR documentacion",
-                        "beneficiario.ID_CONTRATANTE_BENEFICIARIOS = documentacion.ID_CONTRATANTE_BENEFICIARIOS")
+               // .join("SVT_BENEFICIARIOS_DOCUMENTACION_PLAN_ANTERIOR documentacion",
+                 //       "beneficiario.ID_CONTRATANTE_BENEFICIARIOS = documentacion.ID_CONTRATANTE_BENEFICIARIOS")
                 .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratantePaquete",
                         "contratantePaquete.ID_CONTRA_PAQ_CONVENIO_PF = beneficiario.ID_CONTRA_PAQ_CONVENIO_PF")
                 .join("SVT_CONVENIO_PF convenio",
@@ -218,6 +223,7 @@ public class ConsultaConvenios {
         final String unionBeneficiarios = queryBeneficiariosPlanAnterior.unionAll(queryBeneficiarioPlanAnteriorHijos);
 
         final String query = queryBeneficiariosNuevoPlan.build() + " UNION ALL " + unionBeneficiarios;
+        log.info("beneficiarios --> "+query);
         String encoded = queryBeneficiariosNuevoPlan.encrypt(query);
         return recuperarDatos(request, encoded);
     }
@@ -346,17 +352,18 @@ public class ConsultaConvenios {
                 )
                 .from("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratantePaquete")
                 .join("SVT_CONVENIO_PF convenio",
-                        "convenio.ID_CONVENIO_PF = contratantePaquete.ID_CONVENIO_PF",
-                        "convenio.IND_TIPO_CONTRATACION = false")
+                        "convenio.ID_CONVENIO_PF = contratantePaquete.ID_CONVENIO_PF")
                 .join("SVC_VELATORIO velatorio",
                         "velatorio.ID_VELATORIO = convenio.ID_VELATORIO")
-                .join("SVT_EMPRESA_CONVENIO_PF empresaContratante",
-                        "empresaContratante.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
+                .leftJoin("SVT_EMPRESA_CONVENIO_PF empresaContratante",
+                        "empresaContratante.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF",
+                        "convenio.IND_TIPO_CONTRATACION = false")
                 .join("SVC_CONTRATANTE contratante",
                         "contratante.ID_CONTRATANTE = contratantePaquete.ID_CONTRATANTE")
                 .join("SVC_PERSONA personaAfiliada",
                         "personaAfiliada.ID_PERSONA = contratante.ID_PERSONA")
-                .where("convenio.IND_TIPO_CONTRATACION = false",
+                .where(
+                		//"convenio.IND_TIPO_CONTRATACION = false",
                         "convenio.DES_FOLIO = :folioConvenio")
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
         if (filtros.getRfc() != null) {
@@ -365,6 +372,7 @@ public class ConsultaConvenios {
         }
 
         final String query = queryAfiliados.build();
+        log.info("query afiliados --> "+query);
         final String encoded = queryAfiliados.encrypt(query);
 
         return recuperarDatos(request, encoded);
@@ -500,26 +508,28 @@ public class ConsultaConvenios {
      * @param queryUtil
      */
     private static void agregarCondicionBeneficiarios(ConsultaGeneralRequest filtros, SelectQueryUtil queryUtil, boolean esHijo, boolean planAnterior) {
-        if (planAnterior) {
+    	 queryUtil.where("convenio.DES_FOLIO = :folioConvenio",
+                 "beneficiario.IND_ACTIVO = true",
+                 "beneficiario.IND_SINIESTROS = 0")
+         .setParameter("folioConvenio", filtros.getFolioConvenio());
+    	if (planAnterior) {
+    		  queryUtil.where("convenio.ID_TIPO_PREVISION = 2");
             if (esHijo) {
-                queryUtil.where("(IF(beneficiario.ID_PARENTESCO = " + PARENTESCO_HIJO + " AND TIMESTAMPDIFF(YEAR, personaBeneficiario.FEC_NAC, CURDATE()) < 18, beneficiario.ID_PARENTESCO, NULL))")
-                        .or("beneficiario.ID_PARENTESCO = :idParentesco")
-                        .and("documentacion.IND_COMPROBANTE_ESTUDIOS = 1")
-                        .and("TIMESTAMPDIFF(YEAR, personaBeneficiario.FEC_NAC, CURDATE()) BETWEEN 18 AND 25")
-                        .setParameter("idParentesco", PARENTESCO_HIJO);
+                queryUtil.where("beneficiario.ID_PARENTESCO IN (8,9) AND (TIMESTAMPDIFF(YEAR, personaBeneficiario.FEC_NAC, CURDATE()) < 18")
+                       // .or("beneficiario.ID_PARENTESCO = :idParentesco")
+                	.or("(TIMESTAMPDIFF(YEAR, personaBeneficiario.FEC_NAC, CURDATE()) BETWEEN 18 AND 25")
+                		.and("documentacion.IND_COMPROBANTE_ESTUDIOS = 1))");
+                        //.and("TIMESTAMPDIFF(YEAR, personaBeneficiario.FEC_NAC, CURDATE()) BETWEEN 18 AND 25)");
+                       // .setParameter("idParentesco", PARENTESCO_HIJO);
             } else {
-                queryUtil.where("beneficiario.ID_PARENTESCO != 4");
+                queryUtil.where("(beneficiario.ID_PARENTESCO != 8 OR beneficiario.ID_PARENTESCO !=9)");
 
             }
-            queryUtil.where("convenio.ID_TIPO_PREVISION = 2");
+          
         } else {
             queryUtil.where("convenio.ID_TIPO_PREVISION = 1");
         }
 
-        queryUtil.where("convenio.DES_FOLIO = :folioConvenio",
-                        "beneficiario.IND_ACTIVO = true",
-                        "beneficiario.IND_SINIESTROS = 0")
-                .setParameter("folioConvenio", filtros.getFolioConvenio());
         if (filtros.getNombreBeneficiario() != null) {
             String condicionNombre = recuperarNombrePersona("personaBeneficiario") + "like '%" + filtros.getNombreBeneficiario() + "%'";
             queryUtil.where(condicionNombre);
