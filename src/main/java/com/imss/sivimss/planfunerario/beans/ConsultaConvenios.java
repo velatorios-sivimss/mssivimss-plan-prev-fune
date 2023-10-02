@@ -522,7 +522,7 @@ public class ConsultaConvenios {
                         //.and("TIMESTAMPDIFF(YEAR, personaBeneficiario.FEC_NAC, CURDATE()) BETWEEN 18 AND 25)");
                        // .setParameter("idParentesco", PARENTESCO_HIJO);
             } else {
-                queryUtil.where("(beneficiario.ID_PARENTESCO != 8 OR beneficiario.ID_PARENTESCO !=9)");
+                queryUtil.where("(beneficiario.ID_PARENTESCO != 8 AND beneficiario.ID_PARENTESCO !=9)");
 
             }
           
