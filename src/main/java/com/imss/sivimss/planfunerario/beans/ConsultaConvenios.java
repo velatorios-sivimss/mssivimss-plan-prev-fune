@@ -47,7 +47,8 @@ public class ConsultaConvenios {
         SelectQueryUtil queryBeneficiarios = new SelectQueryUtil();
         queryBeneficiarios.select("count(*)")
                 .from("SVT_CONTRATANTE_BENEFICIARIOS beneficiarios")
-                .where("beneficiarios.ID_CONTRA_PAQ_CONVENIO_PF = contratanteConvenio.ID_CONTRA_PAQ_CONVENIO_PF");
+                .where("beneficiarios.ID_CONTRA_PAQ_CONVENIO_PF = contratanteConvenio.ID_CONTRA_PAQ_CONVENIO_PF")
+                .and("beneficiarios.IND_ACTIVO=1").and("beneficiarios.IND_SINIESTROS=0");
 
         SelectQueryUtil queryFacturas = new SelectQueryUtil();
         queryFacturas.select()
@@ -130,6 +131,7 @@ public class ConsultaConvenios {
         queryConveniosEmpresa.groupBy("convenio.ID_CONVENIO_PF");
 
         String unionPersonaEmpresa = queryConveniosPersona.unionAll(queryConveniosEmpresa);
+        log.info("---> "+unionPersonaEmpresa);
         String encoded = queryConveniosPersona.encrypt(unionPersonaEmpresa);
         return recuperarDatos(request, encoded);
     }
