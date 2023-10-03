@@ -516,11 +516,10 @@ public class ConsultaConvenios {
     		  queryUtil.where("convenio.ID_TIPO_PREVISION = 2");
             if (esHijo) {
                 queryUtil.where("beneficiario.ID_PARENTESCO IN (8,9) AND (TIMESTAMPDIFF(YEAR, personaBeneficiario.FEC_NAC, CURDATE()) < 18")
-                       // .or("beneficiario.ID_PARENTESCO = :idParentesco")
+             
                 	.or("(TIMESTAMPDIFF(YEAR, personaBeneficiario.FEC_NAC, CURDATE()) BETWEEN 18 AND 25")
                 		.and("documentacion.IND_COMPROBANTE_ESTUDIOS = 1))");
-                        //.and("TIMESTAMPDIFF(YEAR, personaBeneficiario.FEC_NAC, CURDATE()) BETWEEN 18 AND 25)");
-                       // .setParameter("idParentesco", PARENTESCO_HIJO);
+                      
             } else {
                 queryUtil.where("(beneficiario.ID_PARENTESCO != 8 AND beneficiario.ID_PARENTESCO !=9)");
 
