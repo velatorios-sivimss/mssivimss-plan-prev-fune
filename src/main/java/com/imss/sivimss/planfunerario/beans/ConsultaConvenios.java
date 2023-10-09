@@ -638,6 +638,9 @@ public class ConsultaConvenios {
 
         parametros.put("rutaNombreReporte", filtros.getRuta());
         parametros.put("tipoReporte", filtros.getTipoReporte());
+        if(filtros.getTipoReporte().equals("xls")) { 
+			parametros.put("IS_IGNORE_PAGINATION", true); 
+			}
         return parametros;
     }
 
