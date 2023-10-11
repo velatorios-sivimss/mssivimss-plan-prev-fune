@@ -32,7 +32,6 @@ public class ConsultaConvenios {
     private final static String ALIAS_FECHA_NACIMIENTO = "fechaNacimiento";
     private final static String ALIAS_EDAD = "edad";
     private final static String ALIAS_PARENTESCO = "descripcionParentesco";
-    private final static Integer PARENTESCO_HIJO = 4;
     private final static Integer TIPO_CONTRATACION_EMPRESA = 0;
     private final static Integer TIPO_CONTRATACION_PERSONA = 1;
     private final static String ALIAS_NOMBRE_BENEFICIARIO = "nombreBeneficiario";
@@ -61,7 +60,7 @@ public class ConsultaConvenios {
         queryConveniosPersona.select("convenio.ID_CONVENIO_PF as idConvenio",
                         "convenio.DES_FOLIO as folioConvenio",
                         recuperarNombrePersona("personaContratante", "nombreContratante"),
-                        formatearFecha("convenio.FEC_INICIO") + " as fechaContratacion", // La fecha de inicio sera la fecha de contratacion o sera la fecha de alta
+                        formatearFecha("convenio.FEC_ALTA") + " as fechaContratacion", // La fecha de inicio sera la fecha de contratacion o sera la fecha de alta
                         formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO)")
                                 + " as fechaVigenciaInicio", // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
                         formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA)")
@@ -100,7 +99,7 @@ public class ConsultaConvenios {
                         "convenio.ID_CONVENIO_PF as idConvenio",
                         "convenio.DES_FOLIO as folioConvenio",
                         "empresaContratante.DES_NOMBRE as nombreContratante",
-                        formatearFecha("convenio.FEC_INICIO") + " as fechaContratacion",
+                        formatearFecha("convenio.FEC_ALTA") + " as fechaContratacion",
                         formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO)")
                                 + " as fechaVigenciaInicio",
                         formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA)")
@@ -396,7 +395,7 @@ public class ConsultaConvenios {
                         formatearFecha("convenio.FEC_INICIO") + " as fechaInicio",
                         formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA)")
                                 + " as fechaFin", // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
-                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO)")
+                        formatearFecha("if(convenio.IND_RENOVACION = false, '', renovacionConvenio.FEC_INICIO)")
                                 + " as fechaRenovacion" // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
                 )
                 .from("SVT_CONVENIO_PF convenio")
@@ -594,7 +593,7 @@ public class ConsultaConvenios {
     }
 
     /**
-     * Recuprea la edad de la persona con su fecha de nacimiento.
+     * Recupera la edad de la persona con su fecha de nacimiento.
      *
      * @param aliasTabla
      * @return
@@ -612,7 +611,6 @@ public class ConsultaConvenios {
      */
     private static DatosRequest recuperarDatos(DatosRequest request, String encoded) {
         DatosRequest datos = new DatosRequest();
-        System.out.println(request);
         Map<String, Object> parametros = new HashMap<>();
         parametros.put(AppConstantes.QUERY, encoded);
         parametros.put("pagina", request.getDatos().get("pagina"));
