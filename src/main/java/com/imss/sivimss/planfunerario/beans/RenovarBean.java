@@ -97,7 +97,7 @@ public class RenovarBean {
 		.leftJoin("SVC_CP CP", "SD.DES_CP = CP.CVE_CODIGO_POSTAL")
 		.join(SVC_PERSONA, "SC.ID_PERSONA = SP.ID_PERSONA");
 
-		queryUtil.where("SCP.ID_ESTATUS_CONVENIO = 2");
+		queryUtil.where("SCP.ID_ESTATUS_CONVENIO IN (2, 4)");
 		queryUtil.where("SCP.ID_TIPO_PREVISION = :tipoPrevision")
 		.setParameter("tipoPrevision", filtros.getTipoPrevision());
 		if(filtros.getNumeroConvenio()!=null) {
@@ -262,8 +262,8 @@ public class RenovarBean {
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper(UPDATE_SVT_CONVENIO_PF);
 		q.agregarParametroValues(""+AppConstantes.ID_ESTATUS_CONVENIO+"", "4");
-		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+id+"");
-		q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+	//	q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+id+"");
+	//	q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		if(folio!=null) {
 			q.addWhere("DES_FOLIO = '"+folio+"'");
 		}
