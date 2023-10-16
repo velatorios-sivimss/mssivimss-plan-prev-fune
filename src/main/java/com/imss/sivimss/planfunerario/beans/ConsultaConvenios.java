@@ -243,6 +243,7 @@ public class ConsultaConvenios {
                 "velatorio.DES_VELATORIO as nombreVelatorio",
                 formatearFecha("ods.FEC_ALTA") + " as fechaSiniestro",
                 "ods.CVE_FOLIO as folioSiniestro",
+                "nota.NUM_FOLIO as nota",
                 recuperarNombrePersona("personaFinado", "nombreFinado"),
                 "parentesco.DES_PARENTESCO as descripcionParentesco",
                 "velatorioOrigen.DES_VELATORIO as velatorioOrigen",
@@ -273,8 +274,9 @@ public class ConsultaConvenios {
                         "parentesco.ID_PARENTESCO = beneficiario.ID_PARENTESCO")
                 .join("SVC_CARAC_PRESUPUESTO presupuesto",
                         "presupuesto.ID_ORDEN_SERVICIO = ods.ID_ORDEN_SERVICIO")
+                .join("SVT_NOTA_REMISION nota", "ods.ID_ORDEN_SERVICIO = nota.ID_ORDEN_SERVICIO AND nota.ID_ESTATUS=2")
                 .where("convenio.DES_FOLIO = :folioConvenio",
-                        "ods.ID_ESTATUS_ORDEN_SERVICIO in (4, 5)") // sacar a una constante
+                        "ods.ID_ESTATUS_ORDEN_SERVICIO = 6") // sacar a una constante
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
         if (filtros.getFolioSiniestro() != null) {
             querySiniestros.where("ods.cve_folio = :folioSiniestro")
@@ -286,8 +288,9 @@ public class ConsultaConvenios {
                         "velatorio.DES_VELATORIO as nombreVelatorio",
                         formatearFecha("ods.FEC_ALTA") + " as fechaSiniestro",
                         "ods.CVE_FOLIO as folioSiniestro",
+                        "nota.NUM_FOLIO as nota",
                         recuperarNombrePersona("personaFinado", "nombreFinado"),
-                        "parentesco.DES_PARENTESCO as descripcionParentesco",
+                        "IFNULL(parentesco.DES_PARENTESCO, '') as descripcionParentesco",
                         "velatorioOrigen.DES_VELATORIO as velatorioOrigen",
                         formatearImporte("presupuesto.CAN_PRESUPUESTO") + " as importe"
                 )
@@ -306,20 +309,17 @@ public class ConsultaConvenios {
                 .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVC_CONTRATANTE contratante",
-                        "contratante.ID_CONTRATANTE = ods.ID_CONTRATANTE",
                         "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
                 .join("SVC_PERSONA personaContratante",
                         "personaContratante.ID_PERSONA = contratante.ID_PERSONA",
                         "personaContratante.id_persona = personaFinado.id_persona")
-                .join("SVC_PARENTESCO parentesco",
+                .leftJoin("SVC_PARENTESCO parentesco",
                         "parentesco.ID_PARENTESCO = ods.ID_PARENTESCO")
                 .join("SVC_CARAC_PRESUPUESTO presupuesto",
                         "presupuesto.ID_ORDEN_SERVICIO = ods.ID_ORDEN_SERVICIO")
-                .join("SVT_PAGO_BITACORA pago",
-                        "pago.CVE_FOLIO = ods.CVE_FOLIO",
-                        "pago.CVE_ESTATUS_PAGO in (4, 5)") // sacar a una constante
+                .join("SVT_NOTA_REMISION nota", "ods.ID_ORDEN_SERVICIO = nota.ID_ORDEN_SERVICIO AND nota.ID_ESTATUS=2")
                 .where("convenio.DES_FOLIO = :folioConvenio",
-                        "ods.ID_ESTATUS_ORDEN_SERVICIO in (4, 5)")// sacar a una constante
+                        "ods.ID_ESTATUS_ORDEN_SERVICIO = 6")// sacar a una constante
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
         if (filtros.getFolioSiniestro() != null) {
             querySiniestrosContratante.where("ods.CVE_FOLIO = :folioSiniestro")
@@ -327,6 +327,7 @@ public class ConsultaConvenios {
         }
 
         final String query = querySiniestros.unionAll(querySiniestrosContratante);
+        log.info(" -> "+query);
         String encoded = querySiniestros.encrypt(query);
         return recuperarDatos(request, encoded);
     }
