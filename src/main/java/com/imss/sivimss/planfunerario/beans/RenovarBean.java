@@ -97,7 +97,7 @@ public class RenovarBean {
 		.leftJoin("SVC_CP CP", "SD.REF_CP = CP.CVE_CODIGO_POSTAL")
 		.join(SVC_PERSONA, "SC.ID_PERSONA = SP.ID_PERSONA");
 
-		queryUtil.where("SCP.ID_ESTATUS_CONVENIO = 2");
+		queryUtil.where("SCP.ID_ESTATUS_CONVENIO IN (2, 4)");
 		queryUtil.where("SCP.ID_TIPO_PREVISION = :tipoPrevision")
 		.setParameter("tipoPrevision", filtros.getTipoPrevision());
 		if(filtros.getNumeroConvenio()!=null) {
@@ -238,8 +238,8 @@ public class RenovarBean {
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper(UPDATE_SVT_CONVENIO_PF);
 		q.agregarParametroValues(""+AppConstantes.ID_ESTATUS_CONVENIO+"", "4");
-		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+id+"");
-		q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+	//	q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+id+"");
+	//	q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 		if(folio!=null) {
 			q.addWhere("REF_FOLIO = '"+folio+"'");
 		}
@@ -382,7 +382,7 @@ public class RenovarBean {
 		String query;
 			final QueryHelper q = new QueryHelper("UPDATE SVT_CONTRATANTE_BENEFICIARIOS SB");
 			q.agregarParametroValues("IND_ACTIVO", "0");
-			q.agregarParametroValues("ID_USUARIO_BAJA", ""+idUsuario+"");
+			//q.agregarParametroValues("ID_USUARIO_BAJA", ""+idUsuario+"");
 			q.agregarParametroValues("FEC_BAJA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
 			q.addWhere("SB.ID_CONTRATANTE_BENEFICIARIOS IN " );
 			query = q.obtenerQueryActualizar().replace(";", "(");
@@ -393,11 +393,6 @@ public class RenovarBean {
 			.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SB.ID_CONTRA_PAQ_CONVENIO_PF = SCPC.ID_CONTRA_PAQ_CONVENIO_PF")
 			.join("SVT_CONVENIO_PF PF", "SCPC.ID_CONVENIO_PF= PF.ID_CONVENIO_PF")
 			.join("SVC_PERSONA SP ON SB.ID_PERSONA = SP.ID_PERSONA");
-			queryUtil.where("(SB.ID_PARENTESCO=8 OR SB.ID_PARENTESCO=9) "
-					+ "AND TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURDATE()) BETWEEN 18 AND 25")
-			.and("(SBD.IND_COMPROBANTE_ESTUDIOS = 0 OR SBD.IND_COMPROBANTE_ESTUDIOS IS NULL)")
-			.or("((SB.ID_PARENTESCO=8 OR SB.ID_PARENTESCO=9) AND TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURDATE())>25)");
-			
 			if(idConvenio!=null) {
 				queryUtil.where("PF.ID_CONVENIO_PF= :idConvenio")
 				.setParameter(ID_CONVENIO, idConvenio);	
@@ -406,7 +401,11 @@ public class RenovarBean {
 				queryUtil.where("SCPC.ID_CONTRATANTE= :idContra")
 				.setParameter("idContra", idContra);	
 			}
-			queryUtil.where("PF.ID_TIPO_PREVISION=2)");
+			queryUtil.where("PF.ID_TIPO_PREVISION=2");
+			queryUtil.where("SB.ID_PARENTESCO IN (8,9) "
+					+ "AND (TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURDATE()) BETWEEN 18 AND 25")
+			.and("(SBD.IND_COMPROBANTE_ESTUDIOS = 0 OR SBD.IND_COMPROBANTE_ESTUDIOS IS NULL)")
+			.or("TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURDATE())>25))");
 			String queryConsulta = obtieneQuery(queryUtil);
 			String consultaFinal=query+queryConsulta;
 		log.info("update -> "+consultaFinal);
