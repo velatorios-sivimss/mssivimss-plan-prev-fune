@@ -300,16 +300,6 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		}
 	}
 
-	
-
-
-/*	private boolean validarFallecidoCtoAnterior(Integer numContratante, Integer numConvenio, Authentication authentication) throws IOException {
-		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarFallecidoCtoAnterior(numContratante, numConvenio).getDatos(), urlConsulta,
-				authentication);
-	Object rst=response.getDatos();
-	return !rst.toString().equals("[]");
-	} */
-
 	@Override
 	public Response<?> descargarAdendaRenovacionAnual(DatosRequest request, Authentication authentication) throws IOException {
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
@@ -428,17 +418,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	anioMesVigencia = recuperaDato(fec);
 	return !rst.toString().equals("[]");
 	}
-	
-	/*private void obtieneMesVigencia(String fec) {
-		Integer vigencia = 0;
-		Pattern pattern = Pattern.compile("vig=(\\d+)");
-		Matcher matcher = pattern.matcher(fec);
-		if (matcher.find()) {
-		    vigencia = Integer.parseInt(matcher.group(1));
-		}
-		log.info("-> " +vigencia);
-		anioMesVigencia = vigencia;
-	} */
+
 	private Response<?> devuelveVacio(Response<?> response) {
 		response.setCodigo(200);
         response.setError(false);
