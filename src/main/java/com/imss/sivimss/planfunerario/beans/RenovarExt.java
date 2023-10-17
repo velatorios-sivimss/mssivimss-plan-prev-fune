@@ -56,12 +56,10 @@ public class RenovarExt {
 		.join(SVC_PERSONA, "SC.ID_PERSONA = SP.ID_PERSONA");
 		queryUtil.where("PF.ID_ESTATUS_CONVENIO = 4");
 		if(filtros.getIdDelegacion()!=null) {
-			queryUtil.where("SV.ID_DELEGACION= :idDelegacion")
-			.setParameter("idDelegacion", filtros.getIdDelegacion());
+			queryUtil.where("SV.ID_DELEGACION= "  +filtros.getIdDelegacion());
 		}
 		if(filtros.getIdVelatorio()!=null) {
-			queryUtil.where("PF.ID_VELATORIO= :idVelatorio")
-			.setParameter("idVelatorio", filtros.getIdVelatorio());
+			queryUtil.where("PF.ID_VELATORIO= " +filtros.getIdVelatorio());
 		}
 		if(filtros.getFolio()!=null) {
 			queryUtil.where("PF.DES_FOLIO= :folio")
@@ -70,6 +68,9 @@ public class RenovarExt {
 		if(filtros.getRfc()!=null) {
 			queryUtil.where("SP.CVE_RFC = :rfc")
 			.setParameter("rfc", filtros.getRfc());
+		}
+		if(filtros.getNumConvenio()!=null) {
+			queryUtil.where("PF.ID_CONVENIO_PF= " +filtros.getNumConvenio());
 		}
 		String query = obtieneQuery(queryUtil);
 		log.info("-> " +query);

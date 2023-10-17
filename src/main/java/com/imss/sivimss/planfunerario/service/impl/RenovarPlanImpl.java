@@ -55,6 +55,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private static final String IMPRIMIR = "imprimir";
 	private static final String INFORMACION_INCOMPLETA = "Informacion incompleta";
 	private static final String EXITO = "EXITO";
+	private static final String SIN_INFORMACION = "45 NO HAY INFORMACION RELACIONADA A TU BUSQUEDA";
 	
 	@Autowired
 	private LogUtil logUtil;
@@ -107,11 +108,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 					authentication);
 			Object rst = responseDatosConvenio.getDatos();
 		      if(rst.toString().equals("[]")){
-		    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getFolio(), CONSULTA, authentication);
-		    		  response.setCodigo(200);
-			          response.setError(false);
-			          response.setMensaje("45");
-			          return response;
+		    		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),SIN_INFORMACION +filtros.getFolio(), CONSULTA, authentication);
+		    		return devuelveVacio(response); 
 		      }
 		    	  convenioResponse = Arrays.asList(modelMapper.map(responseDatosConvenio.getDatos(), DatosConvenioResponse[].class));
 			        benefResponse = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(renovarBean.buscarBeneficiarios(filtros.getFolio(), filtros.getNumeroConvenio()).getDatos(), urlConsulta, authentication).getDatos(), BenefResponse[].class));
@@ -138,7 +136,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 					          log.info("ESTATUS INACTIVO: CONTRATO CERRADO");
 				  			return response;
 		    		    } 
-		    		if(validarFallecido(filtros, authentication)) {
+		    	  if(validarFallecido(filtros, authentication)) {
 		    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A CERRADO", MODIFICACION, authentication);
 		    			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
 		    			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
@@ -148,10 +146,15 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			  			 response.setMensaje("39");
 			  			return response;
 		    		  }
-		    		response.setCodigo(200);
-		            response.setError(false);
-		            response.setMensaje("Exito");
-			      response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));
+		    	  if(datosConvenio.getEstatusConvenio()==2) {
+		    		  response.setCodigo(200);
+			            response.setError(false);
+			            response.setMensaje("Exito");
+				      response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));  
+		    	  }else {
+		    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),SIN_INFORMACION +filtros.getFolio(), CONSULTA, authentication);
+			          return devuelveVacio(response);
+		    	  }
 	}catch(Exception e) {
 		log.info("Fallo al e ejecutar la query {} ", e.getCause());
 		throw new IOException("5", e.getCause()) ;
@@ -159,6 +162,11 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		      return response;   
 	
 	}
+
+
+
+
+
 
 	public Response<?> buscarConvenioAnterior(DatosRequest request, Authentication authentication) throws IOException {
 		Response<?> response = new Response<>();
@@ -179,12 +187,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		 Response<?> responseDatosConvenio = providerRestTemplate.consumirServicio(renovarBean.buscarConvenio(request, filtros, fecFormat).getDatos(), urlConsulta,
 				authentication);
 	      if(responseDatosConvenio.getDatos().toString().equals("[]")){
-	    		logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"45 No se encontro informacion relacionada a tu busqueda " +filtros.getNumeroConvenio(), CONSULTA, authentication);
-	    		response.setMensaje("45 " +filtros.getNumeroConvenio());
-	    		  response.setCodigo(200);
-		          response.setError(false);
-		          response.setMensaje("45");
-		          return response;
+	    		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),SIN_INFORMACION +filtros.getFolio(), CONSULTA, authentication);
+		          return devuelveVacio(response);
 	      }
 	    	  
 	      convenioResponse = Arrays.asList(modelMapper.map(responseDatosConvenio.getDatos(), DatosConvenioResponse[].class));
@@ -222,10 +226,15 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			    			response.setMensaje("39");
 			    			return response;
 			    		}
-			    		   response.setCodigo(200);
-			    		   response.setError(false);
-			    		   response.setMensaje("Exito");
-			    		 response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));
+			    		  if(datosConvenio.getEstatusConvenio()==2) {
+				    		  response.setCodigo(200);
+					            response.setError(false);
+					            response.setMensaje("Exito");
+						      response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));  
+				    	  }else {
+				    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),SIN_INFORMACION +filtros.getFolio(), CONSULTA, authentication);
+				    		  return devuelveVacio(response);
+				    	  }
    }catch(Exception e) {
 	   log.info("Fallo al e ejecutar la query {} ", e.getCause());
 	   throw new IOException("5", e.getCause()) ;
@@ -430,6 +439,13 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		log.info("-> " +vigencia);
 		anioMesVigencia = vigencia;
 	} */
+	private Response<?> devuelveVacio(Response<?> response) {
+		response.setCodigo(200);
+        response.setError(false);
+        response.setMensaje("45");
+		return response;
+	}
+
 	
 	private Integer obtieneVigencia(String fecVigencia) throws ParseException {
 		Date sdf = new SimpleDateFormat("dd/MM/yyyy").parse(fecVigencia);

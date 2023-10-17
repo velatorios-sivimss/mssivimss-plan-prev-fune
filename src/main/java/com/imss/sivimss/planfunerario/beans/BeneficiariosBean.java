@@ -412,9 +412,9 @@ public class BeneficiariosBean {
 		 DatosRequest request = new DatosRequest();
 			Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("UPDATE SVT_BENEF_DOC_PLAN_ANTERIOR");
-	        q.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS", this.indComprobanteEstudios.toString());
-	        q.agregarParametroValues("IND_UBICACION_ACTA_MATRIMONIO", this.indActaMatrimonio.toString());
-	        q.agregarParametroValues("IND_DECLARACION_CONCUBINATO", this.indDeclaracionConcubinato.toString());	
+	        q.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS", ""+this.indComprobanteEstudios+"");
+	        q.agregarParametroValues("IND_UBICACION_ACTA_MATRIMONIO", ""+this.indActaMatrimonio+"");
+	        q.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+this.indDeclaracionConcubinato+"");	
 	        q.agregarParametroValues(AppConstantes.ID_USUARIO_MODIFICA, usuarioAlta.toString() );
 			q.agregarParametroValues(AppConstantes.FEC_ACTUALIZACION, AppConstantes.CURRENT_TIMESTAMP);
 		    q.addWhere("ID_CONTRATANTE_BENEFICIARIOS= " +this.idBeneficiario);

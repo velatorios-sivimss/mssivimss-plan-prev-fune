@@ -310,11 +310,11 @@ public class RenovarBean {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("UPDATE SVC_VALIDA_DOCS_CONVENIO_PF");
-		q.agregarParametroValues("IND_INE_AFILIADO", verificarDoc.getIneAfiliado().toString());
-		q.agregarParametroValues("IND_CURP", verificarDoc.getCurp().toString());
-		q.agregarParametroValues("IND_RFC", verificarDoc.getRfc().toString());
-		q.agregarParametroValues("IND_ACTA_NACIMIENTO", verificarDoc.getActaNac().toString());
-		q.agregarParametroValues("IND_INE_BENEFICIARIO", verificarDoc.getIneBeneficiario().toString());
+		q.agregarParametroValues("IND_INE_AFILIADO", ""+verificarDoc.getIneAfiliado()+"");
+		q.agregarParametroValues("IND_CURP", ""+verificarDoc.getCurp()+"");
+		q.agregarParametroValues("IND_RFC", ""+verificarDoc.getRfc()+"");
+		q.agregarParametroValues("IND_ACTA_NACIMIENTO", ""+verificarDoc.getActaNac()+"");
+		q.agregarParametroValues("IND_INE_BENEFICIARIO", ""+verificarDoc.getIneBeneficiario()+"");
 		q.agregarParametroValues(AppConstantes.ID_USUARIO_MODIFICA, usuarioAlta.toString());
 		q.agregarParametroValues(AppConstantes.FEC_ACTUALIZACION, AppConstantes.CURRENT_TIMESTAMP);
 		q.addWhere("ID_VALIDACION_DOCUMENTO = "+verificarDoc.getIdValidacionDoc());
@@ -330,7 +330,7 @@ public class RenovarBean {
 
 	private String renovarDocumentacion(RenovarDocumentacionModel renovarDoc, Integer validacionDoc) {
 	    	StringBuilder queries= new StringBuilder();
-	    	  final QueryHelper qh = new QueryHelper("INSERT INTO SVC_VALIDA_DOCS_RENV_CONV_PF");
+	    	  final QueryHelper qh = new QueryHelper("INSERT INTO SVC_VALIDA_DOCS_RENOV_CONV_PF");
 		        qh.agregarParametroValues("ID_VALIDACION_DOCUMENTO", validacionDoc.toString());
 		        qh.agregarParametroValues("IND_CONVENIO_ANTERIOR", ""+renovarDoc.getConvenioAnterior()+"");
 		        qh.agregarParametroValues("IND_CARTA_PODER", ""+renovarDoc.getCartaPoder()+"");
