@@ -37,13 +37,13 @@ public class RenovarExt {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SV.DES_VELATORIO AS velatorio",
 				"PF.ID_CONVENIO_PF AS idConvenio",
-				"PF.REF_FOLIO AS folio",
+				"PF.DES_FOLIO AS folio",
 				"SP.CVE_RFC AS rfc",
 				"SP.NOM_PERSONA AS nombre",
 				"SP.NOM_PRIMER_APELLIDO AS primerApellido",
 				"SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
 				"PF.ID_TIPO_PREVISION AS tipoPrevision",
-				"PAQ.DES_NOM_PAQUETE AS tipopaquete",
+				"PAQ.REF_PAQUETE_NOMBRE AS tipopaquete",
 				"PAQ.MON_COSTO_REFERENCIA AS cuotaRecuperacion",
 				"IF(PF.IND_RENOVACION=0, (DATE_FORMAT(PF.FEC_INICIO, '"+fecFormat+"')), DATE_FORMAT(RPF.FEC_INICIO, '"+fecFormat+"')) AS fecInicio",
 				"IF(PF.IND_RENOVACION=0, (DATE_FORMAT(PF.FEC_VIGENCIA, '"+fecFormat+"')), DATE_FORMAT(RPF.FEC_VIGENCIA, '"+fecFormat+"')) AS fecVigencia")
@@ -64,7 +64,7 @@ public class RenovarExt {
 			.setParameter("idVelatorio", filtros.getIdVelatorio());
 		}
 		if(filtros.getFolio()!=null) {
-			queryUtil.where("PF.REF_FOLIO= :folio")
+			queryUtil.where("PF.DES_FOLIO= :folio")
 			.setParameter("folio", filtros.getFolio());
 		}
 		if(filtros.getRfc()!=null) {
@@ -86,7 +86,7 @@ public class RenovarExt {
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("PF.ID_CONVENIO_PF AS idConvenio",
-				"PF.REF_FOLIO AS folio",
+				"PF.DES_FOLIO AS folio",
 				"SP.CVE_RFC AS rfc",
 				"SC.CVE_MATRICULA AS matricula",
 				"SP.NOM_PERSONA AS nombre",
@@ -94,12 +94,12 @@ public class RenovarExt {
 				"SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
 				"PF.ID_TIPO_PREVISION AS tipoPrevision",
 				"PF.ID_ESTATUS_CONVENIO AS idEstatus",
-				"PAQ.DES_NOM_PAQUETE AS tipopaquete",
+				"PAQ.REF_PAQUETE_NOMBRE AS tipopaquete",
 				"PAQ.MON_COSTO_REFERENCIA AS cuotaRecuperacion",
 				"IF(PF.IND_RENOVACION=0, (DATE_FORMAT(PF.FEC_INICIO, '"+fecFormat+"')), DATE_FORMAT(RPF.FEC_INICIO, '"+fecFormat+"')) AS fecInicio",
 				"IF(PF.IND_RENOVACION=0, (DATE_FORMAT(PF.FEC_VIGENCIA, '"+fecFormat+"')), DATE_FORMAT(RPF.FEC_VIGENCIA, '"+fecFormat+"')) AS fecVigencia",
-				"SP.DES_TELEFONO AS tel",
-				"SP.DES_CORREO AS correo",
+				"SP.REF_TELEFONO AS tel",
+				"SP.REF_CORREO AS correo",
 				"PF.IND_RENOVACION AS indRenovacion")
 		.from(SVT_CONVENIO_PF)
 		.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "PF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS = 2")
@@ -143,9 +143,9 @@ public class RenovarExt {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("UPDATE SVT_RENOVACION_CONVENIO_PF");
-		q.agregarParametroValues("FEC_VIGENCIA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
-		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"");
-		q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		q.agregarParametroValues("FEC_VIGENCIA", AppConstantes.CURRENT_TIMESTAMP);
+		q.agregarParametroValues(AppConstantes.ID_USUARIO_MODIFICA, idUsuario.toString());
+		q.agregarParametroValues(AppConstantes.FEC_ACTUALIZACION, AppConstantes.CURRENT_TIMESTAMP);
 		q.addWhere(ID_CONVENIO_PF +"="+ idConvenio +" AND ID_ESTATUS= 2");
 		String query = q.obtenerQueryActualizar();
 		log.info("actualizar estatus convenio --> "+query);
@@ -161,10 +161,10 @@ public class RenovarExt {
 		final QueryHelper q = new QueryHelper("UPDATE SVT_CONVENIO_PF");
 		q.agregarParametroValues("ID_ESTATUS_CONVENIO", "2");
 		if(extRequest.getIndRenovacion()==0) {
-			q.agregarParametroValues("FEC_VIGENCIA", ""+AppConstantes.CURRENT_TIMESTAMP+"");	
+			q.agregarParametroValues("FEC_VIGENCIA", AppConstantes.CURRENT_TIMESTAMP);	
 		}
-		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"");
-		q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		q.agregarParametroValues(AppConstantes.ID_USUARIO_MODIFICA, idUsuario.toString());
+		q.agregarParametroValues(AppConstantes.FEC_ACTUALIZACION, AppConstantes.CURRENT_TIMESTAMP);
 		q.addWhere("ID_CONVENIO_PF =" + extRequest.getIdConvenio());
 		String query = q.obtenerQueryActualizar() + " $$ " + insertarJustificacion(extRequest.getIdConvenio(), extRequest.getJustificacion(), idUsuario);
 		log.info(query);
@@ -177,20 +177,13 @@ public class RenovarExt {
 	
 	
 	private String insertarJustificacion(Integer idConvenio, String justificacion, Integer idUsuario) {
-		DatosRequest request = new DatosRequest();
-		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVT_RENOVACION_EXT_CONVENIO_PF");
-		q.agregarParametroValues(ID_CONVENIO_PF, ""+idConvenio+"");
+		q.agregarParametroValues(ID_CONVENIO_PF, idConvenio.toString());
 		q.agregarParametroValues("REF_JUSTIFICACION", setValor(justificacion));
-		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_ALTA+"", ""+idUsuario+"");
-		q.agregarParametroValues(""+AppConstantes.FEC_ALTA+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, idUsuario.toString());
+		q.agregarParametroValues(AppConstantes.FEC_ALTA, AppConstantes.CURRENT_TIMESTAMP);
 		q.addWhere("ID_CONVENIO_PF =" + idConvenio);
-		String query = q.obtenerQueryInsertar();
-		log.info(query);
-		String encoded = encodedQuery(query);
-		parametro.put(AppConstantes.QUERY, encoded);
-		request.setDatos(parametro);
-		return query;
+		return q.obtenerQueryInsertar();
 	}
 	
 	public DatosRequest validarFallecido(String palabra) {
@@ -204,8 +197,7 @@ public class RenovarExt {
 		.join(SVC_CONTRATANTE, "SP.ID_PERSONA = SC.ID_PERSONA")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SC.ID_CONTRATANTE = SCPC.ID_CONTRATANTE")
 		.join("SVT_CONVENIO_PF SPF", "SCPC.ID_CONVENIO_PF = SPF.ID_CONVENIO_PF");
-			queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio")
-			.setParameter(ID_CONVENIO, Integer.parseInt(palabra));
+			queryUtil.where("SCPC.ID_CONVENIO_PF =" +palabra);
 			String query = obtieneQuery(queryUtil);
 			log.info("validar fallecido ->"+query);
 			String encoded = encodedQuery(query);
