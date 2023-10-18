@@ -264,12 +264,13 @@ public class BeneficiariosImpl implements BeneficiariosService {
 		return response;
 	}
 
-	@Override
+@Override
 	public Response<?> buscarBeneficiariosPlanAnterior(DatosRequest request, Authentication authentication)
 			throws IOException {
-		return providerRestTemplate.consumirServicio(benefBean.beneficiariosPlanAnterior(request).getDatos(),
+	/*	return providerRestTemplate.consumirServicio(benefBean.beneficiariosPlanAnterior(request).getDatos(),
 				urlConsulta,
-				authentication);
+				authentication);*/
+	return null;
 	}
 
 	@Override
