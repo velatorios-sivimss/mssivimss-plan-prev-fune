@@ -88,8 +88,8 @@ public class BeneficiariosBean {
 	public static final String FEC_NAC = "FEC_NAC";
 	public static final String CVE_CURP = "CVE_CURP";
 	public static final String CVE_RFC = "CVE_RFC";
-	public static final String DES_CORREO = "DES_CORREO";
-	public static final String DES_TELEFONO = "DES_TELEFONO";
+	public static final String DES_CORREO = "REF_CORREO";
+	public static final String DES_TELEFONO = "REF_TELEFONO";
 	public static final String ID_TABLA = "idTabla";
 
 	public static final String IND_ACTA_NACIMIENTO = "IND_ACTA_NACIMIENTO";
@@ -158,14 +158,14 @@ public class BeneficiariosBean {
 			    "PAR.DES_PARENTESCO AS parentesco",
 				 "SP.CVE_CURP AS curp",
 				 "SP.CVE_RFC AS rfc",
-				 "SP.DES_CORREO AS correo",
-				 "SP.DES_TELEFONO AS tel",
+				 "SP.REF_CORREO AS correo",
+				 "SP.REF_TELEFONO AS tel",
 				 "SB.IND_ACTA_NACIMIENTO AS indActa",
 				 "SB.IND_INE_BENEFICIARIO AS indIne",
 				 "SP.ID_PERSONA AS idPersona",
 				 "SB.IND_ACTIVO AS estatus",
 				 "SBD.IND_COMPROBANTE_ESTUDIOS AS comprobEstudios",
-				  "SBD.IND_ACTA_MATRIMONIO AS actaMatrimonio",
+				  "SBD.IND_UBICACION_ACTA_MATRIMONIO AS actaMatrimonio",
 				  "SBD.IND_DECLARACION_CONCUBINATO AS declaracionConcubinato")
 		.from(SVT_CONTRATANTE_BENEFICIARIOS)
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF)
@@ -187,7 +187,7 @@ public class BeneficiariosBean {
 	public DatosRequest insertarPersonaPlanAnterior() {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
-		final QueryHelper q = new QueryHelper("INSERT INTO SVC_PERSONA ");
+		final QueryHelper q = new QueryHelper("INSERT INTO SVC_PERSONA");
 		q.agregarParametroValues(NOM_PERSONA, setValor(this.nombre));
 		q.agregarParametroValues(NOM_PRIMER_APELLIDO, setValor(this.apellidoP));
 		q.agregarParametroValues(NOM_SEGUNDO_APELLIDO, setValor(this.apellidoM));
@@ -196,8 +196,8 @@ public class BeneficiariosBean {
 		q.agregarParametroValues(CVE_RFC, setValor(this.rfc));
 		q.agregarParametroValues(DES_CORREO, setValor(this.correoE));
 		q.agregarParametroValues(DES_TELEFONO, setValor(this.tel));
-		q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, ""+usuarioAlta+"");
-		q.agregarParametroValues(AppConstantes.FEC_ALTA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, usuarioAlta.toString());
+		q.agregarParametroValues(AppConstantes.FEC_ALTA, AppConstantes.CURRENT_TIMESTAMP);
 		String query = q.obtenerQueryInsertar();
 		log.info(query);
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
@@ -212,19 +212,19 @@ public class BeneficiariosBean {
 		 DatosRequest request = new DatosRequest();
 	        Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("INSERT INTO SVT_CONTRATANTE_BENEFICIARIOS");
-	        q.agregarParametroValues("ID_CONTRA_PAQ_CONVENIO_PF", ""+this.idContratanteConvenioPf+"");
-	        q.agregarParametroValues("ID_PERSONA", ""+id+"");
-	        q.agregarParametroValues(ID_PARENTESCO, ""+this.idParentesco+"");
+	        q.agregarParametroValues("ID_CONTRA_PAQ_CONVENIO_PF", this.idContratanteConvenioPf.toString());
+	        q.agregarParametroValues("ID_PERSONA", id.toString());
+	        q.agregarParametroValues(ID_PARENTESCO, this.idParentesco.toString());
 	        if(indActa!=null) {
-	        	q.agregarParametroValues(IND_ACTA_NACIMIENTO, ""+this.indActa+"");	
+	        	q.agregarParametroValues(IND_ACTA_NACIMIENTO, this.indActa.toString());	
 	        }
 	        if(indIne!=null) {
-	        	   q.agregarParametroValues(IND_INE_BENEFICIARIO, ""+this.indIne+"");   	
+	        	   q.agregarParametroValues(IND_INE_BENEFICIARIO, this.indIne.toString());   	
  	        }
-	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
+	        q.agregarParametroValues(AppConstantes.IND_ACTIVO, "1");
 	        q.agregarParametroValues("IND_SINIESTROS", "0");
-	        q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, ""+usuarioAlta+"" );
-			q.agregarParametroValues(AppConstantes.FEC_ALTA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
+	        q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, usuarioAlta.toString() );
+			q.agregarParametroValues(AppConstantes.FEC_ALTA, AppConstantes.CURRENT_TIMESTAMP);
 	        String query = q.obtenerQueryInsertar()+"$$" +insertarDocPlanAnterior();
 	        log.info("estoy aqui "+query);
 	        String encoded = encodedQuery(query);
@@ -237,20 +237,14 @@ public class BeneficiariosBean {
 
 
 	public String insertarDocPlanAnterior() {
-		 DatosRequest request = new DatosRequest();
-		Map<String, Object> parametro = new HashMap<>();
         final QueryHelper q = new QueryHelper("INSERT INTO SVT_BENEF_DOC_PLAN_ANTERIOR");
         q.agregarParametroValues("ID_CONTRATANTE_BENEFICIARIOS", ID_TABLA);
         q.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS", ""+this.indComprobanteEstudios+"");
-        q.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+this.indActaMatrimonio+"");
+        q.agregarParametroValues("IND_UBICACION_ACTA_MATRIMONIO", ""+this.indActaMatrimonio+"");
         q.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+this.indDeclaracionConcubinato+"");	
-        q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, ""+usuarioAlta+"" );
-		q.agregarParametroValues(AppConstantes.FEC_ALTA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
-        String query = q.obtenerQueryInsertar();
-        String encoded = encodedQuery(query);
-        parametro.put(AppConstantes.QUERY, encoded);
-        request.setDatos(parametro);
-        return query;	
+        q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, usuarioAlta.toString() );
+		q.agregarParametroValues(AppConstantes.FEC_ALTA, AppConstantes.CURRENT_TIMESTAMP);
+        return q.obtenerQueryInsertar();
 	}
 
 
@@ -266,8 +260,8 @@ public class BeneficiariosBean {
 		q.agregarParametroValues(CVE_RFC, setValor(this.rfc));
 		q.agregarParametroValues(DES_CORREO, setValor(this.correoE));
 		q.agregarParametroValues(DES_TELEFONO, setValor(this.tel));
-		q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+usuarioAlta+"");
-		q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		q.agregarParametroValues(AppConstantes.ID_USUARIO_MODIFICA, usuarioAlta.toString());
+		q.agregarParametroValues(AppConstantes.FEC_ACTUALIZACION, AppConstantes.CURRENT_TIMESTAMP);
 		q.addWhere("ID_PERSONA = " + this.idPersona);
 		String query = q.obtenerQueryActualizar();
 		String encoded = encodedQuery(query);
@@ -282,15 +276,15 @@ public class BeneficiariosBean {
 		 DatosRequest request = new DatosRequest();
 	        Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("UPDATE SVT_CONTRATANTE_BENEFICIARIOS");
-	        q.agregarParametroValues(ID_PARENTESCO, ""+parentesco+"");
+	        q.agregarParametroValues(ID_PARENTESCO, parentesco.toString());
 	        if(indActa!=null) {
-	        	 q.agregarParametroValues(IND_ACTA_NACIMIENTO, ""+indActa+""); 	
+	        	 q.agregarParametroValues(IND_ACTA_NACIMIENTO, indActa.toString()); 	
 	        }
 	       if(indIne!=null) {
-	    	   q.agregarParametroValues(IND_INE_BENEFICIARIO, ""+indIne+"");   
+	    	   q.agregarParametroValues(IND_INE_BENEFICIARIO, indIne.toString());   
 	       }
-	        q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+idUsuario+"" );
-			q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+	        q.agregarParametroValues(AppConstantes.ID_USUARIO_MODIFICA, idUsuario.toString() );
+			q.agregarParametroValues(AppConstantes.FEC_ACTUALIZACION, AppConstantes.CURRENT_TIMESTAMP);
 			q.addWhere("ID_PERSONA = " + idPersona);
 	        String query = q.obtenerQueryActualizar();
 	        String encoded = encodedQuery(query);
@@ -305,13 +299,13 @@ public class BeneficiariosBean {
 		 DatosRequest request = new DatosRequest();
 	        Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("UPDATE SVT_CONTRATANTE_BENEFICIARIOS");
-	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", ""+estatus+"");
+	        q.agregarParametroValues(AppConstantes.IND_ACTIVO, ""+estatus+"");
 	        if(!estatus) {
-	        	 q.agregarParametroValues("ID_USUARIO_BAJA", ""+usuarioBaja+"" );
-	 			q.agregarParametroValues("FEC_BAJA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+	        	 q.agregarParametroValues("ID_USUARIO_BAJA", usuarioBaja.toString() );
+	 			q.agregarParametroValues("FEC_BAJA", AppConstantes.CURRENT_TIMESTAMP);
 	        }else {
-	        	  q.agregarParametroValues(""+AppConstantes.ID_USUARIO_MODIFICA+"", ""+usuarioBaja+"" );
-	  			q.agregarParametroValues(""+AppConstantes.FEC_ACTUALIZACION+"", ""+AppConstantes.CURRENT_TIMESTAMP+"");
+	        	  q.agregarParametroValues(AppConstantes.ID_USUARIO_MODIFICA, usuarioBaja.toString() );
+	  			q.agregarParametroValues(AppConstantes.FEC_ACTUALIZACION, AppConstantes.CURRENT_TIMESTAMP);
 	        }
 			q.addWhere("ID_CONTRATANTE_BENEFICIARIOS = " + idBeneficiario);
 	        String query = q.obtenerQueryActualizar();
@@ -337,7 +331,7 @@ public class BeneficiariosBean {
 		      .join(SVT_CONVENIO_PF, SCPC_ID_CONVENIO_PF_PF_ID_CONVENIO_PF)
 		      .join(SVC_PERSONA, "SB.ID_PERSONA=SP.ID_PERSONA");
 		queryUno.where("PF.ID_TIPO_PREVISION=2").and("SB.IND_SINIESTROS=0").and("SB.ID_PARENTESCO !=4")
-		.and("PF.ID_CONVENIO_PF= "+palabra+"");
+		.and("PF.ID_CONVENIO_PF= "+palabra);
 		SelectQueryUtil queryDos = new SelectQueryUtil();
 		queryDos.select("SCPC.ID_CONVENIO_PF AS idCovenio",
 				"SB.ID_CONTRATANTE_BENEFICIARIOS AS idBenef",
@@ -384,8 +378,8 @@ public class BeneficiariosBean {
 		q.agregarParametroValues(CVE_RFC, setValor(this.rfc));
 		q.agregarParametroValues(DES_CORREO, setValor(this.correoE));
 		q.agregarParametroValues(DES_TELEFONO, setValor(this.tel));
-		q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, ""+usuarioAlta+"");
-		q.agregarParametroValues(AppConstantes.FEC_ALTA, ""+AppConstantes.CURRENT_TIMESTAMP+"");
+		q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, usuarioAlta.toString());
+		q.agregarParametroValues(AppConstantes.FEC_ALTA, AppConstantes.CURRENT_TIMESTAMP);
 		String query = q.obtenerQueryInsertar() +"$$"  + insertarBeneficiario();
 		log.info(query);
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
@@ -397,28 +391,21 @@ public class BeneficiariosBean {
 	}
 
 	private String insertarBeneficiario() {
-		 DatosRequest request = new DatosRequest();
-	        Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("INSERT INTO SVT_CONTRATANTE_BENEFICIARIOS");
-	        q.agregarParametroValues("ID_CONTRA_PAQ_CONVENIO_PF", ""+this.idContratanteConvenioPf+"");
+	        q.agregarParametroValues("ID_CONTRA_PAQ_CONVENIO_PF", this.idContratanteConvenioPf.toString());
 	        q.agregarParametroValues("ID_PERSONA", ID_TABLA);
-	        q.agregarParametroValues(ID_PARENTESCO, ""+this.idParentesco+"");
+	        q.agregarParametroValues(ID_PARENTESCO, this.idParentesco.toString());
 	        if(this.indActa!=null) {
-	        	q.agregarParametroValues(IND_ACTA_NACIMIENTO, ""+this.indActa+"");	
+	        	q.agregarParametroValues(IND_ACTA_NACIMIENTO, this.indActa.toString());	
 	        }
 	        if(this.indIne!=null) {
-	        	   q.agregarParametroValues(IND_INE_BENEFICIARIO, ""+this.indIne+"");   	
+	        	   q.agregarParametroValues(IND_INE_BENEFICIARIO, this.indIne.toString());   	
 	        }
-	        q.agregarParametroValues(""+AppConstantes.IND_ACTIVO+"", "1");
+	        q.agregarParametroValues(AppConstantes.IND_ACTIVO, "1");
 	        q.agregarParametroValues("IND_SINIESTROS", "0");
-	        q.agregarParametroValues("ID_USUARIO_ALTA", ""+usuarioAlta+"" );
-			q.agregarParametroValues("FEC_ALTA", ""+AppConstantes.CURRENT_TIMESTAMP+"");
-	        String query = q.obtenerQueryInsertar();
-
-	        String encoded = encodedQuery(query);
-	        parametro.put(AppConstantes.QUERY, encoded);
-	        request.setDatos(parametro);
-	        return query;
+	        q.agregarParametroValues("ID_USUARIO_ALTA", usuarioAlta.toString() );
+			q.agregarParametroValues("FEC_ALTA", AppConstantes.CURRENT_TIMESTAMP);
+	        return q.obtenerQueryInsertar();
 	}
 
 	public DatosRequest editarDocPlanAnterior() {
@@ -426,10 +413,10 @@ public class BeneficiariosBean {
 			Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("UPDATE SVT_BENEF_DOC_PLAN_ANTERIOR");
 	        q.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS", ""+this.indComprobanteEstudios+"");
-	        q.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+this.indActaMatrimonio+"");
+	        q.agregarParametroValues("IND_UBICACION_ACTA_MATRIMONIO", ""+this.indActaMatrimonio+"");
 	        q.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+this.indDeclaracionConcubinato+"");	
-	        q.agregarParametroValues(AppConstantes.ID_USUARIO_MODIFICA, ""+usuarioAlta+"" );
-			q.agregarParametroValues(AppConstantes.FEC_ACTUALIZACION, ""+AppConstantes.CURRENT_TIMESTAMP+"");
+	        q.agregarParametroValues(AppConstantes.ID_USUARIO_MODIFICA, usuarioAlta.toString() );
+			q.agregarParametroValues(AppConstantes.FEC_ACTUALIZACION, AppConstantes.CURRENT_TIMESTAMP);
 		    q.addWhere("ID_CONTRATANTE_BENEFICIARIOS= " +this.idBeneficiario);
 	        String query = q.obtenerQueryActualizar();
 	        String encoded = encodedQuery(query);
@@ -454,7 +441,7 @@ public class BeneficiariosBean {
 				 "SVDR.IND_INE_TESTIGO AS ineTestigo",
 				 "SVDR.IND_INE_TESTIGO_DOS AS ineTestigoDos")
 		.from("SVC_VALIDA_DOCS_CONVENIO_PF SVD")
-		.leftJoin("SVC_VALIDA_DOCS_RENV_CONV_PF SVDR", "SVD.ID_VALIDACION_DOCUMENTO = SVDR.ID_VALIDACION_DOCUMENTO")
+		.leftJoin("SVC_VALIDA_DOCS_RENOV_CONV_PF SVDR", "SVD.ID_VALIDACION_DOCUMENTO = SVDR.ID_VALIDACION_DOCUMENTO")
 
 		.join(SVT_CONVENIO_PF, "SVD.ID_CONVENIO_PF=PF.ID_CONVENIO_PF")
         .join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "PF.ID_CONVENIO_PF =SCPC.ID_CONVENIO_PF")
@@ -475,7 +462,7 @@ public class BeneficiariosBean {
 		queryUtil.select("PF.ID_TIPO_PREVISION AS idTipoPrevision",
 				"IF(PF.ID_TIPO_PREVISION=1,'Prevision funeraria plan nuevo', 'Prevision funeraria plan anterior') AS tipoPrevision",
 				 "SCPC.ID_PAQUETE AS idPaquete",
-				 "PAQ.DES_PAQUETE AS tipoPaquete",
+				 "PAQ.REF_PAQUETE_NOMBRE AS tipoPaquete",
 				 "PAQ.MON_COSTO_REFERENCIA AS cuotaRecuperacion",
 				 "MAX(DATE_FORMAT(RPF.FEC_INICIO, '"+fecFormat+"')) AS fecInicio",
 				 "MAX(DATE_FORMAT(RPF.FEC_VIGENCIA, '"+fecFormat+"')) AS fecVigencia",
@@ -487,10 +474,10 @@ public class BeneficiariosBean {
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "PF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
         .join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
         .join("SVT_RENOVACION_CONVENIO_PF RPF", "PF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF")
-        .leftJoin("SVT_PAGO_BITACORA SPB", "PF.REF_FOLIO = SPB.CVE_FOLIO") 
+        .leftJoin("SVT_PAGO_BITACORA SPB", "PF.DES_FOLIO = SPB.CVE_FOLIO") 
         .leftJoin("SVT_PAGO_DETALLE SPD", "SPB.ID_PAGO_BITACORA = SPD.ID_PAGO_BITACORA")
         .leftJoin("SVC_METODO_PAGO SMP", "SPD.ID_METODO_PAGO = SMP.ID_METODO_PAGO")
-        .where("(RPF.ID_ESTATUS=1 OR RPF.ID_ESTATUS=2) AND PF.ID_CONVENIO_PF=" +idConvenio )
+        .where("RPF.ID_ESTATUS IN (1,2) AND PF.ID_CONVENIO_PF=" +idConvenio )
         .groupBy("PF.ID_CONVENIO_PF");
 		String query = obtieneQuery(queryUtil);
 	   String encoded = encodedQuery(query);
