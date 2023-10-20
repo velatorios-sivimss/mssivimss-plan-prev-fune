@@ -195,9 +195,9 @@ public class RenovarPlanImpl implements RenovarPlanService {
    		   benefResponse = Arrays.asList(modelMapper.map(providerRestTemplate.consumirServicio(renovarBean.buscarBeneficiarios(filtros.getFolio(),filtros.getNumeroConvenio()).getDatos(), urlConsulta, authentication).getDatos(), BenefResponse[].class));
    		   datosConvenio = convenioResponse.get(0);
    		   datosConvenio.setBeneficiarios(benefResponse);
-   		  if(filtros.getNumeroConvenio()==null) {
-	        	filtros.setNumeroConvenio(datosConvenio.getIdConvenio());
-	        }
+   		if(filtros.getFolio()==null) {
+        	filtros.setNumeroConvenio(datosConvenio.getIdConvenio());
+        }
 	    	        logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CAMBIO DE ESTATUS BENEFICIARIOS PLAN ANTERIOR " +filtros.getNumeroConvenio(), CONSULTA, authentication);
 			    	  if(!validarPeriodoRenovacion(filtros ,authentication)) {
 			    		  logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);

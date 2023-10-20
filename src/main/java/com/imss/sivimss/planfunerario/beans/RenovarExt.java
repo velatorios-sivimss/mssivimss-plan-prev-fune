@@ -70,7 +70,8 @@ public class RenovarExt {
 			.setParameter("rfc", filtros.getRfc());
 		}
 		if(filtros.getNumConvenio()!=null) {
-			queryUtil.where("PF.ID_CONVENIO_PF= " +filtros.getNumConvenio());
+			queryUtil.where("PF.DES_FOLIO= :folio")
+			.setParameter("folio", filtros.getNumConvenio());
 		}
 		String query = obtieneQuery(queryUtil);
 		log.info("-> " +query);

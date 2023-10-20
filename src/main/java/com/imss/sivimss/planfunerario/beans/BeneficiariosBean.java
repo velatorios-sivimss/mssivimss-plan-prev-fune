@@ -136,8 +136,7 @@ public class BeneficiariosBean {
 		.join(SVT_CONVENIO_PF, SCPC_ID_CONVENIO_PF_PF_ID_CONVENIO_PF)
 		.join(SVT_CONTRATANTE_BENEFICIARIOS, "SCPC.ID_CONTRA_PAQ_CONVENIO_PF = SB.ID_CONTRA_PAQ_CONVENIO_PF")
 		.join(SVC_PERSONA, "SB.ID_PERSONA=SP.ID_PERSONA");
-		queryUtil.where("SCPC.ID_CONVENIO_PF = :idConvenio").and("(SB.IND_SINIESTROS=0 OR SB.IND_SINIESTROS IS NULL)")
-		.setParameter("idConvenio", Integer.parseInt(palabra));
+		queryUtil.where("SCPC.ID_CONVENIO_PF = " +palabra).and("(SB.IND_SINIESTROS=0 OR SB.IND_SINIESTROS IS NULL)");
 		String query = obtieneQuery(queryUtil);
 		log.info("-> " +query);
 		String encoded = encodedQuery(query);
@@ -165,7 +164,7 @@ public class BeneficiariosBean {
 				 "SP.ID_PERSONA AS idPersona",
 				 "SB.IND_ACTIVO AS estatus",
 				 "SBD.IND_COMPROBANTE_ESTUDIOS AS comprobEstudios",
-				  "SBD.IND_UBICACION_ACTA_MATRIMONIO AS actaMatrimonio",
+				  "SBD.IND_ACTA_MATRIMONIO AS actaMatrimonio",
 				  "SBD.IND_DECLARACION_CONCUBINATO AS declaracionConcubinato")
 		.from(SVT_CONTRATANTE_BENEFICIARIOS)
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF)
@@ -240,7 +239,7 @@ public class BeneficiariosBean {
         final QueryHelper q = new QueryHelper("INSERT INTO SVT_BENEF_DOC_PLAN_ANTERIOR");
         q.agregarParametroValues("ID_CONTRATANTE_BENEFICIARIOS", ID_TABLA);
         q.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS", ""+this.indComprobanteEstudios+"");
-        q.agregarParametroValues("IND_UBICACION_ACTA_MATRIMONIO", ""+this.indActaMatrimonio+"");
+        q.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+this.indActaMatrimonio+"");
         q.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+this.indDeclaracionConcubinato+"");	
         q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, usuarioAlta.toString() );
 		q.agregarParametroValues(AppConstantes.FEC_ALTA, AppConstantes.CURRENT_TIMESTAMP);
@@ -316,7 +315,7 @@ public class BeneficiariosBean {
 	        return request;
 	}
 	
-	public DatosRequest beneficiariosPlanAnterior(DatosRequest request) {
+/*	public DatosRequest beneficiariosPlanAnterior(DatosRequest request) {
 		String palabra = request.getDatos().get("palabra").toString();
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUno = new SelectQueryUtil();
@@ -351,7 +350,7 @@ public class BeneficiariosBean {
 	   parametros.put(AppConstantes.QUERY, encoded);
 	    request.setDatos(parametros);
 	    return request;
-	}
+	} */
 	
 	public DatosRequest  buscarCatalogoParentescos(DatosRequest request) {
 		Map<String, Object> parametros = new HashMap<>();
@@ -413,7 +412,7 @@ public class BeneficiariosBean {
 			Map<String, Object> parametro = new HashMap<>();
 	        final QueryHelper q = new QueryHelper("UPDATE SVT_BENEF_DOC_PLAN_ANTERIOR");
 	        q.agregarParametroValues("IND_COMPROBANTE_ESTUDIOS", ""+this.indComprobanteEstudios+"");
-	        q.agregarParametroValues("IND_UBICACION_ACTA_MATRIMONIO", ""+this.indActaMatrimonio+"");
+	        q.agregarParametroValues("IND_ACTA_MATRIMONIO", ""+this.indActaMatrimonio+"");
 	        q.agregarParametroValues("IND_DECLARACION_CONCUBINATO", ""+this.indDeclaracionConcubinato+"");	
 	        q.agregarParametroValues(AppConstantes.ID_USUARIO_MODIFICA, usuarioAlta.toString() );
 			q.agregarParametroValues(AppConstantes.FEC_ACTUALIZACION, AppConstantes.CURRENT_TIMESTAMP);
