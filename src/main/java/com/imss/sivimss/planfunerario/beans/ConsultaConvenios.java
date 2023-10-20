@@ -391,30 +391,30 @@ public class ConsultaConvenios {
         SelectQueryUtil queryVigencias = new SelectQueryUtil();
         queryVigencias.select(
                         "convenio.DES_FOLIO as folioConvenio",
-                        formatearFecha("convenio.FEC_INICIO") + " as fechaInicio",
-                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA)")
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, MAX(renovacionConvenio.FEC_INICIO))") + " as fechaInicio",
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, MAX(renovacionConvenio.FEC_VIGENCIA))")
                                 + " as fechaFin", // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
-                        formatearFecha("if(convenio.IND_RENOVACION = false, '', renovacionConvenio.FEC_INICIO)")
+                        formatearFecha("if(convenio.IND_RENOVACION = false, '', MAX(renovacionConvenio.FEC_ALTA))")
                                 + " as fechaRenovacion" // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
                 )
                 .from("SVT_CONVENIO_PF convenio")
-                .leftJoin("SVT_RENOVACION_CONVENIO_PF renovacionConvenio",
-                        "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
+                .leftJoin("SVT_RENOVACION_CONVENIO_PF renovacionConvenio ",
+                        "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF AND renovacionConvenio.ID_ESTATUS IN (1,2)")
                 .where("convenio.DES_FOLIO = :folioConvenio") // persona -> true
                 .setParameter("folioConvenio", filtros.getFolioConvenio());
 
         SelectQueryUtil queryVigenciasEmpresa = new SelectQueryUtil();
         queryVigenciasEmpresa.select(
                         "convenio.DES_FOLIO as folioConvenio",
-                        formatearFecha("convenio.FEC_INICIO") + " as fechaInicio",
-                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA)")
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, MAX(renovacionConvenio.FEC_INICIO)") + " as fechaInicio",
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, MAX(renovacionConvenio.FEC_VIGENCIA))")
                                 + " as fechaFin",
-                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO)")
+                        formatearFecha("if(convenio.IND_RENOVACION = false, '', MAX(renovacionConvenio.FEC_ALTA))")
                                 + " as fechaRenovacion"
                 )
                 .from("SVT_CONVENIO_PF convenio")
                 .leftJoin("SVT_RENOVACION_CONVENIO_PF renovacionConvenio",
-                        "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
+                        "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF AND renovacionConvenio.ID_ESTATUS IN (1,2)")
                 .join("SVT_CONTRATANTE_PAQUETE_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVT_EMPRESA_CONVENIO_PF empresaContratante",

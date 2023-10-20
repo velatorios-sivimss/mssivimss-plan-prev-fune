@@ -101,8 +101,8 @@ public class RenovarBean {
 		queryUtil.where("SCP.ID_TIPO_PREVISION = :tipoPrevision")
 		.setParameter("tipoPrevision", filtros.getTipoPrevision());
 		if(filtros.getNumeroConvenio()!=null) {
-			queryUtil.where("SCP.ID_CONVENIO_PF = :idConvenio")
-			.setParameter(ID_CONVENIO, filtros.getNumeroConvenio());
+			queryUtil.where("SCP.DES_FOLIO = :desFolio")
+			.setParameter(DES_FOLIO, filtros.getNumeroConvenio());
 		}
 		if(filtros.getNumeroContratante()!=null) {
 			queryUtil.where("SCPC.ID_CONTRATANTE = :idNumeroContratante")
@@ -424,7 +424,8 @@ public class RenovarBean {
 			.setParameter("folio", folio);	
 		}
 		if(id!=null) {
-			queryUtil.where("PF.ID_CONVENIO_PF= " +id);	
+			queryUtil.where("PF.DES_FOLIO= :folio")
+			.setParameter("folio", id);
 		}
 		queryUtil.limit(3);
 		String query = obtieneQuery(queryUtil);
