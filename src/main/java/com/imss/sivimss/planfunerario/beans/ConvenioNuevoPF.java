@@ -201,7 +201,7 @@ public class ConvenioNuevoPF {
                 .where("SP.IND_ACTIVO = 1")
                 .and("SPV.ID_VELATORIO = "+idVelatorio);
 
-        selectQueryUtilUnionPaqueteRegion.select("SP.ID_PAQUETE","SP.REF_PAQUETE_NOMBREBRE","SP.REF_PAQUETE_DESCRIPCION")
+        selectQueryUtilUnionPaqueteRegion.select("SP.ID_PAQUETE","SP.REF_PAQUETE_NOMBRE","SP.REF_PAQUETE_DESCRIPCION")
                 .from("SVT_PAQUETE SP")
                 .where("SP.IND_ACTIVO =1 ")
                 .and("SP.IND_REGION =1");
@@ -230,7 +230,7 @@ public class ConvenioNuevoPF {
         String queryPaqueteRegion=selectQueryUtilUnionPaqueteVelatorio.union(selectQueryUtilUnionPaqueteRegion);
         String queryPaqueteServiciosArticulos=selectQueryUtilUnionPaqueteServicio.union(selectQueryUtilUnionPaqueteArticulo);
 
-        selectQueryUtilPaquete.select("PAQUETES.ID_PAQUETE AS idPaquete","PAQUETES.DES_NOM_PAQUETE AS nomPaquete", "PAQUETES.DES_PAQUETE AS descPaquete")
+        selectQueryUtilPaquete.select("PAQUETES.ID_PAQUETE AS idPaquete","PAQUETES.REF_PAQUETE_NOMBRE AS nomPaquete", "PAQUETES.REF_PAQUETE_DESCRIPCION AS descPaquete")
                 .from("("+queryPaqueteRegion+") PAQUETES");
          //       .where("PAQUETES.ID_PAQUETE IN("+queryPaqueteServiciosArticulos+")");
 
