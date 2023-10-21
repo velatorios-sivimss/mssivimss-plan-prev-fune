@@ -61,9 +61,9 @@ public class ConsultaConvenios {
                         "convenio.DES_FOLIO as folioConvenio",
                        recuperarNombrePersona("personaContratante", "nombreContratante"),
                         formatearFecha("convenio.FEC_ALTA") + " as fechaContratacion", // La fecha de inicio sera la fecha de contratacion o sera la fecha de alta
-                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO)")
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, MAX(renovacionConvenio.FEC_INICIO))")
                                 + " as fechaVigenciaInicio", // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
-                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA)")
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, MAX(renovacionConvenio.FEC_VIGENCIA))")
                                 + " as fechaVigenciaFin",
                         "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
                         "if(convenio.IND_RENOVACION = false, 'No Renovado', 'Renovado') as situacion",
@@ -77,7 +77,7 @@ public class ConsultaConvenios {
                         "estatus.ID_ESTATUS_CONVENIO_PF = convenio.ID_ESTATUS_CONVENIO")
                 .leftJoin("SVT_RENOVACION_CONVENIO_PF renovacionConvenio",
                         "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF",
-                        "renovacionConvenio.ID_ESTATUS = 2")
+                        "renovacionConvenio.ID_ESTATUS IN (1,2)")
                 .join("SVT_CONTRA_PAQ_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVT_PAQUETE paquete",
@@ -100,9 +100,9 @@ public class ConsultaConvenios {
                         "convenio.DES_FOLIO as folioConvenio",
                         "empresaContratante.REF_NOMBRE as nombreContratante",
                         formatearFecha("convenio.FEC_ALTA") + " as fechaContratacion",
-                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, renovacionConvenio.FEC_INICIO)")
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_INICIO, MAX(renovacionConvenio.FEC_INICIO))")
                                 + " as fechaVigenciaInicio",
-                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, renovacionConvenio.FEC_VIGENCIA)")
+                        formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, MAX(renovacionConvenio.FEC_VIGENCIA))")
                                 + " as fechaVigenciaFin",
                         "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
                         "if(convenio.IND_RENOVACION = false, 'No Renovado', 'Renovado') as situacion",
@@ -116,7 +116,7 @@ public class ConsultaConvenios {
                         "estatus.ID_ESTATUS_CONVENIO_PF = convenio.ID_ESTATUS_CONVENIO")
                 .leftJoin("SVT_RENOVACION_CONVENIO_PF renovacionConvenio",
                         "renovacionConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF",
-                        "renovacionConvenio.ID_ESTATUS = 2")
+                        "renovacionConvenio.ID_ESTATUS IN (1,2)")
                 .join("SVT_CONTRA_PAQ_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
                 .join("SVT_PAQUETE paquete",
