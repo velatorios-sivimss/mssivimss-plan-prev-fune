@@ -118,6 +118,16 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			        if(filtros.getFolio()==null) {
 			        	filtros.setFolio(datosConvenio.getFolio());
 			        }
+			        if(validarFallecido(filtros, authentication)) {
+		    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A CERRADO", MODIFICACION, authentication);
+		    			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
+		    			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
+		    			 response.setCodigo(200);
+				          response.setError(false);
+			  			response.setDatos(null);
+			  			 response.setMensaje("39");
+			  			return response;
+		    		  }
 		    	  if(!validarPeriodoRenovacion(filtros, authentication)) {
 		    		  logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);
 		    		  response.setCodigo(200);
@@ -136,25 +146,15 @@ public class RenovarPlanImpl implements RenovarPlanService {
 					          log.info("ESTATUS INACTIVO: CONTRATO CERRADO");
 				  			return response;
 		    		    } 
-		    	  if(validarFallecido(filtros, authentication)) {
-		    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A CERRADO", MODIFICACION, authentication);
-		    			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
-		    			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
-		    			 response.setCodigo(200);
-				          response.setError(false);
-			  			response.setDatos(null);
-			  			 response.setMensaje("39");
-			  			return response;
-		    		  }
-		    	  if(datosConvenio.getEstatusConvenio()==2) {
+		    //	  if(datosConvenio.getEstatusConvenio()==2) {
 		    		  response.setCodigo(200);
 			            response.setError(false);
 			            response.setMensaje("Exito");
 				      response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));  
-		    	  }else {
+		    /*	  }else {
 		    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),SIN_INFORMACION +filtros.getFolio(), CONSULTA, authentication);
 			          return devuelveVacio(response);
-		    	  }
+		    	  } */
 	}catch(Exception e) {
 		log.info("Fallo al e ejecutar la query {} ", e.getCause());
 		throw new IOException("5", e.getCause()) ;
@@ -198,6 +198,15 @@ public class RenovarPlanImpl implements RenovarPlanService {
    		if(filtros.getFolio()==null) {
         	filtros.setNumeroConvenio(datosConvenio.getIdConvenio());
         }
+   		if(validarFallecido(filtros, authentication)) {
+			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A CERRADO", MODIFICACION, authentication);
+			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
+			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
+			response.setCodigo(200);
+	        response.setError(false);
+			response.setMensaje("39");
+			return response;
+		}
 	    	        logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CAMBIO DE ESTATUS BENEFICIARIOS PLAN ANTERIOR " +filtros.getNumeroConvenio(), CONSULTA, authentication);
 			    	  if(!validarPeriodoRenovacion(filtros ,authentication)) {
 			    		  logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);
@@ -217,24 +226,15 @@ public class RenovarPlanImpl implements RenovarPlanService {
 						        log.info("ESTATUS INACTIVO: CONTRATO CERRADO");
 					    	     return response;
 			    		}
-			    		  if(validarFallecido(filtros, authentication)) {
-			    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A CERRADO", MODIFICACION, authentication);
-			    			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
-			    			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
-			    			response.setCodigo(200);
-					        response.setError(false);
-			    			response.setMensaje("39");
-			    			return response;
-			    		}
-			    		  if(datosConvenio.getEstatusConvenio()==2) {
+			    		//  if(datosConvenio.getEstatusConvenio()==2) {
 				    		  response.setCodigo(200);
 					            response.setError(false);
 					            response.setMensaje("Exito");
 						      response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));  
-				    	  }else {
+				    	  /*}else {
 				    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),SIN_INFORMACION +filtros.getFolio(), CONSULTA, authentication);
 				    		  return devuelveVacio(response);
-				    	  }
+				    	  }*/
    }catch(Exception e) {
 	   log.info("Fallo al e ejecutar la query {} ", e.getCause());
 	   throw new IOException("5", e.getCause()) ;
