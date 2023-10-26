@@ -146,15 +146,15 @@ public class RenovarPlanImpl implements RenovarPlanService {
 					          log.info("ESTATUS INACTIVO: CONTRATO CERRADO");
 				  			return response;
 		    		    } 
-		    //	  if(datosConvenio.getEstatusConvenio()==2) {
+		    	  if(datosConvenio.getEstatusConvenio()==2) {
 		    		  response.setCodigo(200);
 			            response.setError(false);
 			            response.setMensaje("Exito");
 				      response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));  
-		    /*	  }else {
+		    	  }else {
 		    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),SIN_INFORMACION +filtros.getFolio(), CONSULTA, authentication);
 			          return devuelveVacio(response);
-		    	  } */
+		    	  } 
 	}catch(Exception e) {
 		log.info("Fallo al e ejecutar la query {} ", e.getCause());
 		throw new IOException("5", e.getCause()) ;
@@ -226,15 +226,15 @@ public class RenovarPlanImpl implements RenovarPlanService {
 						        log.info("ESTATUS INACTIVO: CONTRATO CERRADO");
 					    	     return response;
 			    		}
-			    		//  if(datosConvenio.getEstatusConvenio()==2) {
+			    		  if(datosConvenio.getEstatusConvenio()==2) {
 				    		  response.setCodigo(200);
 					            response.setError(false);
 					            response.setMensaje("Exito");
 						      response.setDatos(ConvertirGenerico.convertInstanceOfObject(datosConvenio));  
-				    	  /*}else {
+				    	  }else {
 				    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),SIN_INFORMACION +filtros.getFolio(), CONSULTA, authentication);
 				    		  return devuelveVacio(response);
-				    	  }*/
+				    	  }
    }catch(Exception e) {
 	   log.info("Fallo al e ejecutar la query {} ", e.getCause());
 	   throw new IOException("5", e.getCause()) ;
