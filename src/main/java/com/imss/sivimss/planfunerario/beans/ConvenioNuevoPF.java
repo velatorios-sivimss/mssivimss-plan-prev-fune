@@ -521,7 +521,7 @@ public class ConvenioNuevoPF {
                         "SP.NOM_PRIMER_APELLIDO AS primerApellido", "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
                         "SP.NUM_INE AS numIne", "SCP.DES_FOLIO AS folio",
                         "CPF.ID_PAQUETE AS idPaquete", "PAQ.REF_PAQUETE_NOMBRE AS nombrePaquete",
-                        "PAQ.DES_PAQUETE AS desPaquete", "PAQ.MON_PRECIO AS monPrecio")
+                        "PAQ.REF_PAQUETE_DESCRIPCION AS desPaquete", "PAQ.MON_PRECIO AS monPrecio")
                 .from("SVT_CONVENIO_PF SCP")
                 .leftJoin("SVT_CONTRA_PAQ_CONVENIO_PF CPF", "SCP.ID_CONVENIO_PF = CPF.ID_CONVENIO_PF")
                 .leftJoin("SVT_PAQUETE PAQ", "CPF.ID_PAQUETE = PAQ.ID_PAQUETE")
