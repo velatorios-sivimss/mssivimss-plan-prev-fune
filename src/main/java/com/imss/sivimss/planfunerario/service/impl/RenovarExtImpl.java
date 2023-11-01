@@ -15,9 +15,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
+import com.imss.sivimss.planfunerario.beans.RenovarBean;
 import com.imss.sivimss.planfunerario.beans.RenovarExt;
 import com.imss.sivimss.planfunerario.exception.BadRequestException;
 import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioExtRequest;
+import com.imss.sivimss.planfunerario.model.request.FiltrosConvenioPFRequest;
 import com.imss.sivimss.planfunerario.model.request.RenovarPlanExtRequest;
 import com.imss.sivimss.planfunerario.model.request.UsuarioDto;
 import com.imss.sivimss.planfunerario.model.response.BenefResponse;
@@ -99,9 +101,11 @@ public class RenovarExtImpl implements RenovarExtService{
 		Response<?> response = new Response<>();
 		List<RenovacionExtResponse> renovacionExtResponse;
 		List<BenefResponse> beneficiarios;
+		FiltrosConvenioPFRequest filtros= new FiltrosConvenioPFRequest ();
+		filtros.setNumeroConvenio(Integer.parseInt(palabra));
 		Response<?> responseConsultaDetalle = providerRestTemplate.consumirServicio(renovarExt.verDetalle(request, palabra, fecFormat).getDatos(), urlConsulta,
 				authentication);
-		if(validarFallecido(palabra, authentication)) {
+		if(validarFallecido(filtros, authentication)) {
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
 			response.setCodigo(200);
 	         response.setError(false);
@@ -125,8 +129,9 @@ public class RenovarExtImpl implements RenovarExtService{
 	}
 
 
-	private boolean validarFallecido(String palabra, Authentication authentication) throws IOException {
-		Response<?> response= providerRestTemplate.consumirServicio(renovarExt.validarFallecido(palabra).getDatos(), urlConsulta,
+	private boolean validarFallecido(FiltrosConvenioPFRequest filtros, Authentication authentication) throws IOException {
+		RenovarBean renovar = new RenovarBean(); 
+		Response<?> response= providerRestTemplate.consumirServicio(renovar.validarFallecido(filtros).getDatos(), urlConsulta,
 				authentication);
 	Object rst=response.getDatos();
 	return !rst.toString().equals("[]");

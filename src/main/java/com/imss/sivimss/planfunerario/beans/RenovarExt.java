@@ -188,7 +188,7 @@ public class RenovarExt {
 		return q.obtenerQueryInsertar();
 	}
 	
-	public DatosRequest validarFallecido(String palabra) {
+	/*public DatosRequest validarFallecido(String palabra) {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
@@ -206,7 +206,7 @@ public class RenovarExt {
 			parametro.put(AppConstantes.QUERY, encoded);
 			request.setDatos(parametro);
 			return request;
-	}
+	} */
 
 	private static String obtieneQuery(SelectQueryUtil queryUtil) {
         return queryUtil.build();
