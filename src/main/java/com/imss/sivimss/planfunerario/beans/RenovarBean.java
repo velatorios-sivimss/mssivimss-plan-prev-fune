@@ -134,15 +134,17 @@ public class RenovarBean {
 				"SP.NOM_PERSONA")
 		.from("SVC_FINADO SF")
 		.join(SVC_PERSONA, "SF.ID_PERSONA = SP.ID_PERSONA")
-		.join(SVC_CONTRATANTE, "SP.ID_PERSONA = SC.ID_PERSONA")
-		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SC.ID_CONTRATANTE = SCPC.ID_CONTRATANTE")
-		.join(SVT_CONVENIO_PF, "SCPC.ID_CONVENIO_PF = SPF.ID_CONVENIO_PF");
+		.join(SVT_CONVENIO_PF, "SF.ID_CONTRATO_PREVISION = SPF.ID_CONVENIO_PF")
+		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SPF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
+		.join(SVC_CONTRATANTE, "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE  AND SF.ID_PERSONA = SC.ID_PERSONA");
+		queryUtil.where("SF.ID_TIPO_ORDEN");
 		if(filtros.getNumeroConvenio()!= null) {
 			queryUtil.where("SCPC.ID_CONVENIO_PF =" +filtros.getNumeroConvenio());
 		}
 		if(filtros.getFolio()!=null) {
 			queryUtil.where("SPF.DES_FOLIO= '"+filtros.getFolio()+"'");
 		}
+		
 			String query = obtieneQuery(queryUtil);
 			log.info("validar fallecido ->"+query);
 			String encoded = encodedQuery(query);
