@@ -130,21 +130,15 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    		  }
 		    	  if(!validarPeriodoRenovacion(filtros, authentication)) {
 		    		  logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);
-		    		  response.setCodigo(200);
-			          response.setError(false);
-		    		  response.setMensaje("36");
-		    			return response;
+		    			return fueraPeriodo(response);
 		    	  }
 		    	  Integer vig = obtieneVigencia(datosConvenio.getFecVigencia());
 		    	  if(getDia()>20 && getDia()>vig || anioMesActual()>anioMesVigencia) {		  
 		    			  logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 		    		    	providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), filtros.getNumeroConvenio() , usuarioDto.getIdUsuario()).getDatos(), urlActualizar,authentication);
 		    		    	logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 CONVENIO INACTIVO ", CONSULTA, authentication);
-		    		    	 response.setCodigo(200);
-					          response.setError(false);
-					          response.setMensaje("36");
-					          log.info("ESTATUS INACTIVO: CONTRATO CERRADO");
-				  			return response;
+		    		    	 log.info("ESTATUS INACTIVO: CONTRATO CERRADO"); 
+		    		    	 return fueraPeriodo(response);
 		    		    } 
 		    	  if(datosConvenio.getEstatusConvenio()==2) {
 		    		  response.setCodigo(200);
@@ -162,10 +156,6 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		      return response;   
 	
 	}
-
-
-
-
 
 
 	public Response<?> buscarConvenioAnterior(DatosRequest request, Authentication authentication) throws IOException {
@@ -210,21 +200,15 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	    	        logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CAMBIO DE ESTATUS BENEFICIARIOS PLAN ANTERIOR " +filtros.getNumeroConvenio(), CONSULTA, authentication);
 			    	  if(!validarPeriodoRenovacion(filtros ,authentication)) {
 			    		  logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);
-			    		  response.setCodigo(200);
-				          response.setError(false);
-			    		  response.setMensaje("36");
-			    			return response;
+			    		  return fueraPeriodo(response);
 			    	  }
 			    	  Integer vig = obtieneVigencia(datosConvenio.getFecVigencia());
 			    		 if(getDia()>20 && getDia()>vig || anioMesActual()>anioMesVigencia) {
 			    	         logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 			    			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
 			    			 logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO SE ENCUENTRA INACTIVO", CONSULTA, authentication);
-			    			    response.setCodigo(200);
-						        response.setError(false);
-						        response.setMensaje("36");
-						        log.info("ESTATUS INACTIVO: CONTRATO CERRADO");
-					    	     return response;
+			    			    log.info("ESTATUS INACTIVO: CONTRATO CERRADO");
+			    			    return fueraPeriodo(response);
 			    		}
 			    		  if(datosConvenio.getEstatusConvenio()==2) {
 				    		  response.setCodigo(200);
@@ -425,7 +409,13 @@ public class RenovarPlanImpl implements RenovarPlanService {
         response.setMensaje("45");
 		return response;
 	}
-
+	
+	private Response<?> fueraPeriodo(Response<?> response) {
+		 response.setCodigo(200);
+        response.setError(false);
+        response.setMensaje("36");
+		return response;
+	}
 	
 	private Integer obtieneVigencia(String fecVigencia) throws ParseException {
 		Date sdf = new SimpleDateFormat("dd/MM/yyyy").parse(fecVigencia);

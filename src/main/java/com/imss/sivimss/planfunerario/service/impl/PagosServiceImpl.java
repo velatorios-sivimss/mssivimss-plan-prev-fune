@@ -1,6 +1,7 @@
 package com.imss.sivimss.planfunerario.service.impl;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +59,7 @@ public class PagosServiceImpl implements PagosService {
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
 				this.getClass().getPackage().toString(), "","CONSULTA " + query, authentication);
 		
-		datos.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes("UTF-8")));
+		datos.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8)));
 		
 		respuesta = providerRestTemplate.consumirServicio(datos, urlConsulta,
 				authentication);
@@ -72,7 +73,7 @@ public class PagosServiceImpl implements PagosService {
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
 				this.getClass().getPackage().toString(), "","CONSULTA " + query, authentication);
 		
-		datos.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes("UTF-8")));
+		datos.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8)));
 		
 		respuesta = providerRestTemplate.consumirServicio(datos, urlCrear,
 				authentication);

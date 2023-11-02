@@ -432,6 +432,7 @@ public class BeneficiariosBean {
 				 "SP.NOM_PRIMER_APELLIDO, ' '",
 				 "SP.NOM_SEGUNDO_APELLIDO) AS contratante",
 				 "SV.DES_VELATORIO AS velatorio",
+				 "DEL.DES_DELEGACION AS delegacion",
 				 "IND_INE_AFILIADO AS ineAfiliado",
 				 "IND_CURP AS curpAfiliado",
 				 "IND_RFC AS rfcAfiliado",
@@ -441,12 +442,12 @@ public class BeneficiariosBean {
 				 "SVDR.IND_INE_TESTIGO_DOS AS ineTestigoDos")
 		.from("SVC_VALIDA_DOCS_CONVENIO_PF SVD")
 		.leftJoin("SVC_VALIDA_DOCS_RENOV_CONV_PF SVDR", "SVD.ID_VALIDACION_DOCUMENTO = SVDR.ID_VALIDACION_DOCUMENTO")
-
 		.join(SVT_CONVENIO_PF, "SVD.ID_CONVENIO_PF=PF.ID_CONVENIO_PF")
         .join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "PF.ID_CONVENIO_PF =SCPC.ID_CONVENIO_PF")
         .join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
         .join(SVC_PERSONA, "SC.ID_PERSONA=SP.ID_PERSONA") 
         .join("SVC_VELATORIO SV", "PF.ID_VELATORIO = SV.ID_VELATORIO")
+        .join("SVC_DELEGACION DEL", "SV.ID_DELEGACION = DEL.ID_DELEGACION")
         .where("SVD.ID_CONVENIO_PF=" +idConvenio);
 		String query = obtieneQuery(queryUtil);
 	   String encoded = encodedQuery(query);
