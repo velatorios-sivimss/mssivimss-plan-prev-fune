@@ -116,7 +116,7 @@ public class BeneficiariosImpl implements BeneficiariosService {
 			throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);
 		}
 		return providerRestTemplate.consumirServicio(
-				benefBean.detalleBeneficiarios(request, filtros.getIdBeneficiario()).getDatos(), urlConsulta,
+				benefBean.detalleBeneficiarios(request, filtros.getIdBeneficiario(), fecFormat).getDatos(), urlConsulta,
 				authentication);
 	}
 

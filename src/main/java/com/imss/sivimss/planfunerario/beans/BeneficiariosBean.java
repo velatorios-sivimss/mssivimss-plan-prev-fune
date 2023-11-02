@@ -145,7 +145,7 @@ public class BeneficiariosBean {
 		return request;
 	}
 		
-	public DatosRequest detalleBeneficiarios(DatosRequest request, Integer idBeneficiario) {
+	public DatosRequest detalleBeneficiarios(DatosRequest request, Integer idBeneficiario, String fecFormat) {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SCPC.ID_CONTRA_PAQ_CONVENIO_PF AS idConvenio", 
 				SB_ID_CONTRATANTE_BENEFICIARIOS +" AS idBenef",
@@ -153,6 +153,7 @@ public class BeneficiariosBean {
 				 "SP.NOM_PRIMER_APELLIDO AS primerApellido",
 				 "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
 				 "TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURRENT_TIMESTAMP()) AS edad",
+				 "DATE_FORMAT(SP.FEC_NAC, '"+fecFormat+"') AS fechaNac",
 				 "SB.ID_PARENTESCO AS idParentesco",
 			    "PAR.DES_PARENTESCO AS parentesco",
 				 "SP.CVE_CURP AS curp",
@@ -314,43 +315,6 @@ public class BeneficiariosBean {
 	        request.setDatos(parametro);
 	        return request;
 	}
-	
-/*	public DatosRequest beneficiariosPlanAnterior(DatosRequest request) {
-		String palabra = request.getDatos().get("palabra").toString();
-		Map<String, Object> parametros = new HashMap<>();
-		SelectQueryUtil queryUno = new SelectQueryUtil();
-		queryUno.select("SCPC.ID_CONVENIO_PF AS idCovenio",
-				"SB.ID_CONTRATANTE_BENEFICIARIOS AS idBenef",
-				"CONCAT(SP.NOM_PERSONA,' ',"
-				+ "SP.NOM_PRIMER_APELLIDO, ' ',"
-				+ "SP.NOM_SEGUNDO_APELLIDO) AS nombre",
-				SP_ID_PERSONA +" AS idPersona")
-		      .from(SVT_CONTRATANTE_BENEFICIARIOS)
-		      .join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF)
-		      .join(SVT_CONVENIO_PF, SCPC_ID_CONVENIO_PF_PF_ID_CONVENIO_PF)
-		      .join(SVC_PERSONA, "SB.ID_PERSONA=SP.ID_PERSONA");
-		queryUno.where("PF.ID_TIPO_PREVISION=2").and("SB.IND_SINIESTROS=0").and("SB.ID_PARENTESCO !=4")
-		.and("PF.ID_CONVENIO_PF= "+palabra);
-		SelectQueryUtil queryDos = new SelectQueryUtil();
-		queryDos.select("SCPC.ID_CONVENIO_PF AS idCovenio",
-				"SB.ID_CONTRATANTE_BENEFICIARIOS AS idBenef",
-				"CONCAT(SP.NOM_PERSONA,' ', SP.NOM_PRIMER_APELLIDO, ' ', SP.NOM_SEGUNDO_APELLIDO) AS nombre",
-				"SP.ID_PERSONA AS idPersona")
-				.from(SVT_CONTRATANTE_BENEFICIARIOS)
-				 .join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, SB_ID_CONTRATANTE_PAQUETE_CONVENIO_PF_SCPC_ID_CONTRATANTE_PAQUETE_CONVENIO_PF)
-			      .join(SVT_CONVENIO_PF, SCPC_ID_CONVENIO_PF_PF_ID_CONVENIO_PF)
-			      .leftJoin("SVT_BENEFICIARIOS_DOCUMENTACION_PLAN_ANTERIOR SBD", "SB.ID_CONTRATANTE_BENEFICIARIOS = SBD.ID_CONTRATANTE_BENEFICIARIOS")
-			      .join(SVC_PERSONA, "SB.ID_PERSONA = SP.ID_PERSONA");
-		           queryDos.where("(IF(SB.ID_PARENTESCO=4 AND TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURDATE())<18, SB.ID_PARENTESCO, NULL))")
-		           .or("(SB.ID_PARENTESCO=4 AND SB.IND_SINIESTROS=0  AND PF.ID_CONVENIO_PF= "+palabra+" AND SBD.IND_COMPROBANTE_ESTUDIOS = 1 "
-		           		+ "AND TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURDATE()) BETWEEN 18 AND 25)");
-		           final String query = queryUno.union(queryDos);
-		log.info("estoy en --> " +query);
-	   String encoded = encodedQuery(query);
-	   parametros.put(AppConstantes.QUERY, encoded);
-	    request.setDatos(parametros);
-	    return request;
-	} */
 	
 	public DatosRequest  buscarCatalogoParentescos(DatosRequest request) {
 		Map<String, Object> parametros = new HashMap<>();
