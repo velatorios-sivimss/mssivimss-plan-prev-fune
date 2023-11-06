@@ -323,13 +323,15 @@ public class RenovarBean {
 		q.agregarParametroValues("IND_RFC", ""+verificarDoc.getRfc()+"");
 		q.agregarParametroValues("IND_ACTA_NACIMIENTO", ""+verificarDoc.getActaNac()+"");
 		q.agregarParametroValues("IND_INE_BENEFICIARIO", ""+verificarDoc.getIneBeneficiario()+"");
-		q.agregarParametroValues(AppConstantes.ID_USUARIO_MODIFICA, usuarioAlta.toString());
-		q.agregarParametroValues(AppConstantes.FEC_ACTUALIZACION, AppConstantes.CURRENT_TIMESTAMP);
 		if(verificarDoc.getIdValidacionDoc()!=null) {
+			q.agregarParametroValues(AppConstantes.ID_USUARIO_MODIFICA, usuarioAlta.toString());
+			q.agregarParametroValues(AppConstantes.FEC_ACTUALIZACION, AppConstantes.CURRENT_TIMESTAMP);
 			q.addWhere("ID_VALIDACION_DOCUMENTO = "+verificarDoc.getIdValidacionDoc());
 			query = q.obtenerQueryActualizar() +"$$" +renovarDocumentacion(verificarDoc.getRenovarDoc(), verificarDoc.getIdValidacionDoc());
 			log.info("---> "+query);
 		}else {
+			q.agregarParametroValues(AppConstantes.ID_USUARIO_ALTA, usuarioAlta.toString());
+			q.agregarParametroValues(AppConstantes.FEC_ALTA, AppConstantes.CURRENT_TIMESTAMP);
 			q.agregarParametroValues(ID_CONVENIO_PF, verificarDoc.getIdConvenio().toString());
 			query = q.obtenerQueryInsertar() +"$$" + renovarDocumentacion(verificarDoc.getRenovarDoc(), verificarDoc.getIdValidacionDoc());
 			  parametro.put("replace","idTabla");
