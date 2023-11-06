@@ -46,7 +46,8 @@ public class ConsultaConvenios {
         SelectQueryUtil queryBeneficiarios = new SelectQueryUtil();
         queryBeneficiarios.select("count(*)")
                 .from("SVT_CONTRATANTE_BENEFICIARIOS beneficiarios")
-                .where("beneficiarios.ID_CONTRA_PAQ_CONVENIO_PF = contratanteConvenio.ID_CONTRA_PAQ_CONVENIO_PF")
+                .join("SVT_CONTRA_PAQ_CONVENIO_PF benefpaq", "beneficiarios.ID_CONTRA_PAQ_CONVENIO_PF = benefpaq.ID_CONTRA_PAQ_CONVENIO_PF")
+                .where("benefpaq.ID_CONVENIO_PF  = convenio.ID_CONVENIO_PF")
                 .and("beneficiarios.IND_ACTIVO=1").and("beneficiarios.IND_SINIESTROS=0");
 
         SelectQueryUtil queryFacturas = new SelectQueryUtil();

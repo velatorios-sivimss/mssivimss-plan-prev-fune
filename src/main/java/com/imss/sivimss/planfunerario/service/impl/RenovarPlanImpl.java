@@ -323,13 +323,16 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		Response<?> response;
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		VerificarDocumentacionRequest verificarDoc = gson.fromJson(datosJson, VerificarDocumentacionRequest.class);	
-	if (verificarDoc.getIdValidacionDoc()==null) {
-		throw new BadRequestException(HttpStatus.BAD_REQUEST, INFORMACION_INCOMPLETA);		
-	}
+		String path="";
 		try {
 			UsuarioDto usuarioDto = gson.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 			renovarBean.setUsuarioAlta(usuarioDto.getIdUsuario());
-			response = providerRestTemplate.consumirServicio(renovarBean.actualizarDocumentacion(verificarDoc).getDatos(), urlInsertarMultiple, authentication);
+			if(verificarDoc.getIdValidacionDoc()==null) {
+				path = urlCrearMultiple;
+			}else {
+				path = urlInsertarMultiple;
+			}
+			response = providerRestTemplate.consumirServicio(renovarBean.actualizarDocumentacion(verificarDoc).getDatos(), path, authentication);
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Se actualizo correctamente la documentacion requerida", MODIFICACION, authentication);
 				return response;						
 		}catch (Exception e) {
