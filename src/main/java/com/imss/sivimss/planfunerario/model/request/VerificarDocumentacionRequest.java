@@ -16,7 +16,8 @@ import lombok.Setter;
 @Getter
 @JsonIgnoreType(value = true)
 public class VerificarDocumentacionRequest {
-	
+
+	private Integer idConvenio;
 	private Integer idValidacionDoc;
 	private Integer ineAfiliado;
 	private Integer curp;

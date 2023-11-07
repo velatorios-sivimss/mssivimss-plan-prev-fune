@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.imss.sivimss</groupId>
 	<artifactId>mssivimss-plan-prev-fune</artifactId>
-	<version>0.0.142-SNAPSHOT</version>
+	<version>0.0.143-SNAPSHOT</version>
 	<name>mssivimss-plan-prev-fune</name>
 	<description>Ms plan funerario</description>
 	<properties>

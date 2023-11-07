@@ -404,16 +404,17 @@ public class BeneficiariosBean {
 				 "SVDR.IND_CARTA_PODER AS cartaPoder",
 				 "SVDR.IND_INE_TESTIGO AS ineTestigo",
 				 "SVDR.IND_INE_TESTIGO_DOS AS ineTestigoDos")
-		.from("SVC_VALIDA_DOCS_CONVENIO_PF SVD")
+		.from(SVT_CONVENIO_PF)
+		.leftJoin("SVC_VALIDA_DOCS_CONVENIO_PF SVD", "PF.ID_CONVENIO_PF=SVD.ID_CONVENIO_PF")
 		.leftJoin("SVC_VALIDA_DOCS_RENOV_CONV_PF SVDR", "SVD.ID_VALIDACION_DOCUMENTO = SVDR.ID_VALIDACION_DOCUMENTO")
-		.join(SVT_CONVENIO_PF, "SVD.ID_CONVENIO_PF=PF.ID_CONVENIO_PF")
         .join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "PF.ID_CONVENIO_PF =SCPC.ID_CONVENIO_PF")
         .join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
         .join(SVC_PERSONA, "SC.ID_PERSONA=SP.ID_PERSONA") 
         .join("SVC_VELATORIO SV", "PF.ID_VELATORIO = SV.ID_VELATORIO")
         .join("SVC_DELEGACION DEL", "SV.ID_DELEGACION = DEL.ID_DELEGACION")
-        .where("SVD.ID_CONVENIO_PF=" +idConvenio);
+        .where("PF.ID_CONVENIO_PF=" +idConvenio);
 		String query = obtieneQuery(queryUtil);
+		log.info("docs "+query);
 	   String encoded = encodedQuery(query);
 	   parametros.put(AppConstantes.QUERY, encoded);
 	    request.setDatos(parametros);
