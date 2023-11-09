@@ -96,7 +96,7 @@ public class RenovarBean {
 		.join("SVT_DOMICILIO SD", "SC.ID_DOMICILIO = SD.ID_DOMICILIO ")
 	//	.leftJoin("SVC_CP CP", "SD.REF_CP = CP.CVE_CODIGO_POSTAL")
 		.join(SVC_PERSONA, "SC.ID_PERSONA = SP.ID_PERSONA");
-
+        queryUtil.where("SCP.IND_TIPO_CONTRATACION=1");
 		queryUtil.where("SCP.ID_ESTATUS_CONVENIO IN (2, 4)");
 		queryUtil.where("SCP.ID_TIPO_PREVISION = :tipoPrevision")
 		.setParameter("tipoPrevision", filtros.getTipoPrevision());
