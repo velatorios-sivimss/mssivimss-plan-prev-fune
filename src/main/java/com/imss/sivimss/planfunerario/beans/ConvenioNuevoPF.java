@@ -152,20 +152,23 @@ public class ConvenioNuevoPF {
         public String generarQueryValidacionDocumentos(PersonaConvenioRequest persona, String usuario) {
                 final QueryHelper queryValidaDocumentos = new QueryHelper("INSERT INTO SVC_VALIDA_DOCS_CONVENIO_PF");
                 queryValidaDocumentos.agregarParametroValues("IND_INE_AFILIADO",
-                                persona.getPersona().getDocumentacion().getValidaIneContratante().toString());
+                		 ""+setEntero(persona.getPersona().getDocumentacion().getValidaIneContratante())+"");
                 queryValidaDocumentos.agregarParametroValues("IND_CURP",
-                                persona.getPersona().getDocumentacion().getValidaCurp().toString());
+                		 ""+setEntero(persona.getPersona().getDocumentacion().getValidaCurp())+"");
                 queryValidaDocumentos.agregarParametroValues("IND_RFC",
-                                persona.getPersona().getDocumentacion().getValidaRfc().toString());
+                		 ""+setEntero( persona.getPersona().getDocumentacion().getValidaRfc())+"");
                 queryValidaDocumentos.agregarParametroValues("IND_ACTA_NACIMIENTO",
-                                persona.getPersona().getDocumentacion().getValidaActaNacimientoBeneficiario()
-                                                .toString());
+                		 ""+setEntero(persona.getPersona().getDocumentacion().getValidaActaNacimientoBeneficiario())+"");
                 queryValidaDocumentos.agregarParametroValues("IND_INE_BENEFICIARIO",
-                                persona.getPersona().getDocumentacion().getValidaIneBeneficiario().toString());
+                                ""+setEntero(persona.getPersona().getDocumentacion().getValidaIneBeneficiario())+"");
                 queryValidaDocumentos.agregarParametroValues("ID_CONVENIO_PF", "idConvenioPf");
                 queryValidaDocumentos.agregarParametroValues("ID_USUARIO_ALTA", usuario);
                 log.info("Query insert validacion documentos: " + queryValidaDocumentos.obtenerQueryInsertar());
                 return queryValidaDocumentos.obtenerQueryInsertar();
+        }
+        
+        private int setEntero(Boolean indicador) {
+        	return  indicador?1:0;
         }
 
         public String generarQueryEmpresaConvenioPf(PorEmpresaRequest empresa, String usuario) {
@@ -451,7 +454,7 @@ public class ConvenioNuevoPF {
                                                 "SP2.NUM_SEXO AS numSexo",
                                                 "SP2.REF_OTRO_SEXO AS otroSexo", "SP2.NUM_SEXO AS numSexo",
                                                 "SP2.ID_ESTADO AS idEstado",
-                                                "SP2.ID_ESTADO as idEstado", "E.REF_ESTADO AS desEstado",
+                                                "SP2.ID_ESTADO as idEstado", "E.DES_ESTADO AS desEstado",
                                                 "SP2.REF_TELEFONO AS telefono", "SP2.REF_CORREO AS correo",
                                                 "SP2.TIP_PERSONA AS tipoPersona",
                                                 "SP2.NUM_INE AS numIne",
