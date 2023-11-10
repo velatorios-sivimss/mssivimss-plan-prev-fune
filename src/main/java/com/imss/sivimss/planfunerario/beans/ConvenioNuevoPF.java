@@ -130,7 +130,7 @@ public class ConvenioNuevoPF {
         }
 
         public String generarQueryContratanteBeneficiarios(String parentesco, String claveActa, String usuario,
-                        PersonaAltaConvenio persona, Authentication authentication) throws IOException {
+                        Documentos persona, Authentication authentication) throws IOException {
                 final QueryHelper queryContratanteBeneficiarios = new QueryHelper(
                                 "INSERT INTO SVT_CONTRATANTE_BENEFICIARIOS");
                 queryContratanteBeneficiarios.agregarParametroValues("ID_CONTRA_PAQ_CONVENIO_PF",
@@ -140,10 +140,11 @@ public class ConvenioNuevoPF {
                 queryContratanteBeneficiarios.agregarParametroValues("CVE_ACTA", "'" + claveActa + "'");
                 queryContratanteBeneficiarios.agregarParametroValues("ID_USUARIO_ALTA", usuario);
                 queryContratanteBeneficiarios.agregarParametroValues("IND_ACTIVO", "1");
+                
                 queryContratanteBeneficiarios.agregarParametroValues("IND_INE_BENEFICIARIO",
-                                persona.getDocumentacion().getValidaIneBeneficiario() == true ? "1" : "0");
+                                persona.getValidaIneBeneficiario() == true ? "1" : "0");
                 queryContratanteBeneficiarios.agregarParametroValues("IND_ACTA_NACIMIENTO",
-                                persona.getDocumentacion().getValidaActaNacimientoBeneficiario() == true ? "1" : "0");
+                                persona.getValidaActaNacimientoBeneficiario() == true ? "1" : "0");
                 log.info("Query insert contratante beneficiarios: "
                                 + queryContratanteBeneficiarios.obtenerQueryInsertar());
                 return queryContratanteBeneficiarios.obtenerQueryInsertar();
@@ -168,7 +169,7 @@ public class ConvenioNuevoPF {
         }
         
         private int setEntero(Boolean indicador) {
-        	return  indicador?1:0;
+        	return indicador==Boolean.TRUE?1:0;
         }
 
         public String generarQueryEmpresaConvenioPf(PorEmpresaRequest empresa, String usuario) {
