@@ -119,14 +119,12 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			        	filtros.setFolio(datosConvenio.getFolio());
 			        }
 			        if(validarFallecido(filtros, authentication)) {
-		    			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A CERRADO", MODIFICACION, authentication);
-		    			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
+			        	if(!finadoVigencias(datosConvenio.getFecActual(), datosConvenio.getFecVigencia())){
+							providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
+							logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A CERRADO", MODIFICACION, authentication);
+						}
 		    			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
-		    			 response.setCodigo(200);
-				          response.setError(false);
-			  			response.setDatos(null);
-			  			 response.setMensaje("39");
-			  			return response;
+			  			return responseFallecido(response);
 		    		  }
 		    	  if(!validarPeriodoRenovacion(filtros, authentication)) {
 		    		  logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);
@@ -189,13 +187,14 @@ public class RenovarPlanImpl implements RenovarPlanService {
         	filtros.setNumeroConvenio(datosConvenio.getIdConvenio());
         }
    		if(validarFallecido(filtros, authentication)) {
-			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A CERRADO", MODIFICACION, authentication);
-			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
+			
+			if(!finadoVigencias(datosConvenio.getFecActual(), datosConvenio.getFecVigencia())){
+				providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
+				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A CERRADO", MODIFICACION, authentication);
+			}
+			
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"39 TITULAR DEL CONVENIO FALLECIO NO PUEDE RENOVAR EL CONVENIO", CONSULTA, authentication);
-			response.setCodigo(200);
-	        response.setError(false);
-			response.setMensaje("39");
-			return response;
+			return responseFallecido(response);
 		}
 	    	        logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"CAMBIO DE ESTATUS BENEFICIARIOS PLAN ANTERIOR " +filtros.getNumeroConvenio(), CONSULTA, authentication);
 			    	  if(!validarPeriodoRenovacion(filtros ,authentication)) {
@@ -420,11 +419,28 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		return response;
 	}
 	
+	private Response<?> responseFallecido(Response<?> response) {
+		 response.setCodigo(200);
+        response.setError(false);
+			response.setDatos(null);
+			 response.setMensaje("39");
+			 return response;
+	}
+	
 	private Integer obtieneVigencia(String fecVigencia) throws ParseException {
 		Date sdf = new SimpleDateFormat("dd/MM/yyyy").parse(fecVigencia);
 		  DateFormat fechaFormateada = new SimpleDateFormat("dd");
 		  String fechaVig = fechaFormateada.format(sdf);
 		return  Integer.parseInt(fechaVig);
+	}
+	
+	private boolean finadoVigencias(Date fecActual, String fecVigencia) throws ParseException {
+		SimpleDateFormat formatter;
+		formatter = new SimpleDateFormat("dd/MM/yyyy");
+		Date vigFin = formatter.parse(fecVigencia); 
+		log.info("vigencia "+ vigFin);
+		log.info("actual "+ fecActual);
+		 return !vigFin.before(fecActual);
 	}
 
 }

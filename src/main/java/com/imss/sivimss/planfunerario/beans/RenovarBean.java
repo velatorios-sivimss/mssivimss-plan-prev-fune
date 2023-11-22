@@ -87,7 +87,9 @@ public class RenovarBean {
 				 "SP.REF_TELEFONO AS tel",
 				 "SP.REF_CORREO AS correo",
 		 "PAQ.MON_COSTO_REFERENCIA AS costoRenovacion",
-		 "SCP.IND_RENOVACION AS indRenovacion")
+		 "SCP.IND_RENOVACION AS indRenovacion",
+		 "CURDATE() AS fecActual")
+		
 		.from("SVT_CONVENIO_PF SCP")
 		.leftJoin(SVT_RENOVACION_CONVENIO_PF, "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS=2")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
@@ -136,7 +138,7 @@ public class RenovarBean {
 		.join(SVT_CONVENIO_PF, "SF.ID_CONTRATO_PREVISION = SPF.ID_CONVENIO_PF")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SPF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join(SVC_CONTRATANTE, "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE  AND SF.ID_PERSONA = SC.ID_PERSONA");
-		queryUtil.where("SF.ID_TIPO_ORDEN");
+		queryUtil.where("SF.ID_TIPO_ORDEN = 2");
 		if(filtros.getNumeroConvenio()!= null) {
 			queryUtil.where("SCPC.ID_CONVENIO_PF =" +filtros.getNumeroConvenio());
 		}

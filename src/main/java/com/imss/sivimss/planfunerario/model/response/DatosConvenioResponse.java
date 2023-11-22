@@ -1,6 +1,7 @@
 package com.imss.sivimss.planfunerario.model.response;
 
 
+import java.util.Date;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -39,4 +40,5 @@ public class DatosConvenioResponse {
     private String folio;
     private String matricula;
     private Integer idConvenio;
+    private Date fecActual;
 }
