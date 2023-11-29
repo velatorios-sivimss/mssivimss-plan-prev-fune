@@ -13,7 +13,7 @@ public class ReporteDto {
 	private String tipoReporte;
 	private String rutaNombreReporte;
 	private String folio;
-	private Integer costoRenovacion;
+	private Double costoRenovacion;
 	private Integer idConvenio;
 	private String observaciones;
 	private String directoraFibeso;
