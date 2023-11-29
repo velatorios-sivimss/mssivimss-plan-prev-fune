@@ -86,10 +86,9 @@ public class RenovarBean {
 				 "IFNULL(SD.REF_MUNICIPIO, '') AS municipio",
 				 "SP.REF_TELEFONO AS tel",
 				 "SP.REF_CORREO AS correo",
-		 "PAQ.MON_COSTO_REFERENCIA AS costoRenovacion",
+		 "PAQ.MON_PRECIO AS costoRenovacion",
 		 "SCP.IND_RENOVACION AS indRenovacion",
 		 "CURDATE() AS fecActual")
-		
 		.from("SVT_CONVENIO_PF SCP")
 		.leftJoin(SVT_RENOVACION_CONVENIO_PF, "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS=2")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
@@ -134,6 +133,7 @@ public class RenovarBean {
 		queryUtil.select("SP.CVE_RFC",
 				"SP.NOM_PERSONA")
 		.from("SVC_FINADO SF")
+		.join("SVT_NOTA_REMISION nota", "SF.ID_ORDEN_SERVICIO = nota.ID_ORDEN_SERVICIO AND nota.IND_ESTATUS = 2")
 		.join(SVC_PERSONA, "SF.ID_PERSONA = SP.ID_PERSONA")
 		.join(SVT_CONVENIO_PF, "SF.ID_CONTRATO_PREVISION = SPF.ID_CONVENIO_PF")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SPF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
@@ -158,20 +158,20 @@ public class RenovarBean {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("IF(SPF.IND_RENOVACION=0, (DATE_FORMAT(SPF.FEC_VIGENCIA, \"%Y%m\")), DATE_FORMAT(RPF.FEC_VIGENCIA, \"%Y%m\")) AS c")
+		queryUtil.select("IF(SPF.IND_RENOVACION=0, (DATE_FORMAT(SPF.FEC_VIGENCIA, '%Y%m')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%Y%m')) AS c")
 		.from(SVT_CONVENIO_PF)
 		.leftJoin(SVT_RENOVACION_CONVENIO_PF, "SPF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS=2")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SPF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF ")
 		.join(SVC_CONTRATANTE, SCPC_ID_CONTRATANTE_SC_ID_CONTRATANTE)
 		.join(SVC_PERSONA, "SC.ID_PERSONA=SP.ID_PERSONA");
-		queryUtil.where("IF(TIMESTAMPDIFF(DAY, IF(SPF.IND_RENOVACION=0, DATE_FORMAT(SPF.FEC_VIGENCIA, \"%Y/%m/%1\"), DATE_FORMAT(RPF.FEC_VIGENCIA, \"%Y/%m/%1\")), CURDATE())>=0, SPF.FEC_VIGENCIA, 0)");
+		queryUtil.where("IF(TIMESTAMPDIFF(DAY, IF(SPF.IND_RENOVACION=0, DATE_FORMAT(SPF.FEC_VIGENCIA, '%Y/%m/%1'), DATE_FORMAT(RPF.FEC_VIGENCIA, '%Y/%m/%1')), CURDATE())>=0, SPF.FEC_VIGENCIA, 0)");
 		if(filtros.getFolio()!=null) {
 			queryUtil.where("SPF.DES_FOLIO = '"+filtros.getFolio() +"'");
 		}
 	    if(filtros.getNumeroConvenio()!=null) {
 	    	queryUtil.where("SPF.ID_CONVENIO_PF = "+filtros.getNumeroConvenio());
 	    }
-	    queryUtil.groupBy("SPF.ID_CONVENIO_PF");
+	 //   queryUtil.groupBy("SPF.ID_CONVENIO_PF");
 		String query = obtieneQuery(queryUtil);
 		log.info("valida ->"+query);
 		String encoded = encodedQuery(query);
@@ -490,12 +490,12 @@ public class RenovarBean {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("PAQ.MON_COSTO_REFERENCIA AS c")
+		queryUtil.select("PAQ.MON_PRECIO AS costoRecuperacion")
 		.from("SVT_CONVENIO_PF SCP")
 		.join(SVT_RENOVACION_CONVENIO_PF, "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE");
-		queryUtil.where("SCP.ID_ESTATUS_CONVENIO = 2 AND RPF.ID_ESTATUS=2");
+		queryUtil.where("RPF.ID_ESTATUS=2");
 		queryUtil.where("SCP.ID_TIPO_PREVISION = 2");
 			queryUtil.where("SCP.ID_CONVENIO_PF = " +idConvenio);
 		String query = obtieneQuery(queryUtil);

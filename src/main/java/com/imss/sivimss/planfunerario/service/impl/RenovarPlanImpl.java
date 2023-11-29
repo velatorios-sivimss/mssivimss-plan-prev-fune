@@ -278,7 +278,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			String consulta = renovarBean.renovarPlan().getDatos().get("query").toString();
 			String encoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error("Error al ejecutar la query " +encoded);
-			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"ERRO AL RENOVAR EL CONVENIO: Fallo al ejecutar la query", ALTA, authentication);
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"ERROR AL RENOVAR EL CONVENIO: Fallo al ejecutar la query ", ALTA, authentication);
 			throw new IOException("5", e.getCause()) ;
 		}
 	}
@@ -293,13 +293,16 @@ public class RenovarPlanImpl implements RenovarPlanService {
 				authentication);		
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Response<?> descargarConvenioPlanAnterior(DatosRequest request, Authentication authentication) throws IOException {
+		List<Map<String, Object>> mapping;
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		ReporteDto reporteDto= gson.fromJson(datosJson, ReporteDto.class);
-		Response<?> response = providerRestTemplate.consumirServicio(renovarBean.obtieneCostoRenovacion(reporteDto.getIdConvenio()).getDatos(), urlConsulta, authentication);
-		MensajeResponseUtil.mensajeConsultaResponse(response, EXITO);
-		reporteDto.setCostoRenovacion(recuperaDato(response.getDatos().toString()));
+		Response<?> respuesta = providerRestTemplate.consumirServicio(renovarBean.obtieneCostoRenovacion(reporteDto.getIdConvenio()).getDatos(), urlConsulta, authentication);
+		MensajeResponseUtil.mensajeConsultaResponse(respuesta, EXITO);
+		mapping = Arrays.asList(modelMapper.map(respuesta.getDatos(), Map[].class));
+		reporteDto.setCostoRenovacion(Double.parseDouble(mapping.get(0).get("costoRecuperacion").toString()));
 		Map<String, Object> envioDatos = new RenovarBean().generarConvenioAnterior(reporteDto);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DESCARGA CORRECTA PLANTILLA CONVENIO RENOVACION PLAN ANTERIOR", IMPRIMIR, authentication);
 		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
