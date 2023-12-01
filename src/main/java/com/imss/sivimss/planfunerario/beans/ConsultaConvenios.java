@@ -88,8 +88,8 @@ public class ConsultaConvenios {
                         "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
                 .join("SVC_PERSONA personaContratante",
                         "personaContratante.id_persona = contratante.id_persona")
-                .join("SVT_USUARIOS USR", "USR.ID_USUARIO_ALTA = convenio.ID_USUARIO_ALTA")
-                .leftJoin("SVC_VELATORIO VEL", "USR.ID_VELATORIO = VEL.ID_VELATORIO")
+                //.join("SVT_USUARIOS USR", "USR.ID_USUARIO_ALTA = convenio.ID_USUARIO_ALTA")
+                .join("SVC_VELATORIO VEL", "convenio.ID_VELATORIO = VEL.ID_VELATORIO")
                 .where("convenio.IND_TIPO_CONTRATACION = :tipoContratacion")
                 .setParameter("tipoContratacion", TIPO_CONTRATACION_PERSONA); // persona -> true
 
@@ -128,8 +128,8 @@ public class ConsultaConvenios {
                         "paquete.ID_PAQUETE = contratanteConvenio.ID_PAQUETE")
                 .join("SVT_EMPRESA_CONVENIO_PF empresaContratante",
                         "empresaContratante.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
-                .join("SVT_USUARIOS USR", "USR.ID_USUARIO_ALTA = convenio.ID_USUARIO_ALTA")
-                .leftJoin("SVC_VELATORIO VEL", "USR.ID_VELATORIO = VEL.ID_VELATORIO")
+             //   .join("SVT_USUARIOS USR", "USR.ID_USUARIO_ALTA = convenio.ID_USUARIO_ALTA")
+                .join("SVC_VELATORIO VEL", "convenio.ID_VELATORIO = VEL.ID_VELATORIO")
                 .where("convenio.IND_TIPO_CONTRATACION = :tipoContratacion")
                 .setParameter("tipoContratacion", TIPO_CONTRATACION_EMPRESA); // empresa -> false
         crearWhereConFiltros(queryConveniosEmpresa, filtros, false);
