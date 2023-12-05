@@ -2,7 +2,6 @@ package com.imss.sivimss.planfunerario.beans;
 
 import com.imss.sivimss.planfunerario.model.request.ConsultaGeneralRequest;
 import com.imss.sivimss.planfunerario.model.request.DatosReporteRequest;
-import com.imss.sivimss.planfunerario.service.impl.ConsultaConveniosServiceImpl;
 import com.imss.sivimss.planfunerario.util.AppConstantes;
 import com.imss.sivimss.planfunerario.util.DatosRequest;
 import com.imss.sivimss.planfunerario.util.SelectQueryUtil;
@@ -21,13 +20,13 @@ import java.util.Map;
 public class ConsultaConvenios {
     @Value("${formato_fecha}")
     private String formatoFecha;
-    // todo - revisar si los estatus son correctos
+    /* todo - revisar si los estatus son correctos
     private final static int ESTATUS_VIGENTE = 1;
     private final static int ESTATUS_RENOVACION = 2;
     private final static int ESTATUS_CERRADO = 3;
     private final static int CONVENIO_PERSONA = 1;
     private final static int CONVENIO_EMPRESA = 2;
-    // todo - agregar las demas tablas
+     todo - agregar las demas tablas*/
     private final static String SVT_CONVENIO = "SVT_CONVENIO_PF";
     private final static String ALIAS_FECHA_NACIMIENTO = "fechaNacimiento";
     private final static String ALIAS_EDAD = "edad";
@@ -124,6 +123,10 @@ public class ConsultaConvenios {
                         "renovacionConvenio.ID_ESTATUS IN (1,2)")
                 .join("SVT_CONTRA_PAQ_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
+                .join("SVC_CONTRATANTE contratante",
+                        "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
+                .join("SVC_PERSONA personaContratante",
+                        "personaContratante.id_persona = contratante.id_persona")
                 .join("SVT_PAQUETE paquete",
                         "paquete.ID_PAQUETE = contratanteConvenio.ID_PAQUETE")
                 .join("SVT_EMPRESA_CONVENIO_PF empresaContratante",
@@ -132,7 +135,7 @@ public class ConsultaConvenios {
                 .join("SVC_VELATORIO VEL", "convenio.ID_VELATORIO = VEL.ID_VELATORIO")
                 .where("convenio.IND_TIPO_CONTRATACION = :tipoContratacion")
                 .setParameter("tipoContratacion", TIPO_CONTRATACION_EMPRESA); // empresa -> false
-        crearWhereConFiltros(queryConveniosEmpresa, filtros, false);
+        crearWhereConFiltros(queryConveniosEmpresa, filtros, true);
 
         queryConveniosEmpresa.groupBy("convenio.ID_CONVENIO_PF");
 
