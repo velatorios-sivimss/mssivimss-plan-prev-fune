@@ -452,6 +452,7 @@ public class ConsultaConvenios {
 
         final String CONVENIO_ALIAS = SVT_CONVENIO + " convenio";
         queryFacturas.select(
+        				"factura.ID_FACTURA AS idFactura",
                         "factura.CVE_FOLIO_FISCAL as numeroFactura",
                        // "factura.NUM_UUID as UUID", // cambiar por el nombre que va a tener en la base de datos
                         formatearFecha("factura.FEC_FACTURACION") + " as fecha", // cambiar por la fecha que se estaria registrando
@@ -468,8 +469,8 @@ public class ConsultaConvenios {
                         "pago.ID_PAGO_BITACORA = factura.ID_PAGO")
                 .join(CONVENIO_ALIAS,
                         "convenio.DES_FOLIO = pago.CVE_FOLIO")
-
-                .where("convenio.DES_FOLIO = :folioConvenio")
+                 .where("factura.IND_ACTIVO = 1");
+        queryFacturas.where ("convenio.DES_FOLIO = :folioConvenio")
                 .setParameter("folioConvenio", filtros.getFolioConvenio()); // empresa -> false
 
         if (filtros.getNumeroFactura() != null) {
@@ -478,6 +479,7 @@ public class ConsultaConvenios {
         }
 
         final String query = queryFacturas.build();
+        log.info(query);
         String encoded = queryFacturas.encrypt(query);
 
         return recuperarDatos(request, encoded);
