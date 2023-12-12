@@ -294,7 +294,7 @@ public class RenovarBean {
 		envioDatos.put("costoConvenio", reporteDto.getCostoRenovacion());
 		envioDatos.put("version", "1.0.0");
 		envioDatos.put("letraCosto", costoLetra.toUpperCase() +" PESOS 00/100 M/N");
-		envioDatos.put("nomFibeso", " ");
+		envioDatos.put("nomFibeso", "Dra. Cristinne Leo Martel");
 		return envioDatos;
 	}
 
@@ -305,7 +305,7 @@ public class RenovarBean {
 		envioDatos.put(AppConstantes.TIPO, reporteDto.getTipoReporte());
 		envioDatos.put(ID_CONVENIO, reporteDto.getIdConvenio());
 		envioDatos.put("tipoConvenio", "Previsión Funeraria Plan Anterior");
-		envioDatos.put("nombreFibeso", " ");
+		envioDatos.put("nombreFibeso", "Dra. Cristinne Leo Martel");
 		envioDatos.put("observaciones", reporteDto.getObservaciones());
 		return envioDatos;
 	}
