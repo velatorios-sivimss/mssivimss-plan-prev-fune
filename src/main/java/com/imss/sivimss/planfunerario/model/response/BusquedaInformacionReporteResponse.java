@@ -22,4 +22,5 @@ public class BusquedaInformacionReporteResponse {
     private String desPaquete;
     private String monPrecio;
     private String folio;
+    private String ciudadExpedicion;
 }
