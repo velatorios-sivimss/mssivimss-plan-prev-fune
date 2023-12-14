@@ -192,10 +192,14 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
     }
 
     @Override
-    public Response<?> generarPDF(DatosRequest request, Authentication authentication) throws IOException {
+   public Response<?> generarPDF(DatosRequest request, Authentication authentication) throws IOException {
         String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
         PdfDto pdfDto = json.fromJson(datosJson, PdfDto.class);
-        Map<String, Object> envioDatos = new ConvenioNuevoPF().generarReporte(pdfDto, buscarInformacionReporte(pdfDto.getIdConvenio(), authentication));
+        BusquedaInformacionReporteResponse datosComplementarios = buscarInformacionReporte(pdfDto.getIdConvenio(),
+                authentication);
+        pdfDto.setCiudadExpedicion(datosComplementarios.getCiudadExpedicion());
+        Map<String, Object> envioDatos = new ConvenioNuevoPF().generarReporte(pdfDto,
+                datosComplementarios);
         return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes,
                 authentication);
     }
