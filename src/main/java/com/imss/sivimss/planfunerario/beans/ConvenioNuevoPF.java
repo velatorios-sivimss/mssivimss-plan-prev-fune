@@ -556,7 +556,8 @@ public class ConvenioNuevoPF {
                                                 "PAQ.REF_PAQUETE_NOMBRE AS nombrePaquete",
                                                 "PAQ.REF_PAQUETE_DESCRIPCION AS desPaquete",
                                         "(SELECT d.DES_DELEGACION FROM SVC_VELATORIO v JOIN SVC_DELEGACION d ON d.ID_DELEGACION = v.ID_DELEGACION  WHERE v.ID_VELATORIO = SCP.ID_VELATORIO) as ciudadExpedicion",
-                                                "PAQ.MON_PRECIO AS monPrecio")
+                                               "(SELECT TIP_PARAMETRO FROM SVC_PARAMETRO_SISTEMA WHERE DES_PARAMETRO= 'FIRMA_DIRECTORA') AS firmaFideicomiso",
+                                                 "PAQ.MON_PRECIO AS monPrecio")
                                 .from("SVT_CONVENIO_PF SCP")
                                 .leftJoin("SVT_CONTRA_PAQ_CONVENIO_PF CPF", "SCP.ID_CONVENIO_PF = CPF.ID_CONVENIO_PF")
                                 .leftJoin("SVT_PAQUETE PAQ", "CPF.ID_PAQUETE = PAQ.ID_PAQUETE")
