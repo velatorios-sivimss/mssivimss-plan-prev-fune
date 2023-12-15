@@ -10,4 +10,5 @@ public class PdfDto {
     private String ciudadExpedicion;
     private String fechaExpedicion;
     private String idConvenio;
+    private String firmaFideicomiso;
 }
