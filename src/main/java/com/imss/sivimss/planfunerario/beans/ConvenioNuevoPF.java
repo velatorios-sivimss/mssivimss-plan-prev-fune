@@ -539,6 +539,7 @@ public class ConvenioNuevoPF {
                 datosPdf.put("ciudadExpedicion", pdfDto.getCiudadExpedicion());
                 datosPdf.put("fechaExpedicion", pdfDto.getFechaExpedicion());
                 datosPdf.put("folioConvenio", infoReporte.getFolio());
+                datosPdf.put("firmaFideicomiso", infoReporte.getFirmaFideicomiso());
                 return datosPdf;
         }
 
