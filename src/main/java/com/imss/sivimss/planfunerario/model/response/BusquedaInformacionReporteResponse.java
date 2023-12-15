@@ -23,4 +23,5 @@ public class BusquedaInformacionReporteResponse {
     private String monPrecio;
     private String folio;
     private String ciudadExpedicion;
+    private String firmaFideicomiso;
 }
