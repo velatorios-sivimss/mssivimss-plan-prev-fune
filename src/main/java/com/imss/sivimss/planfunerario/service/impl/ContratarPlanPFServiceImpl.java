@@ -198,6 +198,7 @@ public class ContratarPlanPFServiceImpl implements ContratarPlanPFService {
         BusquedaInformacionReporteResponse datosComplementarios = buscarInformacionReporte(pdfDto.getIdConvenio(),
                 authentication);
         pdfDto.setCiudadExpedicion(datosComplementarios.getCiudadExpedicion());
+        pdfDto.setFirmaFideicomiso(datosComplementarios.getFirmaFideicomiso());
         Map<String, Object> envioDatos = new ConvenioNuevoPF().generarReporte(pdfDto,
                 datosComplementarios);
         return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes,
