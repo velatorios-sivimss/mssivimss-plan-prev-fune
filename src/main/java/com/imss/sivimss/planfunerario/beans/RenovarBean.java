@@ -280,6 +280,7 @@ public class RenovarBean {
 	envioDatos.put("folio", reporte.getFolio());
 	envioDatos.put("planPF", "Prevision Funeraria Plan Nuevo");
 	envioDatos.put("directoraFideicomiso", "Dra. Cristinne Leo Martel");
+	envioDatos.put("imgFirmaDigital", reporte.getImgFirma());
 	return envioDatos;
 	}
 
@@ -295,6 +296,8 @@ public class RenovarBean {
 		envioDatos.put("version", "1.0.0");
 		envioDatos.put("letraCosto", costoLetra.toUpperCase() +" PESOS 00/100 M/N");
 		envioDatos.put("nomFibeso", "Dra. Cristinne Leo Martel");
+		envioDatos.put("imgFirmaDigital", reporteDto.getImgFirma());
+		envioDatos.put("selloRenovacion", reporteDto.getSelloRenovacion());
 		return envioDatos;
 	}
 
@@ -307,6 +310,7 @@ public class RenovarBean {
 		envioDatos.put("tipoConvenio", "Previsión Funeraria Plan Anterior");
 		envioDatos.put("nombreFibeso", "Dra. Cristinne Leo Martel");
 		envioDatos.put("observaciones", reporteDto.getObservaciones());
+		envioDatos.put("imgFirmaDigital", reporteDto.getImgFirma());
 		return envioDatos;
 	}
 	public DatosRequest actualizarDocumentacion(VerificarDocumentacionRequest verificarDoc) {
@@ -486,18 +490,25 @@ public class RenovarBean {
 		return DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 	}
 
-	public DatosRequest  obtieneCostoRenovacion(Integer idConvenio) {
+	public DatosRequest  obtieneCostoRenovacion(Integer idConvenio, String folio) {
 		DatosRequest request = new DatosRequest();
 		Map<String, Object> parametros = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("PAQ.MON_PRECIO AS costoRecuperacion")
+		queryUtil.select("PAQ.MON_PRECIO AS costoRecuperacion",
+				"(SELECT TIP_PARAMETRO FROM SVC_PARAMETRO_SISTEMA WHERE DES_PARAMETRO= 'FIRMA_DIRECTORA') AS firmaFideicomiso",
+				"(SELECT TIP_PARAMETRO FROM SVC_PARAMETRO_SISTEMA WHERE DES_PARAMETRO= 'SELLO_RENOVACION') AS selloRenovacion")
 		.from("SVT_CONVENIO_PF SCP")
 		.join(SVT_RENOVACION_CONVENIO_PF, "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 		.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE");
 		queryUtil.where("RPF.ID_ESTATUS=2");
-		queryUtil.where("SCP.ID_TIPO_PREVISION = 2");
+		//queryUtil.where("SCP.ID_TIPO_PREVISION = 2");
+		if(idConvenio!=null) {
 			queryUtil.where("SCP.ID_CONVENIO_PF = " +idConvenio);
+		}else {
+			queryUtil.where("SCP.DES_FOLIO = '" +folio+"'");	
+		}
+			
 		String query = obtieneQuery(queryUtil);
 		log.info("costo renovacion -> " +query);
 		String encoded = encodedQuery(query);
