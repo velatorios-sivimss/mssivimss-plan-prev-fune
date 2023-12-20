@@ -17,4 +17,6 @@ public class ReporteDto {
 	private Integer idConvenio;
 	private String observaciones;
 	private String directoraFibeso;
+	private String imgFirma;
+	private String selloRenovacion;
 }

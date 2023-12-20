@@ -283,10 +283,16 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Response<?> descargarAdendaRenovacionAnual(DatosRequest request, Authentication authentication) throws IOException {
+		List<Map<String, Object>> mapping;
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		ReporteDto reporteDto= gson.fromJson(datosJson, ReporteDto.class);
+		Response<?> respuesta = providerRestTemplate.consumirServicio(renovarBean.obtieneCostoRenovacion(reporteDto.getIdConvenio(), reporteDto.getFolio()).getDatos(), urlConsulta, authentication);
+		MensajeResponseUtil.mensajeConsultaResponse(respuesta, EXITO);
+		mapping = Arrays.asList(modelMapper.map(respuesta.getDatos(), Map[].class));
+		reporteDto.setImgFirma(mapping.get(0).get("firmaFideicomiso").toString());
 		Map<String, Object> envioDatos = new RenovarBean().generarAdendaAnual(reporteDto);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DESCARGA CORRECTA ANEXO B ADENDA DE RENOVACION ANUAL", IMPRIMIR, authentication);
 		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
@@ -299,10 +305,12 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		List<Map<String, Object>> mapping;
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		ReporteDto reporteDto= gson.fromJson(datosJson, ReporteDto.class);
-		Response<?> respuesta = providerRestTemplate.consumirServicio(renovarBean.obtieneCostoRenovacion(reporteDto.getIdConvenio()).getDatos(), urlConsulta, authentication);
+		Response<?> respuesta = providerRestTemplate.consumirServicio(renovarBean.obtieneCostoRenovacion(reporteDto.getIdConvenio(), reporteDto.getFolio()).getDatos(), urlConsulta, authentication);
 		MensajeResponseUtil.mensajeConsultaResponse(respuesta, EXITO);
 		mapping = Arrays.asList(modelMapper.map(respuesta.getDatos(), Map[].class));
 		reporteDto.setCostoRenovacion(Double.parseDouble(mapping.get(0).get("costoRecuperacion").toString()));
+		reporteDto.setImgFirma(mapping.get(0).get("firmaFideicomiso").toString());
+		reporteDto.setSelloRenovacion(mapping.get(0).get("selloRenovacion").toString());
 		Map<String, Object> envioDatos = new RenovarBean().generarConvenioAnterior(reporteDto);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DESCARGA CORRECTA PLANTILLA CONVENIO RENOVACION PLAN ANTERIOR", IMPRIMIR, authentication);
 		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
@@ -310,10 +318,16 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	}
 
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Response<?> descargarHojaAfiliacion(DatosRequest request, Authentication authentication) throws IOException {
+		List<Map<String, Object>> mapping;
 		String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
 		ReporteDto reporteDto= gson.fromJson(datosJson, ReporteDto.class);
+		Response<?> respuesta = providerRestTemplate.consumirServicio(renovarBean.obtieneCostoRenovacion(reporteDto.getIdConvenio(), reporteDto.getFolio()).getDatos(), urlConsulta, authentication);
+		MensajeResponseUtil.mensajeConsultaResponse(respuesta, EXITO);
+		mapping = Arrays.asList(modelMapper.map(respuesta.getDatos(), Map[].class));
+		reporteDto.setImgFirma(mapping.get(0).get("firmaFideicomiso").toString());
 		Map<String, Object> envioDatos = new RenovarBean().generarHojaAfiliacion(reporteDto);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DESCARGA CORRECTA PLANTILLA HOJA DE AFILIACION", IMPRIMIR, authentication);
 		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
