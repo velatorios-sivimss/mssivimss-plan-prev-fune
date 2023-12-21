@@ -310,6 +310,7 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		mapping = Arrays.asList(modelMapper.map(respuesta.getDatos(), Map[].class));
 		reporteDto.setCostoRenovacion(Double.parseDouble(mapping.get(0).get("costoRecuperacion").toString()));
 		reporteDto.setImgFirma(mapping.get(0).get("firmaFideicomiso").toString());
+	//Aqui se recupera la imagen para el sello del imss para la adenda renovacion: plan anterior
 		reporteDto.setSelloRenovacion(mapping.get(0).get("selloRenovacion").toString());
 		Map<String, Object> envioDatos = new RenovarBean().generarConvenioAnterior(reporteDto);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DESCARGA CORRECTA PLANTILLA CONVENIO RENOVACION PLAN ANTERIOR", IMPRIMIR, authentication);
