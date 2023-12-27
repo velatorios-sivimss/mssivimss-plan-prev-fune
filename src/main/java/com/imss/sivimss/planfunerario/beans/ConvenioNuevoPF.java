@@ -79,15 +79,15 @@ public class ConvenioNuevoPF {
                 return queryDomicilio.obtenerQueryInsertar();
         }
 
-    public String generarQueryContratante(PersonaAltaConvenio persona, String usuario) throws IOException {
-        final QueryHelper queryContratante = new QueryHelper("INSERT INTO SVC_CONTRATANTE");
-        queryContratante.agregarParametroValues("ID_PERSONA", "idPersona");
-        queryContratante.agregarParametroValues("CVE_MATRICULA", setValor(persona.getMatricula()));
-        queryContratante.agregarParametroValues("ID_DOMICILIO", "idDomicilio");
-        queryContratante.agregarParametroValues("ID_USUARIO_ALTA", usuario);
-        log.info("Query insert contratante: " + queryContratante.obtenerQueryInsertar());
-        return queryContratante.obtenerQueryInsertar();
-    }
+        public String generarQueryContratante(PersonaAltaConvenio persona, String usuario) throws IOException {
+                final QueryHelper queryContratante = new QueryHelper("INSERT INTO SVC_CONTRATANTE");
+                queryContratante.agregarParametroValues("ID_PERSONA", "idPersona");
+                queryContratante.agregarParametroValues("CVE_MATRICULA", setValor(persona.getMatricula()));
+                queryContratante.agregarParametroValues("ID_DOMICILIO", "idDomicilio");
+                queryContratante.agregarParametroValues("ID_USUARIO_ALTA", usuario);
+                log.info("Query insert contratante: " + queryContratante.obtenerQueryInsertar());
+                return queryContratante.obtenerQueryInsertar();
+        }
 
         public String generarQueryConvenioPf(String nombreVelatorio, String idPromotor, String idVelatorio,
                         String usuario,
@@ -140,7 +140,7 @@ public class ConvenioNuevoPF {
                 queryContratanteBeneficiarios.agregarParametroValues("CVE_ACTA", "'" + claveActa + "'");
                 queryContratanteBeneficiarios.agregarParametroValues("ID_USUARIO_ALTA", usuario);
                 queryContratanteBeneficiarios.agregarParametroValues("IND_ACTIVO", "1");
-                
+
                 queryContratanteBeneficiarios.agregarParametroValues("IND_INE_BENEFICIARIO",
                                 persona.getValidaIneBeneficiario() == true ? "1" : "0");
                 queryContratanteBeneficiarios.agregarParametroValues("IND_ACTA_NACIMIENTO",
@@ -153,23 +153,25 @@ public class ConvenioNuevoPF {
         public String generarQueryValidacionDocumentos(PersonaConvenioRequest persona, String usuario) {
                 final QueryHelper queryValidaDocumentos = new QueryHelper("INSERT INTO SVC_VALIDA_DOCS_CONVENIO_PF");
                 queryValidaDocumentos.agregarParametroValues("IND_INE_AFILIADO",
-                		 ""+setEntero(persona.getPersona().getDocumentacion().getValidaIneContratante())+"");
+                                "" + setEntero(persona.getPersona().getDocumentacion().getValidaIneContratante()) + "");
                 queryValidaDocumentos.agregarParametroValues("IND_CURP",
-                		 ""+setEntero(persona.getPersona().getDocumentacion().getValidaCurp())+"");
+                                "" + setEntero(persona.getPersona().getDocumentacion().getValidaCurp()) + "");
                 queryValidaDocumentos.agregarParametroValues("IND_RFC",
-                		 ""+setEntero( persona.getPersona().getDocumentacion().getValidaRfc())+"");
+                                "" + setEntero(persona.getPersona().getDocumentacion().getValidaRfc()) + "");
                 queryValidaDocumentos.agregarParametroValues("IND_ACTA_NACIMIENTO",
-                		 ""+setEntero(persona.getPersona().getDocumentacion().getValidaActaNacimientoBeneficiario())+"");
+                                "" + setEntero(persona.getPersona().getDocumentacion()
+                                                .getValidaActaNacimientoBeneficiario()) + "");
                 queryValidaDocumentos.agregarParametroValues("IND_INE_BENEFICIARIO",
-                                ""+setEntero(persona.getPersona().getDocumentacion().getValidaIneBeneficiario())+"");
+                                "" + setEntero(persona.getPersona().getDocumentacion().getValidaIneBeneficiario())
+                                                + "");
                 queryValidaDocumentos.agregarParametroValues("ID_CONVENIO_PF", "idConvenioPf");
                 queryValidaDocumentos.agregarParametroValues("ID_USUARIO_ALTA", usuario);
                 log.info("Query insert validacion documentos: " + queryValidaDocumentos.obtenerQueryInsertar());
                 return queryValidaDocumentos.obtenerQueryInsertar();
         }
-        
+
         private int setEntero(Boolean indicador) {
-        	return indicador==Boolean.TRUE?1:0;
+                return indicador == Boolean.TRUE ? 1 : 0;
         }
 
         public String generarQueryEmpresaConvenioPf(PorEmpresaRequest empresa, String usuario) {
@@ -194,7 +196,8 @@ public class ConvenioNuevoPF {
                 SelectQueryUtil query = new SelectQueryUtil();
                 query.select("SP.ID_PROMOTOR AS idPromotor", "SP.NUM_EMPLEDO AS numEmpleado",
                                 "CONCAT (SP.NOM_PROMOTOR , ' ' , SP.NOM_PAPELLIDO , ' ' , SP.NOM_SAPELLIDO) AS nombrePromotor")
-                                .from("SVT_PROMOTOR SP");
+                                .from("SVT_PROMOTOR SP")
+                                .where("SP.IND_ACTIVO = 1");
                 String consulta = query.build();
                 String encoded = DatatypeConverter.printBase64Binary(consulta.getBytes());
                 parametro.put(AppConstantes.QUERY, encoded);
