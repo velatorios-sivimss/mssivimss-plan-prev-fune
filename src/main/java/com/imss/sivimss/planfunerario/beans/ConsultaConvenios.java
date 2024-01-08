@@ -42,20 +42,20 @@ public class ConsultaConvenios {
      */
     public DatosRequest consultarConvenios(DatosRequest request, ConsultaGeneralRequest filtros) throws UnsupportedEncodingException {
         SelectQueryUtil queryConveniosPersona = new SelectQueryUtil();
-        SelectQueryUtil queryBeneficiarios = new SelectQueryUtil();
+      /*  SelectQueryUtil queryBeneficiarios = new SelectQueryUtil();
         queryBeneficiarios.select("count(*)")
                 .from("SVT_CONTRATANTE_BENEFICIARIOS beneficiarios")
                 .join("SVT_CONTRA_PAQ_CONVENIO_PF benefpaq", "beneficiarios.ID_CONTRA_PAQ_CONVENIO_PF = benefpaq.ID_CONTRA_PAQ_CONVENIO_PF")
                 .where("benefpaq.ID_CONVENIO_PF  = convenio.ID_CONVENIO_PF")
-                .and("beneficiarios.IND_ACTIVO=1").and("beneficiarios.IND_SINIESTROS=0");
+                .and("beneficiarios.IND_ACTIVO=1").and("beneficiarios.IND_SINIESTROS=0"); */
 
-        SelectQueryUtil queryFacturas = new SelectQueryUtil();
+       SelectQueryUtil queryFacturas = new SelectQueryUtil();
         queryFacturas.select()
                 .from("SVC_FACTURA factura")
                 .join("SVT_PAGO_BITACORA pago",
                         "pago.ID_PAGO_BITACORA = factura.ID_PAGO",
                         "pago.CVE_ESTATUS_PAGO = 5")
-                .where("pago.CVE_FOLIO = convenio.DES_FOLIO");
+                .where("pago.CVE_FOLIO = convenio.DES_FOLIO"); 
 
         queryConveniosPersona.select("convenio.ID_CONVENIO_PF as idConvenio",
         		"VEL.DES_VELATORIO AS velatorio",
@@ -66,11 +66,12 @@ public class ConsultaConvenios {
                                 + " as fechaVigenciaInicio", // cuando un convenio no tenga renovacion la fecha inicio sera la fecha de inicio, de lo contrario habra que recuperar la fecha de renovacion?
                         formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, MAX(renovacionConvenio.FEC_VIGENCIA))")
                                 + " as fechaVigenciaFin",
-                        "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
+                      //  "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
+                                "COUNT(beneficiarios.ID_CONTRATANTE_BENEFICIARIOS) as cantidadBeneficiarios",
                         "if(convenio.IND_RENOVACION = false, 'No Renovado', 'Renovado') as situacion",
                         "if(convenio.IND_RENOVACION = false, null, renovacionConvenio.ID_ESTATUS) as estatusRenovacion",
                         "convenio.ID_TIPO_PREVISION as tipoPlan",
-                        "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
+                        //"exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
                         formatearImporte("paquete.MON_PRECIO") + " as importeConvenio",
                         "estatus.DES_ESTATUS as estatusConvenio")
                 .from(SVT_CONVENIO + " convenio")
@@ -81,6 +82,8 @@ public class ConsultaConvenios {
                         "renovacionConvenio.ID_ESTATUS IN (1,2)")
                 .join("SVT_CONTRA_PAQ_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
+                .leftJoin("SVT_CONTRATANTE_BENEFICIARIOS beneficiarios",
+                        "contratanteConvenio.ID_CONTRA_PAQ_CONVENIO_PF = beneficiarios.ID_CONTRA_PAQ_CONVENIO_PF AND (beneficiarios.IND_SINIESTROS = 0 OR beneficiarios.IND_SINIESTROS IS NULL) AND beneficiarios.IND_ACTIVO = 1")
                 .join("SVT_PAQUETE paquete",
                         "paquete.ID_PAQUETE = contratanteConvenio.ID_PAQUETE")
                 .join("SVC_CONTRATANTE contratante",
@@ -108,11 +111,12 @@ public class ConsultaConvenios {
                                 + " as fechaVigenciaInicio",
                         formatearFecha("if(convenio.IND_RENOVACION = false, convenio.FEC_VIGENCIA, MAX(renovacionConvenio.FEC_VIGENCIA))")
                                 + " as fechaVigenciaFin",
-                        "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
+                     //   "(" + queryBeneficiarios.build() + ") as cantidadBeneficiarios",
+                                "COUNT(beneficiarios.ID_CONTRATANTE_BENEFICIARIOS) as cantidadBeneficiarios",
                         "if(convenio.IND_RENOVACION = false, 'No Renovado', 'Renovado') as situacion",
                         "if(convenio.IND_RENOVACION = false, null, renovacionConvenio.ID_ESTATUS) as estatusRenovacion",
                         "convenio.ID_TIPO_PREVISION as tipoPlan",
-                        "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
+                     //   "exists(" + queryFacturas.build() + ") as factura", // ver que es lo que regresa en la consulta
                         formatearImporte("paquete.MON_PRECIO") + " as importeConvenio",
                         "estatus.DES_ESTATUS as estatusConvenio")
                 .from(SVT_CONVENIO + " convenio")
@@ -123,6 +127,8 @@ public class ConsultaConvenios {
                         "renovacionConvenio.ID_ESTATUS IN (1,2)")
                 .join("SVT_CONTRA_PAQ_CONVENIO_PF contratanteConvenio",
                         "contratanteConvenio.ID_CONVENIO_PF = convenio.ID_CONVENIO_PF")
+                .leftJoin("SVT_CONTRATANTE_BENEFICIARIOS beneficiarios",
+                        "contratanteConvenio.ID_CONTRA_PAQ_CONVENIO_PF = beneficiarios.ID_CONTRA_PAQ_CONVENIO_PF AND (beneficiarios.IND_SINIESTROS = 0 OR beneficiarios.IND_SINIESTROS IS NULL) AND beneficiarios.IND_ACTIVO = 1")
                 .join("SVC_CONTRATANTE contratante",
                         "contratante.ID_CONTRATANTE = contratanteConvenio.ID_CONTRATANTE")
                 .join("SVC_PERSONA personaContratante",

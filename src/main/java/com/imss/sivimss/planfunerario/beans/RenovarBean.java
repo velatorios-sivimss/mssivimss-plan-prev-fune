@@ -98,7 +98,7 @@ public class RenovarBean {
 	//	.leftJoin("SVC_CP CP", "SD.REF_CP = CP.CVE_CODIGO_POSTAL")
 		.join(SVC_PERSONA, "SC.ID_PERSONA = SP.ID_PERSONA");
         queryUtil.where("SCP.IND_TIPO_CONTRATACION=1");
-		queryUtil.where("SCP.ID_ESTATUS_CONVENIO IN (2, 4)");
+		queryUtil.where("SCP.ID_ESTATUS_CONVENIO IN (2,4)");
 		queryUtil.where("SCP.ID_TIPO_PREVISION = :tipoPrevision")
 		.setParameter("tipoPrevision", filtros.getTipoPrevision());
 		if(filtros.getNumeroConvenio()!=null) {
@@ -447,7 +447,7 @@ public class RenovarBean {
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SCB.ID_CONTRA_PAQ_CONVENIO_PF=SCPC.ID_CONTRA_PAQ_CONVENIO_PF")
 		.join("SVT_CONVENIO_PF PF", "SCPC.ID_CONVENIO_PF = PF.ID_CONVENIO_PF")
 		.join("SVC_PERSONA PC", "SCB.ID_PERSONA = PC.ID_PERSONA");
-		queryUtil.where("SCB.IND_ACTIVO=1 AND SCB.IND_SINIESTROS=0");
+		queryUtil.where("SCB.IND_ACTIVO=1 AND (SCB.IND_SINIESTROS=0 OR SCB.IND_SINIESTROS IS NULL)");
 		if(folio!=null) {
 			queryUtil.where("PF.DES_FOLIO= :folio")
 			.setParameter("folio", folio);	
@@ -456,7 +456,7 @@ public class RenovarBean {
 			queryUtil.where("PF.DES_FOLIO= :folio")
 			.setParameter("folio", id);
 		}
-		queryUtil.limit(3);
+	//	queryUtil.limit(3);
 		String query = obtieneQuery(queryUtil);
 		log.info("beneficiarios -> " +query);
 		String encoded = encodedQuery(query);

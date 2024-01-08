@@ -138,7 +138,7 @@ public class BeneficiariosBean {
 		.join(SVC_PERSONA, "SB.ID_PERSONA=SP.ID_PERSONA");
 		queryUtil.where("SCPC.ID_CONVENIO_PF = " +palabra).and("(SB.IND_SINIESTROS=0 OR SB.IND_SINIESTROS IS NULL)");
 		String query = obtieneQuery(queryUtil);
-		log.info("-> " +query);
+		log.info("beneficiarios -->"  +query);
 		String encoded = encodedQuery(query);
 	    parametros.put(AppConstantes.QUERY, encoded);
 	    request.setDatos(parametros);
