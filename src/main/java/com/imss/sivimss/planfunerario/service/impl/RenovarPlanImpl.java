@@ -56,6 +56,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private static final String INFORMACION_INCOMPLETA = "Informacion incompleta";
 	private static final String EXITO = "EXITO";
 	private static final String SIN_INFORMACION = "45 NO HAY INFORMACION RELACIONADA A TU BUSQUEDA";
+	private static final String FIRMA_FIDEICOMISO = "firmaFideicomiso";
+	private static final String NOMBRE_FIBESO = "nombreFibeso";
 	
 	@Autowired
 	private LogUtil logUtil;
@@ -292,7 +294,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		Response<?> respuesta = providerRestTemplate.consumirServicio(renovarBean.obtieneCostoRenovacion(reporteDto.getIdConvenio(), reporteDto.getFolio()).getDatos(), urlConsulta, authentication);
 		MensajeResponseUtil.mensajeConsultaResponse(respuesta, EXITO);
 		mapping = Arrays.asList(modelMapper.map(respuesta.getDatos(), Map[].class));
-		reporteDto.setImgFirma(mapping.get(0).get("firmaFideicomiso").toString());
+		reporteDto.setImgFirma(mapping.get(0).get(FIRMA_FIDEICOMISO).toString());
+		reporteDto.setNomFibeso(mapping.get(0).get(NOMBRE_FIBESO).toString());
 		Map<String, Object> envioDatos = new RenovarBean().generarAdendaAnual(reporteDto);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DESCARGA CORRECTA ANEXO B ADENDA DE RENOVACION ANUAL", IMPRIMIR, authentication);
 		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
@@ -309,9 +312,10 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		MensajeResponseUtil.mensajeConsultaResponse(respuesta, EXITO);
 		mapping = Arrays.asList(modelMapper.map(respuesta.getDatos(), Map[].class));
 		reporteDto.setCostoRenovacion(Double.parseDouble(mapping.get(0).get("costoRecuperacion").toString()));
-		reporteDto.setImgFirma(mapping.get(0).get("firmaFideicomiso").toString());
+		reporteDto.setImgFirma(mapping.get(0).get(FIRMA_FIDEICOMISO).toString());
 	//Aqui se recupera la imagen para el sello del imss para la adenda renovacion: plan anterior
 		reporteDto.setSelloRenovacion(mapping.get(0).get("selloRenovacion").toString());
+		reporteDto.setNomFibeso(mapping.get(0).get(NOMBRE_FIBESO).toString());
 		Map<String, Object> envioDatos = new RenovarBean().generarConvenioAnterior(reporteDto);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DESCARGA CORRECTA PLANTILLA CONVENIO RENOVACION PLAN ANTERIOR", IMPRIMIR, authentication);
 		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
@@ -328,7 +332,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		Response<?> respuesta = providerRestTemplate.consumirServicio(renovarBean.obtieneCostoRenovacion(reporteDto.getIdConvenio(), reporteDto.getFolio()).getDatos(), urlConsulta, authentication);
 		MensajeResponseUtil.mensajeConsultaResponse(respuesta, EXITO);
 		mapping = Arrays.asList(modelMapper.map(respuesta.getDatos(), Map[].class));
-		reporteDto.setImgFirma(mapping.get(0).get("firmaFideicomiso").toString());
+		reporteDto.setImgFirma(mapping.get(0).get(FIRMA_FIDEICOMISO).toString());
+		reporteDto.setNomFibeso(mapping.get(0).get(NOMBRE_FIBESO).toString());
 		Map<String, Object> envioDatos = new RenovarBean().generarHojaAfiliacion(reporteDto);
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"DESCARGA CORRECTA PLANTILLA HOJA DE AFILIACION", IMPRIMIR, authentication);
 		return providerRestTemplate.consumirServicioReportes(envioDatos, urlReportes ,
