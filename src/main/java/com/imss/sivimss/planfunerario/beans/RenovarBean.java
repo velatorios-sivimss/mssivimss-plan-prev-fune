@@ -56,6 +56,8 @@ public class RenovarBean {
 	                                                                                                                                
 	//Parameters
 	public static final String DES_FOLIO = "desFolio";
+	public static final String FIRMA_DIGITAL = "imgFirmaDigital";
+	public static final String FOLIO = "folio";
 	public static final String CVE_RFC = "cveRfc";
 	public static final String NUM_INE = "numIne";
 	public static final String ID_CONVENIO = "idConvenio";
@@ -277,10 +279,10 @@ public class RenovarBean {
 	Map<String, Object> envioDatos = new HashMap<>();
 	envioDatos.put(AppConstantes.RUTA, reporte.getRutaNombreReporte());
 	envioDatos.put(AppConstantes.TIPO, reporte.getTipoReporte());
-	envioDatos.put("folio", reporte.getFolio());
+	envioDatos.put(FOLIO, reporte.getFolio());
 	envioDatos.put("planPF", "Prevision Funeraria Plan Nuevo");
-	envioDatos.put("directoraFideicomiso", "Dra. Cristinne Leo Martel");
-	envioDatos.put("imgFirmaDigital", reporte.getImgFirma());
+	envioDatos.put("directoraFideicomiso", reporte.getNomFibeso());
+	envioDatos.put(FIRMA_DIGITAL, reporte.getImgFirma());
 	return envioDatos;
 	}
 
@@ -295,8 +297,8 @@ public class RenovarBean {
 		envioDatos.put("costoConvenio", reporteDto.getCostoRenovacion());
 		envioDatos.put("version", "1.0.0");
 		envioDatos.put("letraCosto", costoLetra.toUpperCase() +" PESOS 00/100 M/N");
-		envioDatos.put("nomFibeso", "Dra. Cristinne Leo Martel");
-		envioDatos.put("imgFirmaDigital", reporteDto.getImgFirma());
+		envioDatos.put("nomFibeso", reporteDto.getNomFibeso());
+		envioDatos.put(FIRMA_DIGITAL, reporteDto.getImgFirma());
 		envioDatos.put("selloRenovacion", reporteDto.getSelloRenovacion());
 		return envioDatos;
 	}
@@ -308,9 +310,9 @@ public class RenovarBean {
 		envioDatos.put(AppConstantes.TIPO, reporteDto.getTipoReporte());
 		envioDatos.put(ID_CONVENIO, reporteDto.getIdConvenio());
 		envioDatos.put("tipoConvenio", "Previsión Funeraria Plan Anterior");
-		envioDatos.put("nombreFibeso", "Dra. Cristinne Leo Martel");
+		envioDatos.put("nombreFibeso", reporteDto.getNomFibeso());
 		envioDatos.put("observaciones", reporteDto.getObservaciones());
-		envioDatos.put("imgFirmaDigital", reporteDto.getImgFirma());
+		envioDatos.put(FIRMA_DIGITAL, reporteDto.getImgFirma());
 		return envioDatos;
 	}
 	public DatosRequest actualizarDocumentacion(VerificarDocumentacionRequest verificarDoc) {
@@ -450,11 +452,11 @@ public class RenovarBean {
 		queryUtil.where("SCB.IND_ACTIVO=1 AND (SCB.IND_SINIESTROS=0 OR SCB.IND_SINIESTROS IS NULL)");
 		if(folio!=null) {
 			queryUtil.where("PF.DES_FOLIO= :folio")
-			.setParameter("folio", folio);	
+			.setParameter(FOLIO, folio);	
 		}
 		if(id!=null) {
 			queryUtil.where("PF.DES_FOLIO= :folio")
-			.setParameter("folio", id);
+			.setParameter(FOLIO, id);
 		}
 	//	queryUtil.limit(3);
 		String query = obtieneQuery(queryUtil);
@@ -496,7 +498,8 @@ public class RenovarBean {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("PAQ.MON_PRECIO AS costoRecuperacion",
 				"(SELECT TIP_PARAMETRO FROM SVC_PARAMETRO_SISTEMA WHERE DES_PARAMETRO= 'FIRMA_DIRECTORA') AS firmaFideicomiso",
-				"(SELECT TIP_PARAMETRO FROM SVC_PARAMETRO_SISTEMA WHERE DES_PARAMETRO= 'SELLO_RENOVACION') AS selloRenovacion")
+				"(SELECT TIP_PARAMETRO FROM SVC_PARAMETRO_SISTEMA WHERE DES_PARAMETRO= 'SELLO_RENOVACION') AS selloRenovacion",
+				"(SELECT TIP_PARAMETRO FROM SVC_PARAMETRO_SISTEMA WHERE DES_PARAMETRO= 'NOMBRE FIBESO') AS nombreFibeso")
 		.from("SVT_CONVENIO_PF SCP")
 		.join(SVT_RENOVACION_CONVENIO_PF, "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
