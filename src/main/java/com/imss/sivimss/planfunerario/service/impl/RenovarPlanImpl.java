@@ -91,6 +91,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	RenovarBean renovarBean = new RenovarBean();
 	
 	Integer anioMesVigencia = 0;
+	Integer diaActual = 0;
+	Integer anioMesActual = 0;
 	
 	@Override
 	public Response<?> buscarConvenioNuevo(DatosRequest request, Authentication authentication) throws IOException {		 
@@ -132,8 +134,9 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		    		  logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO NO SE ENCUENTRA EN PERIODO DE RENOVACION", CONSULTA, authentication);
 		    			return fueraPeriodo(response);
 		    	  }
+		    	  
 		    	  Integer vig = obtieneVigencia(datosConvenio.getFecVigencia());
-		    	  if(getDia()>20 && getDia()>vig || anioMesActual()>anioMesVigencia) {		  
+		    	  if(diaActual>20 && diaActual>vig || anioMesActual>anioMesVigencia) {		  
 		    			  logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 		    		    	providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), filtros.getNumeroConvenio() , usuarioDto.getIdUsuario()).getDatos(), urlActualizar,authentication);
 		    		    	logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 CONVENIO INACTIVO ", CONSULTA, authentication);
@@ -204,7 +207,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 			    		  return fueraPeriodo(response);
 			    	  }
 			    	  Integer vig = obtieneVigencia(datosConvenio.getFecVigencia());
-			    		 if(getDia()>20 && getDia()>vig || anioMesActual()>anioMesVigencia) {
+			    	  
+			    		 if(diaActual>20 && diaActual>vig || anioMesActual>anioMesVigencia) {
 			    	         logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"OK CAMBIO DE ESTATUS A INHABILITADO", MODIFICACION, authentication);
 			    			providerRestTemplate.consumirServicio(renovarBean.cambiarEstatusPlan(filtros.getFolio(), filtros.getNumeroConvenio(), usuarioDto.getIdUsuario()).getDatos(), urlActualizar, authentication);
 			    			 logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"36 EL CONVENIO SE ENCUENTRA INACTIVO", CONSULTA, authentication);
@@ -405,8 +409,8 @@ public class RenovarPlanImpl implements RenovarPlanService {
 		return folio+"-"+formatearConvenioCeros;
 	}
 
-	
-	private int getDia() {
+	//se comenta por el horario del servidor
+	/*private int getDia() {
 	SimpleDateFormat sdf = new SimpleDateFormat("dd");
 		String date = sdf.format(new Date());
 		return Integer.parseInt(date);
@@ -416,15 +420,21 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	    SimpleDateFormat sdfMes = new SimpleDateFormat("yyyyMM");
 		String date = sdfMes.format(new Date());
 		return Integer.parseInt(date);
-	}
+	} */
 	
+	@SuppressWarnings("unchecked")
 	private boolean validarPeriodoRenovacion(FiltrosConvenioPFRequest filtros, Authentication authentication) throws IOException {
 		Response<?> response= providerRestTemplate.consumirServicio(renovarBean.validarPeriodo(filtros).getDatos(), urlConsulta,
 				authentication);
+		List<Map<String, Object>> mapping;
 	MensajeResponseUtil.mensajeConsultaResponse(response, EXITO);
 	Object rst=response.getDatos();
-	String fec = rst.toString();
-	anioMesVigencia = recuperaDato(fec);
+	mapping = Arrays.asList(modelMapper.map(response.getDatos(), Map[].class));
+	if(!mapping.isEmpty()) {
+		anioMesVigencia = Integer.parseInt((mapping.get(0).get("fecVigencia").toString())) ;
+		diaActual = Integer.parseInt((mapping.get(0).get("dia").toString()));
+		anioMesActual = Integer.parseInt((mapping.get(0).get("anioMes").toString()));
+	}
 	return !rst.toString().equals("[]");
 	}
 

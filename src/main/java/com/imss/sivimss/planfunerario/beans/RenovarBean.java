@@ -160,7 +160,9 @@ public class RenovarBean {
 		DatosRequest request= new DatosRequest();
 		Map<String, Object> parametro = new HashMap<>();
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("IF(SPF.IND_RENOVACION=0, (DATE_FORMAT(SPF.FEC_VIGENCIA, '%Y%m')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%Y%m')) AS c")
+		queryUtil.select("IF(SPF.IND_RENOVACION=0, (DATE_FORMAT(SPF.FEC_VIGENCIA, '%Y%m')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%Y%m')) fecVigencia",
+				"DATE_FORMAT(CURDATE(), '%d') dia",
+				"DATE_FORMAT(CURDATE(), '%Y%m') anioMes")
 		.from(SVT_CONVENIO_PF)
 		.leftJoin(SVT_RENOVACION_CONVENIO_PF, "SPF.ID_CONVENIO_PF = RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS=2")
 		.join(SVT_CONTRATANTE_PAQUETE_CONVENIO_PF, "SPF.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF ")
@@ -513,7 +515,7 @@ public class RenovarBean {
 		}
 			
 		String query = obtieneQuery(queryUtil);
-		log.info("costo renovacion -> " +query);
+		log.info("parametros -> " +query);
 		String encoded = encodedQuery(query);
 	    parametros.put(AppConstantes.QUERY, encoded);
 	    request.setDatos(parametros);

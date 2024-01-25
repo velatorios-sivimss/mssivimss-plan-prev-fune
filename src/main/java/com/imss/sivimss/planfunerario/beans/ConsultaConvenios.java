@@ -360,7 +360,7 @@ public class ConsultaConvenios {
         queryAfiliados.select(
                         "velatorio.DES_VELATORIO as nombreVelatorio",
                         recuperarNombrePersona("personaAfiliada", "nombreAfiliado"),
-                        "empresaContratante.CVE_RFC as rfcTitular",
+                        "IFNULL(empresaContratante.CVE_RFC, personaAfiliada.CVE_RFC) as rfcTitular",
                         formatearFecha("personaAfiliada.FEC_NAC") + "as " + ALIAS_FECHA_NACIMIENTO,
                         recuperarEdad("personaAfiliada"),
                         "personaAfiliada.NUM_SEXO as genero",
