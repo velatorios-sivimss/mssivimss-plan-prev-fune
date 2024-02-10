@@ -165,6 +165,7 @@ public class ConvenioNuevoPF {
                                 "" + setEntero(persona.getPersona().getDocumentacion().getValidaIneBeneficiario())
                                                 + "");
                 queryValidaDocumentos.agregarParametroValues("ID_CONVENIO_PF", "idConvenioPf");
+                queryValidaDocumentos.agregarParametroValues("ID_CONTRA_PAQ_CONVENIO_PF", "idContratantePaqueteConvenioPf");
                 queryValidaDocumentos.agregarParametroValues("ID_USUARIO_ALTA", usuario);
                 log.info("Query insert validacion documentos: " + queryValidaDocumentos.obtenerQueryInsertar());
                 return queryValidaDocumentos.obtenerQueryInsertar();
