@@ -510,15 +510,18 @@ public class ConvenioNuevoPF {
                 return dr;
         }
 
-        public DatosRequest cambiarEstatusConvenio(String idEstatusConvenio, String folioConvenio, UsuarioDto user) {
+        public DatosRequest cambiarEstatusConvenio(String idEstatusConvenio, String idFolioConvenio, UsuarioDto user) {
                 DatosRequest dr = new DatosRequest();
                 Map<String, Object> parametro = new HashMap<>();
+                Integer id=Integer.parseInt(idFolioConvenio.replace("\"", ""));
                 final QueryHelper query = new QueryHelper("UPDATE SVT_CONVENIO_PF");
                 query.agregarParametroValues("ID_ESTATUS_CONVENIO", idEstatusConvenio);
                 query.agregarParametroValues("ID_USUARIO_MODIFICA", String.valueOf(user.getIdUsuario()));
                 query.agregarParametroValues("FEC_ACTUALIZACION", "NOW()");
-                query.addWhere("DES_FOLIO = " + folioConvenio);
-                String encoded = DatatypeConverter.printBase64Binary(query.obtenerQueryActualizar().getBytes());
+                query.addWhere("ID_CONVENIO_PF = " + id);
+                String consulta = query.obtenerQueryActualizar();
+                log.info(consulta);
+                String encoded = DatatypeConverter.printBase64Binary(consulta.getBytes());
                 parametro.put(AppConstantes.QUERY, encoded);
                 dr.setDatos(parametro);
                 return dr;
