@@ -27,7 +27,7 @@ public class AppConstantes {
 	public static final String FORBIDDENEXCEPTION_MENSAJE  = "No tiene autorización para realizar la solicitud.";
 	public static final String CIRCUITBREAKER = "186"; //El servicio no responde, no permite más llamadas.
 	public static final String OCURRIO_ERROR_GENERICO="187";// Ocurrio un error al procesar tu solicitud.
-	public static final String CURRENT_TIMESTAMP="CURRENT_DATE()";
+	public static final String CURRENT_TIMESTAMP="CURRENT_TIMESTAMP()";
 	public static final String IND_ACTIVO="IND_ACTIVO";
 	public static final String ID_ESTATUS_CONVENIO="ID_ESTATUS_CONVENIO";
 	public static final String ID_USUARIO_ALTA="ID_USUARIO_ALTA";
