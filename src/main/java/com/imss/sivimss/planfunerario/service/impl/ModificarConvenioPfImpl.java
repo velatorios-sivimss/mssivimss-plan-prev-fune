@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 @Service
 
@@ -37,43 +38,65 @@ public class ModificarConvenioPfImpl implements ModificarConvenioPfService {
     Gson json = new Gson();
     @Autowired
     ModelMapper modelMapper;
+
     @Override
-    public Response<?> modificarConvenioPersona(DatosRequest request, Authentication authentication) throws IOException {
-        HashMap mapa = new HashMap();
+    public Response<?> modificarConvenioPersona(DatosRequest request, Authentication authentication)
+            throws IOException {
+        Map<String, Object> mapa = new HashMap<>();
         String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
         UsuarioDto usuarioDto = json.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
         PersonaConvenioRequest persona = json.fromJson(datosJson, PersonaConvenioRequest.class);
-        String consultaModificarDatosPersona = modificar.generaQueryActualizaPersona(persona.getPersona(),usuarioDto.getIdUsuario().toString(), persona.getIdPersona());
-        String consultaModificaDomicilio = modificar.queryModificaDomicilio(persona.getPersona().getCalle(),persona.getPersona().getNumeroExterior(),
-                persona.getPersona().getNumeroInterior(),persona.getPersona().getCp(),persona.getPersona().getColonia(),
-                persona.getPersona().getMunicipio(),persona.getPersona().getEstado(),usuarioDto.getIdUsuario().toString());
+        String consultaModificarDatosPersona = modificar.generaQueryActualizaPersona(persona.getPersona(),
+                usuarioDto.getIdUsuario().toString(), persona.getIdPersona());
+        String consultaModificaDomicilio = modificar.queryModificaDomicilio(persona.getPersona().getCalle(),
+                persona.getPersona().getNumeroExterior(),
+                persona.getPersona().getNumeroInterior(), persona.getPersona().getCp(),
+                persona.getPersona().getColonia(),
+                persona.getPersona().getMunicipio(), persona.getPersona().getEstado(),
+                usuarioDto.getIdUsuario().toString());
         String[] queryBeneficiarios = new String[persona.getPersona().getBeneficiarios().length];
         for (int i = 0; i < persona.getPersona().getBeneficiarios().length; i++) {
-            queryBeneficiarios[i] = DatatypeConverter.printBase64Binary(modificar.generaQueryActualizaPersonaBeneficiario(persona.getPersona().getBeneficiarios()[i], usuarioDto.getIdUsuario().toString(), persona.getPersona().getBeneficiarios()[i].getIdPersona()).getBytes("UTF-8"));
-         }
+            queryBeneficiarios[i] = DatatypeConverter
+                    .printBase64Binary(
+                            modificar
+                                    .generaQueryActualizaPersonaBeneficiario(persona.getPersona().getBeneficiarios()[i],
+                                            usuarioDto.getIdUsuario().toString(),
+                                            persona.getPersona().getBeneficiarios()[i].getIdPersona())
+                                    .getBytes("UTF-8"));
+        }
 
-        mapa.put("datosPersonaContratante", DatatypeConverter.printBase64Binary(consultaModificarDatosPersona.getBytes("UTF-8")));
-        mapa.put("datosDomicilioContratante",DatatypeConverter.printBase64Binary(consultaModificaDomicilio.getBytes("UTF-8")));
-        mapa.put("folioConvenio",persona.getFolioConvenio());
+        mapa.put("datosPersonaContratante",
+                DatatypeConverter.printBase64Binary(consultaModificarDatosPersona.getBytes("UTF-8")));
+        mapa.put("datosDomicilioContratante",
+                DatatypeConverter.printBase64Binary(consultaModificaDomicilio.getBytes("UTF-8")));
+        mapa.put("folioConvenio", persona.getFolioConvenio());
+        mapa.put("idUsuario", usuarioDto.getIdUsuario().toString());
+        mapa.put("idPersona", persona.getIdPersona().toString());
+
         return providerRestTemplate.consumirServicio(mapa, urlDominioConvenioModificar, authentication);
     }
 
     @Override
-    public Response<?> modificarConvenioEmpresa(DatosRequest request, Authentication authentication) throws IOException {
-        HashMap mapa = new HashMap();
+    public Response<?> modificarConvenioEmpresa(DatosRequest request, Authentication authentication)
+            throws IOException {
+        Map<String, Object> mapa = new HashMap<>();
         String datosJson = String.valueOf(request.getDatos().get(AppConstantes.DATOS));
         UsuarioDto usuarioDto = json.fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
         EmpresaAltaConvenio empresa = json.fromJson(datosJson, EmpresaAltaConvenio.class);
-        String consultaModificaDomicilio = modificar.queryModificaDomicilio(empresa.getEmpresa().getCalle(),empresa.getEmpresa().getNumeroExterior(),
-                empresa.getEmpresa().getNumeroInterior(),empresa.getEmpresa().getCp(),empresa.getEmpresa().getColonia(),
-                empresa.getEmpresa().getMunicipio(),empresa.getEmpresa().getEstado(),usuarioDto.getIdUsuario().toString());
-        String consultaEmpresaConvenio = modificar.queryModificarEmpresaConvenio(empresa.getEmpresa(),usuarioDto.getIdUsuario().toString());
+        String consultaModificaDomicilio = modificar.queryModificaDomicilio(empresa.getEmpresa().getCalle(),
+                empresa.getEmpresa().getNumeroExterior(),
+                empresa.getEmpresa().getNumeroInterior(), empresa.getEmpresa().getCp(),
+                empresa.getEmpresa().getColonia(),
+                empresa.getEmpresa().getMunicipio(), empresa.getEmpresa().getEstado(),
+                usuarioDto.getIdUsuario().toString());
+        String consultaEmpresaConvenio = modificar.queryModificarEmpresaConvenio(empresa.getEmpresa(),
+                usuarioDto.getIdUsuario().toString());
 
-        mapa.put("domicilioEmpresa",DatatypeConverter.printBase64Binary(consultaModificaDomicilio.getBytes("UTF-8")));
-        mapa.put("empresaConvenio",DatatypeConverter.printBase64Binary(consultaEmpresaConvenio.getBytes("UTF-8")));
+        mapa.put("domicilioEmpresa", DatatypeConverter.printBase64Binary(consultaModificaDomicilio.getBytes("UTF-8")));
+        mapa.put("empresaConvenio", DatatypeConverter.printBase64Binary(consultaEmpresaConvenio.getBytes("UTF-8")));
         mapa.put("datosPersonas", empresa.getEmpresa().getPersonas());
         mapa.put("usuario", usuarioDto.getIdUsuario().toString());
-        mapa.put("folioConvenio",empresa.getFolioConvenio());
+        mapa.put("folioConvenio", empresa.getFolioConvenio());
         return providerRestTemplate.consumirServicio(mapa, urlDominioConvenioModificar + "/empresa", authentication);
     }
 }
