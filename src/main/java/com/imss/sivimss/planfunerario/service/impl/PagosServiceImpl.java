@@ -2,6 +2,7 @@ package com.imss.sivimss.planfunerario.service.impl;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,8 @@ import com.imss.sivimss.planfunerario.util.ProviderServiceRestTemplate;
 import com.imss.sivimss.planfunerario.util.QueryHelper;
 import com.imss.sivimss.planfunerario.util.Response;
 
+import main.BitacoraMain;
+
 @Service
 public class PagosServiceImpl implements PagosService {
 
@@ -42,9 +45,18 @@ public class PagosServiceImpl implements PagosService {
 	@Autowired
 	private ModelMapper modelMapper;
 	
+	@Value(value = "${infoDb.urlInfo}")
+	private String url;
+	
+	@Value(value = "${infoDb.usernameInfo}")
+	private String user;
+	
+	@Value(value = "${infoDb.passwordInfo}")
+	private String password;
+	
 	@SuppressWarnings("unchecked")
 	@Override
-	public void insertar(RenovarBean renovarBean, Response<?> response, Authentication authentication) throws IOException {
+	public void insertar(RenovarBean renovarBean, Response<?> response, Authentication authentication) throws IOException, SQLException {
 		
 		Integer idRegistro = (Integer) response.getDatos();
 		Response<?> respuesta;
@@ -77,7 +89,10 @@ public class PagosServiceImpl implements PagosService {
 		
 		respuesta = providerRestTemplate.consumirServicio(datos, urlCrear,
 				authentication);
+		String pago= BitacoraMain.consultarInformacion(this.user,this.password,this.url, "SVT_PAGO_BITACORA", "ID_REGISTRO="+idRegistro+" AND CVE_ESTATUS_PAGO = 2 AND ID_FLUJO_PAGOS=3 AND ID_VELATORIO="+idVelatorio);
 		
+		BitacoraMain.insertarInformacion(this.user,this.password,this.url, "SVT_PAGO_BITACORA", 1, null, pago, 1);
+
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(), 
 				this.getClass().getPackage().toString(), "","RESPUESTA " + respuesta, authentication);
 	}
