@@ -43,7 +43,12 @@ endpoints:
     dominio-crear-multiple: ${endpoints.ms-mod-catalogos}/crearMultiple
     dominio-actualizar: ${endpoints.ms-mod-catalogos}/actualizar
     dominio-insertar-multiple: ${endpoints.ms-mod-catalogos}/insertarMultiple
-
+    
+infoDb:
+  urlInfo: ${msit_CONNECTION_DB}
+  usernameInfo: ${msit_USERNAME_DB}
+  passwordInfo: ${msit_PASSWORD_DB}
+  
 jwt:
   secretkey-flujo: ${msit_SECRET_KEY}
   secretkey-dominios: ${msit_SECRET_KEY_DOMINIO}
