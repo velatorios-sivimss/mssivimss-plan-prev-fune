@@ -1,6 +1,7 @@
 package com.imss.sivimss.planfunerario.service;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import org.springframework.security.core.Authentication;
 
@@ -9,6 +10,6 @@ import com.imss.sivimss.planfunerario.util.Response;
 
 public interface PagosService {
 
-	void insertar(RenovarBean renovarBean, Response<?> response, Authentication authentication)throws IOException;
+	void insertar(RenovarBean renovarBean, Response<?> response, Authentication authentication)throws IOException, SQLException;
 
 }

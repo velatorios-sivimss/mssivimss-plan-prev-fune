@@ -43,6 +43,7 @@ import com.imss.sivimss.planfunerario.util.ProviderServiceRestTemplate;
 import com.imss.sivimss.planfunerario.util.Response;
 
 import lombok.extern.slf4j.Slf4j;
+import main.BitacoraMain;
 
 @Slf4j
 @Service
@@ -82,6 +83,15 @@ public class RenovarPlanImpl implements RenovarPlanService {
 	private String urlReportes;
 	@Value("${formato-fecha}")
 	private String fecFormat;
+	
+	@Value(value = "${infoDb.urlInfo}")
+	private String url;
+	
+	@Value(value = "${infoDb.usernameInfo}")
+	private String user;
+	
+	@Value(value = "${infoDb.passwordInfo}")
+	private String password;
 
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
@@ -267,13 +277,23 @@ public class RenovarPlanImpl implements RenovarPlanService {
 				logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"Estatus OK", ALTA, authentication);
 				
 				if(response.getCodigo()==200) {
+					String object= BitacoraMain.consultarInformacion(this.user,this.password,this.url, "SVT_RENOVACION_CONVENIO_PF", "ID_CONVENIO_PF="+renovarBean.getIdConvenioPf()+" AND ID_ESTATUS = 1");
+					log.info(object);
+					BitacoraMain.insertarInformacion(this.user,this.password,this.url, "SVT_RENOVACION_CONVENIO_PF", 1, null, object, 1);
 					pagosService.insertar(renovarBean, response, authentication);
+				
 				}
 				
 				if(response.getCodigo()==200 && renovarRequest.getIndRenovacion()==0) {
+					String object= BitacoraMain.consultarInformacion(this.user,this.password,this.url, "SVT_CONVENIO_PF", "ID_CONVENIO_PF="+renovarBean.getIdConvenioPf());
+					log.info(object);
+					BitacoraMain.insertarInformacion(this.user,this.password,this.url, "SVT_CONVENIO_PF", 1, null, object, 1);
 					providerRestTemplate.consumirServicio(renovarBean.actualizarEstatusConvenio(renovarRequest.getIdConvenioPf()).getDatos(), urlActualizar,
 							authentication);
 				}else if(response.getCodigo()==200 && renovarRequest.getIndRenovacion()==1) {
+					String object= BitacoraMain.consultarInformacion(this.user,this.password,this.url, "SVT_RENOVACION_CONVENIO_PF", "ID_CONVENIO_PF="+renovarBean.getIdConvenioPf());
+					log.info(object);
+					BitacoraMain.insertarInformacion(this.user,this.password,this.url, "SVT_RENOVACION_CONVENIO_PF", 1, null, object, 1);
 					providerRestTemplate.consumirServicio(renovarBean.actualizarEstatusRenovacionConvenio(renovarRequest.getIdConvenioPf(), fecha).getDatos(), urlActualizar,
 							authentication);
 				}
